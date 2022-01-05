@@ -1,0 +1,7 @@
+notes.txt
+data
+tmp
+scratch
+*.ego.go
+out.gotext.json 
+*.db

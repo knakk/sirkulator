@@ -1,0 +1,47 @@
+{
+    "language": "en",
+    "messages": [
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Home",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Circulation",
+            "message": "Circulation",
+            "translation": "Circulation",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Orders",
+            "message": "Orders",
+            "translation": "Orders",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Metadata",
+            "message": "Metadata",
+            "translation": "Metadata",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Holdings",
+            "message": "Holdings",
+            "translation": "Holdings",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Configuration",
+            "message": "Configuration",
+            "translation": "Configuration",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}

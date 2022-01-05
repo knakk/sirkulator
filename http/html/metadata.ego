@@ -1,0 +1,122 @@
+<%
+package html
+
+import "github.com/knakk/sirkulator/internal/localizer"
+
+type MetadataTemplate struct {
+    Page
+}
+
+func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%><ego:App Page=tmpl.Page>
+    <details>
+        <summary>
+            <h3><%= l.Translate("Show metadata for review") %></h3>
+        </summary>
+        <div>
+            <p>TODO: Table goes here</p>
+        </div>
+    </details>
+
+    <br/>
+
+    <details>
+        <summary>
+            <h3><%= l.Translate("Search/browse catalogue") %></h3>
+        </summary>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <select>
+                                <option>Alle typer</option>
+                                <option>Person</option>
+                                <option>Korporasjon</option>
+                                <option>Utgivelse</option>
+                                <option>Sted</option>
+                            </select>
+                        </th>
+                        <th><input type="search" placeholder="Søk i navn"></th>
+                        <th>Opprettet</th>
+                        <th>Endret</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Person</td>
+                        <td><a href="/">Petter Goksøyr Åsen</a></td>
+                        <td>2022-01-08 12:00:13</td>
+                        <td>2022-01-08 12:02:01</td>
+                    </tr>
+                    <tr>
+                        <td>Utgivelse</td>
+                        <td><a href="/">Per Arvid Åsen: Illustrert algeflora (1980)</a></td>
+                        <td>2021-12-04 09:12:00</td>
+                        <td>2022-01-08 12:02:01</td>
+                    </tr>
+                    <tr>
+                        <td>Person</td>
+                        <td><a href="/">Per Arvid Åsen</a></td>
+                        <td>2022-01-08 12:00:13</td>
+                        <td>2022-01-08 12:02:01</td>
+                    </tr>
+                    <tr>
+                        <td>Forlag</td>
+                        <td><a href="/">Cappelen</a></td>
+                        <td>2022-01-08 12:00:13</td>
+                        <td>2022-01-08 12:02:01</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </details>
+
+    <br/>
+
+    <details>
+        <summary>
+            <h3><%= l.Translate("Import") %></h3>
+        </summary>
+        <div class="border pad">
+            <div class="row border">
+                <div class="column pad">
+                    <label for="identifiers">Idenifikatorer</label>
+                    <textarea id="identifiers" rows="3"></textarea><br/>
+                </div>
+                <div class="column pad content-bottom">
+                    <p>ISBN, ISSN eller EAN<br/>1 per linje</p>
+                    <p></br></p>
+                    <div class="row">
+                        <div class="column"><button>Preview</button></div>
+                        <div class="column pad-left"><button>Import</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="border pad">
+            <h4>Forhåndsvisning (ikke importert)</h4>
+            <div class="row border">
+                <div class="column pad">
+                    <p>ISBN: 82-02-01856-0</p>
+                </div>
+                <div class="column" style="flex:3">
+                    <dl>
+                        <dt>Utgivelse</dt>
+                        <dd>Illustrert algeflora</dd>
+                    </dl>
+                    <dl>
+                        <dt>Person</dt>
+                        <dd>Per Arvid Åsen</dd>
+                    </dl>
+                    <dl>
+                        <dt>Forlag</dt>
+                        <dd>Cappelen</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </details>
+</ego:App>
+<% } %>

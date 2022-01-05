@@ -1,0 +1,22 @@
+<%
+package html
+
+import "github.com/knakk/sirkulator/internal/localizer"
+
+type CircTemplate struct {
+    Page
+}
+
+func (tmpl *CircTemplate) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%><ego:App Page=tmpl.Page>
+    <details>
+        <summary>
+            <h3><%= l.Translate("Show recent transactions") %></h3>
+        </summary>
+        <div>
+            <p>TODO: Table goes here</p>
+        </div>
+    </details>
+</ego:App>
+<% } %>

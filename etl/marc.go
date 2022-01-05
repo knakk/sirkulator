@@ -1,0 +1,423 @@
+package etl
+
+import (
+	"fmt"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"unicode/utf8"
+
+	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/marc"
+)
+
+// createAgent creates a Resource of type Person/Corporation from the given MARC datafield.
+// If the returned Resource has an empty ID, it is to be considered invalid.
+func createAgent(f marc.DataField, idFunc func() string) sirkulator.Resource {
+	res := sirkulator.Resource{}
+	switch f.Tag {
+	case "100", "600", "700":
+		res.Type = sirkulator.TypePerson
+	case "110", "710":
+		res.Type = sirkulator.TypeCorporation
+	}
+	if name := f.ValueAt("a"); name != "" {
+		res.Label = invertName(name)
+	} else {
+		// No name means invalid resource, return without ID
+		return res
+	}
+	for _, v := range f.ValuesAt("0") {
+		// TODO strings.ToLower(v)
+		if strings.HasPrefix(v, "(NO-TrBIB)") {
+			// Ex: "(NO-TrBIB)90086277"
+			// TODO validate ID ^\d+$
+			res.Links = append(res.Links,
+				[2]string{"bibsys", strings.TrimPrefix(v, "(NO-TrBIB)")})
+		}
+		if strings.HasPrefix(v, "(orcid)") {
+			// Ex: "(orcid)0000-0003-1274-907"
+			res.Links = append(res.Links,
+				[2]string{"orcid", strings.TrimPrefix(v, "(orcid)")})
+
+		}
+		// TODO (DE-588) Deutsche Nationalbibliothek
+	}
+	if lifespan := f.ValueAt("d"); lifespan != "" {
+		if res.Type == sirkulator.TypePerson {
+			person := sirkulator.Person{
+				Name: res.Label,
+			}
+			person.YearRange = parseYearRange(lifespan)
+			res.Data = person
+		}
+		res.Label = fmt.Sprintf("%s (%s)", res.Label, lifespan)
+	}
+	res.ID = idFunc()
+	return res
+}
+
+func matchOrCreate(agents *[]sirkulator.Resource, f marc.DataField, idFunc func() string) sirkulator.Resource {
+	// TODO maybe return err, eg. if given marcfield is gibberish?
+	name := invertName(f.ValueAt("a"))
+	for _, agent := range *agents {
+		// First try ID match
+		// TODO check agent.Links and match against subfield '0'
+
+		// Second match on name
+		if strings.HasPrefix(agent.Label, name) {
+			return agent
+		}
+	}
+	agent := createAgent(f, idFunc)
+	if agent.ID != "" {
+		*agents = append(*agents, agent)
+	}
+	return agent
+}
+
+func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ingestion, error) {
+	// TODO switch on source => one fn per source
+
+	p := sirkulator.Publication{}
+	pID := idFunc()
+	var label string
+	var agents []sirkulator.Resource
+	var relations []sirkulator.Relation
+	var ing Ingestion
+	if len(rec.Leader) > 33 {
+		switch rec.Leader[33] {
+		case '0':
+			p.Nonfiction = true
+		case '1':
+			p.Fiction = true
+		default:
+			// TODO:
+			/*
+				33 - Literary form (006/16)
+
+					0 - Not fiction (not further specified)
+					1 - Fiction (not further specified)
+					d - Dramas
+					e - Essays
+					f - Novels
+					h - Humor, satires, etc.
+					i - Letters
+					j - Short stories
+					m - Mixed forms
+					p - Poetry
+					s - Speeches
+					u - Unknown
+					| - No attempt to code
+			*/
+		}
+	}
+	if f, ok := rec.ControlFieldAt("008"); ok {
+		// Fiction/Nonfiction
+		if len(f.Value) > 33 {
+			switch f.Value[33] {
+			case '0':
+				p.Nonfiction = true
+			case '1':
+				p.Fiction = true
+			}
+		}
+		// Language
+		if len(f.Value) > 38 {
+			lang := f.Value[35:38]
+			// Validate Marc language
+			if _, err := marc.ParseLanguage(lang); err == nil {
+				p.Language = lang
+			}
+		}
+	}
+	if f, ok := rec.DataFieldAt("041"); ok {
+		lang := f.ValueAt("h")
+		if _, err := marc.ParseLanguage(lang); err == nil {
+			p.LanguageOriginal = lang
+		}
+	}
+	if f, ok := rec.DataFieldAt("245"); ok {
+		if title := f.ValueAt("a"); title != "" {
+			p.Title = cleanTitle(title)
+			label = p.Title
+		}
+		if subtitle := f.ValueAt("b"); subtitle != "" {
+			p.Subtitle = subtitle
+			label = fmt.Sprintf("%s: %s", label, subtitle)
+		}
+	}
+	if f, ok := rec.DataFieldAt("246"); ok {
+		if title := f.ValueAt("a"); title != "" && strings.Contains(f.ValueAt("i"), "ginaltittel") {
+			// Matches both "Orignaltittel" and the misspelled "Orginaltittel"
+			p.TitleOriginal = title
+		}
+	}
+	// Publisher and published year
+	f, ok := rec.DataFieldAt("260")
+	if !ok {
+		f, ok = rec.DataFieldAt("264")
+	}
+	// Todo handle multiple 260/264 fields
+	if ok {
+		if publisher := f.ValueAt("b"); publisher != "" {
+			p.Publisher = publisher
+			// TODO add published_by Review
+			ing.Reviews = append(ing.Reviews, sirkulator.Relation{
+				FromID: pID,
+				Type:   "published_by",
+				Data:   map[string]interface{}{"label": p.Publisher},
+			})
+		}
+		if year := f.ValueAt("c"); year != "" {
+			year = strings.TrimPrefix(year, "[")
+			year = strings.TrimSuffix(year, "]")
+			n, err := strconv.Atoi(year)
+			if err == nil {
+				p.Year = n
+				label = fmt.Sprintf("%s (%d)", label, n)
+			}
+		}
+	}
+	// Physical properties
+	if f, ok := rec.DataFieldAt("300"); ok {
+		if n := parsePages(f.ValueAt("a")); n != 0 {
+			p.NumPages = n
+		}
+	}
+	// Creator, Main entry (Person)
+	if f, ok := rec.DataFieldAt("100"); ok {
+		agent := createAgent(f, idFunc)
+		agents = append(agents, agent)
+
+		// Add relation from agent to publication
+		relator, _ := marc.ParseRelator(f.ValueAt("4"))
+		role := relator.Code()
+		if role == "" {
+			// default
+			// TODO different default for mediatypes other than books/monographs
+			role = "aut"
+		}
+		relations = append(relations, sirkulator.Relation{
+			FromID: agent.ID,
+			ToID:   pID,
+			Type:   "contributes_to",
+			Data:   map[string]interface{}{"role": role, "main_entry": true},
+		})
+
+		if role == "aut" {
+			switch data := agent.Data.(type) {
+			case sirkulator.Person:
+				label = fmt.Sprintf("%s - %s", data.Name, label)
+			case sirkulator.Corporation:
+				// TODO
+			}
+
+		}
+	}
+
+	// Subjects
+	// https://rdakatalogisering.unit.no/6xx-emneinnforsler/
+	// 600 Subject of person
+	for _, f := range rec.DataFieldsAt("600") {
+		if agent := matchOrCreate(&agents, f, idFunc); agent.ID != "" {
+			relations = append(relations, sirkulator.Relation{
+				FromID: agent.ID,
+				ToID:   pID,
+				Type:   "subject_of",
+			})
+		}
+	}
+	// 610 Subject of corporation
+	// 611 Subject of meeting, conference, event, exhibition etc.
+	// 653 Nøkkelord og stikkord (Index term)
+	/*
+		<datafield ind1=" " ind2=" " tag="653">
+			<subfield code="a">skjønnlitteratur</subfield>
+			<subfield code="a">roman</subfield>
+			<subfield code="a">svensk-litteratur</subfield>
+		</datafield>
+	*/
+	// 655 Genre/literary form
+	for _, f := range rec.DataFieldsAt("655") {
+		if lang := f.ValueAt("9"); lang == "nno" {
+			// skip versions in nynorsk
+			continue
+		}
+		if val := f.ValueAt("a"); val != "" {
+			// TODO lowercase first letter?
+			p.GenreForms = append(p.GenreForms, val)
+		}
+	}
+
+	// 7xx contributors
+	for _, f := range rec.DataFieldsAt("700") {
+		if agent := matchOrCreate(&agents, f, idFunc); agent.ID != "" {
+			relator, _ := marc.ParseRelator(f.ValueAt("4"))
+			role := relator.Code()
+			if role == "" {
+				// default
+				// TODO different default for mediatypes other than books/monographs
+				role = "aut"
+			}
+			relations = append(relations, sirkulator.Relation{
+				FromID: agent.ID,
+				ToID:   pID,
+				Type:   "contributes_to",
+				Data:   map[string]interface{}{"role": role},
+			})
+		}
+	}
+
+	ing.Resources = append(ing.Resources,
+		sirkulator.Resource{
+			ID:    pID,
+			Type:  sirkulator.TypePublication,
+			Label: label,
+			Data:  p,
+		},
+	)
+	ing.Resources = append(ing.Resources, agents...)
+	ing.Relations = relations
+
+	// defaults
+	imgKey := "resource.id"
+	imgVal := pID
+
+	if isbn, _ := rec.ValueAt("020", "a"); isbn != "" { // TODO lookslikeISBN(isbn)
+		imgKey = "isbn"
+		imgVal = isbn
+	}
+
+	var covers []FileFetch
+	for _, f := range rec.DataFieldsAt("856") {
+		if url := f.ValueAt("u"); url != "" {
+			if mime := f.ValueAt("q"); strings.HasPrefix(mime, "image") || strings.Contains(url, ".jpg") || strings.Contains(url, ".jpeg") {
+				covers = append(covers, FileFetch{
+					ResourceID: pID,
+					IDPair:     [2]string{imgKey, imgVal},
+					URL:        url,
+				})
+			}
+
+		}
+	}
+	sort.Slice(covers, func(i, j int) bool {
+		return strings.Contains(covers[i].URL, "original") && !strings.Contains(covers[j].URL, "original")
+	})
+	ing.Covers = covers
+	return ing, nil
+}
+
+var rxpNumbers = regexp.MustCompile(`[0-9]+`)
+
+func parsePages(s string) int {
+	for _, match := range rxpNumbers.FindAllString(s, -1) {
+		n, _ := strconv.Atoi(match)
+		return n
+	}
+	return 0
+}
+
+func parseYearRange(s string) sirkulator.YearRange {
+	// TODO cases:
+	//  1800-tallet | 1500-tallet
+	//  17. årh. | 16. årh.  2. årh.
+	//  2. årh. f.Kr.
+	//  2. årh. f.Kr.?
+	//  2./3. årh.
+	//  4./3. årh. f.Kr.
+	//  382-336 f.Kr.
+	//  f. 1891
+	//  f. ca 1685 | f. ca 1740
+	//  virksom 1849
+	//  virksom 18. årh.
+	//  virksom omkr. 1840
+	//  Virksom ca. 1761
+	//  virksom 1685-1711
+	//  aktiv på 1000-tallet
+	//  b. 1883
+	//  19-? | 17-?
+	//  19??
+	//  1980?
+	//  død 1836
+	//  d. 1650 | d. 1657
+	//  d. ca. 1480
+	//  d. 514 f.Kr.
+	//  fl. 1200-tallet
+	//  500-tallet
+	//  1700-1800-tallet
+	//  1700-tallet-1800-tallet
+	//  1700-tallet?
+	//  19
+	//  f. 20. årh. | f. 18. årh.
+	//  19. årh.-20. årh.?
+	//  13th cent | 16th cent
+	//  -1465 | -1755
+	//  --1989
+	//  1871-?
+	//  1907?-1979 | 1181?-1246
+	//  1960-....
+	//  1945-03-25
+	//  ca 1705
+	//  1872-ca. 1950?
+	//  1862-ca. 1930
+	//  (1961- )
+	//  1881 [eller 1889]-1943
+	//  ca. 1030-ca. 1112
+	//  1977-,
+	//  [1774-1857]
+	//  43 B.C.-17 or 18 A.D
+	parsingFrom := false
+	parsingTo := false
+	res := sirkulator.YearRange{}
+	start := 0
+	pos := 0
+	for pos <= len(s) {
+		r, w := utf8.DecodeRuneInString(s[pos:])
+		pos += w
+		switch r {
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			if !parsingFrom && !parsingTo && res.FromYear == 0 {
+				parsingFrom = true
+				start = pos - w
+			}
+			if res.FromYear != 0 && !parsingTo {
+				start = pos - w
+				parsingTo = true
+			}
+		default:
+			if pos > start && (parsingFrom || parsingTo) {
+				n, err := strconv.Atoi(s[start : pos-w])
+				if err == nil {
+					if parsingFrom {
+						res.FromYear = n
+						parsingFrom = false
+					} else if parsingTo {
+						res.ToYear = n
+					}
+				}
+			}
+			if r == utf8.RuneError { // eof
+				return res
+			}
+
+		}
+
+	}
+	return res
+}
+
+func cleanTitle(s string) string {
+	s = strings.TrimSuffix(s, " :")
+	s = strings.TrimSuffix(s, " : ")
+	return s
+}
+
+func invertName(s string) string {
+	if i := strings.Index(s, ", "); i != -1 {
+		return s[i+2:] + " " + s[:i]
+	}
+	return s
+}

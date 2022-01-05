@@ -1,0 +1,115 @@
+<%
+package html
+
+import "github.com/knakk/sirkulator/internal/localizer"
+
+type App struct {
+    Page
+
+    Yield func()
+}
+
+type MenuItem struct {
+	Name string
+	Path string
+}
+
+type TopMenuItem struct {
+	MenuItem
+	SubItems []MenuItem
+}
+
+func (app *App) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+    TopMenu := []TopMenuItem{
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Home"),
+                Path: "/",
+            },
+        },
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Circulation"),
+                Path: "/circulation",
+            },
+        },
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Orders"),
+                Path: "/orders",
+            },
+        },
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Metadata"),
+                Path: "/metadata",
+            },
+        },
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Holdings"),
+                Path: "/holdings",
+            },
+        },
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Configuration"),
+                Path: "/configuration",
+            },
+        },
+    }
+
+%>
+<!DOCTYPE html>
+
+<html dir="ltr" lang="<%= app.Lang %>">
+<head>
+<meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>
+        Sirkulator
+		<% if app.Title != "" { %>
+			- <%= app.Title %>
+		<% } %>
+	</title>
+    <link rel="stylesheet" href="/assets/main.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <ul>
+                    <% for _, item := range TopMenu { %>
+                        <% if item.Path == app.Path { %>
+                            <li class="active">
+                                <%= item.Name %>
+                            </li>
+                        <% } else { %>
+                            <li data-title="<%= item.Name %>">
+                                <a href="<%= item.Path %>">
+                                    <%= item.Name %>
+                                </a>
+                            </li>
+                        <% } %>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <% if app.Yield != nil { %><% app.Yield() %><% } %>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="logo rotating-border">
+                <span>SIRKULATOR</span>
+            </div>
+            © 2022 <a href="https://knakk.no">Knakk AS</a>
+        </div>
+    </footer>
+</body>
+</html>
+<% } %>

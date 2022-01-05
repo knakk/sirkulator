@@ -1,0 +1,40 @@
+{
+    "language": "no",
+    "messages": [
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Hjem"
+        },
+        {
+            "id": "Circulation",
+            "message": "Circulation",
+            "translation": "Sirkulasjon"
+        },
+        {
+            "id": "Orders",
+            "message": "Orders",
+            "translation": "Bestillinger"
+        },
+        {
+            "id": "Metadata",
+            "message": "Metadata",
+            "translation": "Metadata"
+        },
+        {
+            "id": "Holdings",
+            "message": "Holdings",
+            "translation": "Bestand"
+        },
+        {
+            "id": "Configuration",
+            "message": "Configuration",
+            "translation": "Konfigurasjon"
+        },
+        {
+            "id": "Show recent transactions",
+            "message": "Show recent transactions",
+            "translation": "Vis siste transaksjoner"
+        }
+    ]
+}

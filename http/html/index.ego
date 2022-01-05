@@ -1,0 +1,14 @@
+<%
+package html
+
+type HomeTemplate struct {
+    Page
+}
+
+func (tmpl *HomeTemplate) Render(ctx context.Context, w io.Writer) {
+%><ego:App Page=tmpl.Page>
+    <div class="parent">
+        <p>Hjemme</p>
+    </div>
+</ego:App>
+<% } %>
