@@ -18,14 +18,24 @@ CREATE TABLE resource_edit_log (
     PRIMARY KEY(resource_id, at)
 );
 
+-- A relation describes a relation between to known resources.
+--
+-- If one part of the relation is a publication, it should be in the
+-- originating position (from_id).
+--
+-- The value in the type column should be named so that the direction of the
+-- relation is obvious; for example 'subject_of', rather than just 'subject',
+-- where you wouldn't know if A is subject of B or B is subject of A.
 CREATE TABLE relation (
     from_id  TEXT NOT NULL REFERENCES resource (id),
     to_id    TEXT NOT NULL REFERENCES resource (id),
-    type     TEXT NOT NULL, -- contributes_to|subject_of|in_series|followed_by|derived_from|translation_of|
+    type     TEXT NOT NULL, -- has_contributor|has_subject|in_series|followed_by|derived_from|translation_of|
     data     JSON,
 
     PRIMARY KEY(from_id, to_id, type, data)
 );
+
+CREATE INDEX idx_relation_to_id ON relation (to_id);
 
 CREATE TABLE link (
     resource_id TEXT REFERENCES resource (id),
@@ -38,13 +48,17 @@ CREATE TABLE link (
 
 CREATE INDEX idx_link_id ON link (id);
 
+-- A review is a relation where we only know the identity of
+-- the resource from which the relation is pointing, but the
+-- resource it is pointing to, is unknown, and must be manually
+-- matched by a human by looking at the information in data.
 CREATE TABLE review (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    resource_id TEXT NOT NULL REFERENCES resource (id),
-    prop        TEXT NOT NULL, -- or path?
-    value       TEXT NOT NULL,
+    from_id     TEXT REFERENCES resource (id),
+    type        TEXT NOT NULL,
     data        JSON,
-    queued_at   INTEGER NOT NULL -- time.Now().Unix()
+    queued_at   INTEGER NOT NULL, -- time.Now().Unix()
+
+    PRIMARY KEY(from_id, type, data)
 );
 
 -- increment with 1 for each migration

@@ -6,13 +6,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
 
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/oai"
-	"github.com/knakk/sirkulator/search"
 )
 
 type Ingestor struct {
@@ -106,6 +106,11 @@ func (ig *Ingestor) remoteRecord(idtype, id string) (oai.Record, error) {
 	return oai.Record{}, errors.New("remoteRecord: TODO")
 }
 
+// persistIngestion will store all resources, relations and reviews in
+// the Ingestion. No further validation of input is performed - all of
+// the given data is assumed to be valid at this point, as not to
+// trigger any SQL constraints when inserting into DB.
+// TODO: handle data.Covers
 func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	defer sqlitex.Save(conn)(&err)
 
@@ -146,6 +151,25 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 			return err // TODO annotate
 		}
 	}
+
+	for _, rev := range data.Reviews {
+		stmt := conn.Prep(`
+			INSERT INTO review (from_id, type, data, queued_at)
+				VALUES ($from_id, $type, $data, $queued_at)
+		`)
+		stmt.SetText("$from_id", rev.FromID)
+		stmt.SetText("$type", rev.Type)
+		stmt.SetInt64("$queued_at", time.Now().Unix())
+		b, err := json.Marshal(rev.Data)
+		if err != nil {
+			return err // TODO annotate
+		}
+		stmt.SetBytes("$data", b)
+		if _, err := stmt.Step(); err != nil {
+			return err // TODO annotate
+		}
+	}
+
 	return nil
 }
 
@@ -204,8 +228,8 @@ type Ingestion struct {
 	Resources []sirkulator.Resource
 	Relations []sirkulator.Relation
 	Reviews   []sirkulator.Relation
-	Documents []search.Document
 	Covers    []FileFetch
+	//Documents []search.Document
 }
 
 type FileFetch struct {

@@ -310,15 +310,15 @@ func TestIngestISBN(t *testing.T) {
 	// Verify that 2 relations where added, from existing person to imported publication
 	wantRelations := []sirkulator.Relation{
 		{
-			FromID: "p0",
-			ToID:   "t1",
-			Type:   "contributes_to",
+			FromID: "t1",
+			ToID:   "p0",
+			Type:   "has_contributor",
 			Data:   map[string]interface{}{"role": "aut", "main_entry": true},
 		},
 		{
-			FromID: "p0",
-			ToID:   "t1",
-			Type:   "contributes_to",
+			FromID: "t1",
+			ToID:   "p0",
+			Type:   "has_contributor",
 			Data:   map[string]interface{}{"role": "ill"},
 		},
 	}
@@ -343,6 +343,37 @@ func TestIngestISBN(t *testing.T) {
 	if diff := cmp.Diff(wantRelations, gotRelations); diff != "" {
 		t.Errorf("relations mismatch (-want +got):\n%s", diff)
 	}
+
+	// Verify that reviews where stored
+	wantReviews := []sirkulator.Relation{
+		{
+			FromID: "t1",
+			Type:   "published_by",
+			Data:   map[string]interface{}{"label": "Cappelen"},
+		},
+	}
+	var gotReviews []sirkulator.Relation
+	checkRev := func(stmt *sqlite.Stmt) error {
+		rel := sirkulator.Relation{
+			FromID: stmt.ColumnText(0),
+			Type:   stmt.ColumnText(1),
+		}
+		data := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(stmt.ColumnText(2)), &data); err != nil {
+			return err
+		}
+		rel.Data = data
+		gotReviews = append(gotReviews, rel)
+		return nil
+	}
+	const rq = "SELECT from_id, type, data FROM review WHERE from_id=?"
+	if err := sqlitex.Exec(conn, rq, checkRev, "t1"); err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(wantReviews, gotReviews); diff != "" {
+		t.Errorf("relations mismatch (-want +got):\n%s", diff)
+	}
+
 	// TODO link to nb deduced from marc record? /nb, nb-free, nb-norway?
 	// TODO check for link [2]string{"nb-fulltext","2014021108035"}
 	// https://api.nb.no/catalog/v1/items?q=oaiid%3A%22oai%3Anb.bibsys.no%3A998110670684702202%22&filter=mediatype%3Aaviser%20OR%20mediatype%3Abilder%20OR%20mediatype%3Ab%C3%B8ker%20OR%20mediatype%3Akart%20OR%20mediatype%3Amusikk%20OR%20mediatype%3Amusikkmanuskripter%20OR%20mediatype%3Anoter%20OR%20mediatype%3Aplakater%20OR%20mediatype%3Aprivatarkivmateriale%20OR%20mediatype%3Atidsskrift&aggs=mediatype&size=1&profile=nbdigital

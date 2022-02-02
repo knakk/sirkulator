@@ -200,9 +200,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			role = "aut"
 		}
 		relations = append(relations, sirkulator.Relation{
-			FromID: agent.ID,
-			ToID:   pID,
-			Type:   "contributes_to",
+			FromID: pID,
+			ToID:   agent.ID,
+			Type:   "has_contributor",
 			Data:   map[string]interface{}{"role": role, "main_entry": true},
 		})
 
@@ -223,9 +223,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	for _, f := range rec.DataFieldsAt("600") {
 		if agent := matchOrCreate(&agents, f, idFunc); agent.ID != "" {
 			relations = append(relations, sirkulator.Relation{
-				FromID: agent.ID,
-				ToID:   pID,
-				Type:   "subject_of",
+				FromID: pID,
+				ToID:   agent.ID,
+				Type:   "has_subject",
 			})
 		}
 	}
@@ -262,9 +262,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 				role = "aut"
 			}
 			relations = append(relations, sirkulator.Relation{
-				FromID: agent.ID,
-				ToID:   pID,
-				Type:   "contributes_to",
+				FromID: pID,
+				ToID:   agent.ID,
+				Type:   "has_contributor",
 				Data:   map[string]interface{}{"role": role},
 			})
 		}
