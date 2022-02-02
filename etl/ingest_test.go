@@ -273,22 +273,10 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePerson,
 		Label: "Per Arvid Åsen (1949-)",
 		ID:    "p0",
-		Data:  personWant,
+		Data:  &personWant,
 	}
-	var perGot sirkulator.Resource
-	checkPer := func(stmt *sqlite.Stmt) error {
-		perGot.Type = sirkulator.TypePerson
-		perGot.ID = stmt.ColumnText(0)
-		perGot.Label = stmt.ColumnText(1)
-		ds := stmt.ColumnText(2) // TODO investigate ColumnBytes
-		var data sirkulator.Person
-		if err := json.Unmarshal([]byte(ds), &data); err != nil {
-			return err
-		}
-		perGot.Data = data
-		return nil
-	}
-	if err := sqlitex.Exec(conn, "SELECT id, label, data FROM resource WHERE type='person'", checkPer); err != nil {
+	perGot, err := sql.GetResource(conn, sirkulator.TypePerson, "p0")
+	if err != nil {
 		t.Fatal(err)
 	}
 	if diff := cmp.Diff(perWant, perGot); diff != "" {
@@ -309,22 +297,10 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePublication,
 		Label: "Per Arvid Åsen - Illustrert algeflora (1980)",
 		ID:    "t1",
-		Data:  pubData,
+		Data:  &pubData,
 	}
-	var pubGot sirkulator.Resource
-	checkPub := func(stmt *sqlite.Stmt) error {
-		pubGot.Type = sirkulator.TypePublication
-		pubGot.ID = stmt.ColumnText(0)
-		pubGot.Label = stmt.ColumnText(1)
-		ds := stmt.ColumnText(2) // TODO investigate ColumnBytes
-		var data sirkulator.Publication
-		if err := json.Unmarshal([]byte(ds), &data); err != nil {
-			return err
-		}
-		pubGot.Data = data
-		return nil
-	}
-	if err := sqlitex.Exec(conn, "SELECT id, label, data FROM resource WHERE type='publication'", checkPub); err != nil {
+	pubGot, err := sql.GetResource(conn, sirkulator.TypePublication, "t1")
+	if err != nil {
 		t.Fatal(err)
 	}
 	if diff := cmp.Diff(pubWant, pubGot); diff != "" {
