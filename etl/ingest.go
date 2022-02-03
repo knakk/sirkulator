@@ -2,17 +2,22 @@
 package etl
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	"encoding/json"
 	"errors"
+	"image"
+	"image/jpeg"
 	"time"
 
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/http"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/oai"
+	"golang.org/x/image/draw"
 )
 
 type Ingestor struct {
@@ -20,8 +25,9 @@ type Ingestor struct {
 	idFunc func() string
 
 	// Options
-	ImageWidth int
-	ImageWebp  bool
+	ImageAsync bool // if true, download images after IngestISBN has returned
+	ImageWidth int  // scale to this with, calculating width to preserve aspect ratio
+	//ImageWebp  bool // convert to webp before storing
 }
 
 func NewIngestor(db *sqlitex.Pool) *Ingestor {
@@ -173,6 +179,51 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	return nil
 }
 
+// downloadImages will try to download an image and store it in DB, stopping
+// at the first successfull operation.
+// No errors are reported or logged.
+func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
+	conn := ig.db.Get(ctx)
+	if conn == nil {
+		return // context.Cancelled
+	}
+	defer ig.db.Put(conn)
+	for _, f := range files {
+		r, err := http.Open(ctx, f.URL)
+		if err != nil {
+			continue
+		}
+		src, _, err := image.Decode(r)
+		if err != nil {
+			r.Close()
+			continue
+		}
+		r.Close()
+		ratio := float64(ig.ImageWidth) / float64(src.Bounds().Max.X)
+		height := float64(src.Bounds().Max.Y) * ratio
+		dst := image.NewRGBA(image.Rect(0, 0, ig.ImageWidth, int(height)))
+		draw.CatmullRom.Scale(dst, dst.Bounds(), src, src.Bounds(), draw.Over, nil)
+		var b bytes.Buffer
+		if err := jpeg.Encode(&b, dst, nil); err != nil {
+			continue
+		}
+		stmt := conn.Prep(`
+			INSERT INTO files.image (id, type, width, height, data, source)
+				VALUES ($id, $type, $width, $height, $data, $source)`)
+		stmt.SetText("$id", f.ResourceID)
+		stmt.SetText("$type", "jpeg")
+		stmt.SetInt64("$width", 200)
+		stmt.SetInt64("$height", int64(height))
+		stmt.SetBytes("$data", b.Bytes())
+		stmt.SetText("$source", f.URL)
+		if _, err = stmt.Step(); err != nil {
+			continue
+		}
+
+		break // Sucessfully stored an image.
+	}
+}
+
 func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 	conn := ig.db.Get(ctx)
 	if conn == nil {
@@ -184,6 +235,9 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 	// resources in DB, remove from data.Resources and swap the matching IDs in
 	// data.Relations.
 	for i := len(data.Resources) - 1; i >= 0; i-- {
+		// We loop backwards, which make it easier to remove resource from data.Resources
+		// if we find any matches.
+
 		res := data.Resources[i]
 		if res.Type == sirkulator.TypePublication {
 			// This is already checked not in DB, before we started ingesting (TODO)
@@ -221,6 +275,12 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 		return err // TODO annotate
 	}
 
+	if ig.ImageAsync {
+		go ig.downloadImages(ctx, data.Covers)
+	} else {
+		ig.downloadImages(ctx, data.Covers)
+	}
+
 	return nil
 }
 
@@ -234,6 +294,5 @@ type Ingestion struct {
 
 type FileFetch struct {
 	ResourceID string
-	IDPair     [2]string
 	URL        string
 }

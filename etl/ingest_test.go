@@ -6,6 +6,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/color"
+	"image/jpeg"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -176,18 +179,13 @@ const isbn8213002962 = `
         <subfield code="z">Søke-URL</subfield>
     </datafield>
     <datafield ind1="4" ind2="2" tag="856">
-		<subfield code="3">Omslagsbilde</subfield>
-		<subfield code="u">%[1]s/invalid.jpg</subfield>
-		<subfield code="q">image/jpeg</subfield>
-	</datafield>
-    <datafield ind1="4" ind2="2" tag="856">
-        <subfield code="3">Originalt bilde</subfield>
-        <subfield code="u">%[1]s/img.jpg</subfield>
+        <subfield code="3">Omslagsbilde</subfield>
+        <subfield code="u">%[1]s/invalid.jpg</subfield>
         <subfield code="q">image/jpeg</subfield>
     </datafield>
     <datafield ind1="4" ind2="2" tag="856">
-        <subfield code="3">Miniatyrbilde</subfield>
-        <subfield code="u">https://contents.bibs.aws.unit.no/files/images/small/7/6/9788213002967.jpg</subfield>
+        <subfield code="3">Originalt bilde</subfield>
+        <subfield code="u">%[1]s/img.jpg</subfield>
         <subfield code="q">image/jpeg</subfield>
     </datafield>
     <datafield ind1=" " ind2=" " tag="901">
@@ -200,12 +198,21 @@ const isbn8213002962 = `
 </record>
 `
 
+func dummyImage() []byte {
+	img := image.NewRGBA(image.Rect(0, 0, 100, 50))
+	img.Set(2, 3, color.RGBA{255, 0, 0, 255})
+	var b bytes.Buffer
+	jpeg.Encode(&b, img, nil)
+	return b.Bytes()
+}
+
 func TestIngestISBN(t *testing.T) {
 	// Setup mock server for testing that image is downloaded
 	// TODO actually test this when Ingest downloads..
 	const validImagePath = "/img.jpg"
 	const invalidImagePath = "/invalid.jpg"
-	validJpeg := []byte{0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0x00, 0x0B, 0x08, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x11, 0x00, 0xFF, 0xC4, 0x00, 0x14, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x08, 0x01, 0x01, 0x00, 0x01, 0x3F, 0x10}
+
+	validJpeg := dummyImage()
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case validImagePath:
@@ -372,6 +379,27 @@ func TestIngestISBN(t *testing.T) {
 	}
 	if diff := cmp.Diff(wantReviews, gotReviews); diff != "" {
 		t.Errorf("relations mismatch (-want +got):\n%s", diff)
+	}
+
+	// Verify image was downloaded and scaled
+	rowid, err := sqlitex.ResultInt64(conn.Prep("SELECT rowid FROM files.image WHERE id='t1';"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	blob, err := conn.OpenBlob("files", "image", "data", rowid, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer blob.Close()
+	img, _, err := image.Decode(blob)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if x := img.Bounds().Max.X; x != ing.ImageWidth {
+		t.Errorf("image width=%d; expected %d", x, ing.ImageWidth)
+	}
+	if y := img.Bounds().Max.Y; y != 100 {
+		t.Errorf("image width=%d; expected 100", y)
 	}
 
 	// TODO link to nb deduced from marc record? /nb, nb-free, nb-norway?

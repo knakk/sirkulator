@@ -310,27 +310,22 @@ func TestIngestOAIRecord(t *testing.T) {
 			Covers: []FileFetch{
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788203365133"},
 					URL:        "https://contents.bibs.aws.unit.no/files/images/original/3/3/9788203365133.jpg",
 				},
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788203365133"},
 					URL:        "https://media.aja.bs.no/4bfe1c40-8ee2-4601-b7eb-2e032a2e59b7/cover/original.jpg",
 				},
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788203365133"},
 					URL:        "https://contents.bibs.aws.unit.no/files/images/small/3/3/9788203365133.jpg",
 				},
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788203365133"},
 					URL:        "https://contents.bibs.aws.unit.no/files/images/large/3/3/9788203365133.jpg",
 				},
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788203365133"},
 					URL:        "https://media.aja.bs.no/4bfe1c40-8ee2-4601-b7eb-2e032a2e59b7/cover/thumbnail.jpg",
 				},
 			},
@@ -850,17 +845,14 @@ func TestIngestOAIRecord(t *testing.T) {
 			Covers: []FileFetch{
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788230021743"},
 					URL:        "https://contents.bibs.aws.unit.no/files/images/original/3/4/9788230021743.jpg",
 				},
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788230021743"},
 					URL:        "https://aja.bs.no/ad0ca9fa-1460-430b-a306-348a47f26437/cover/original.jpg",
 				},
 				{
 					ResourceID: "t1",
-					IDPair:     [2]string{"isbn", "9788230021743"},
 					URL:        "https://aja.bs.no/ad0ca9fa-1460-430b-a306-348a47f26437/cover/thumbnail.jpg",
 				},
 			},

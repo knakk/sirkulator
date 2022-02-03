@@ -281,22 +281,12 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	ing.Resources = append(ing.Resources, agents...)
 	ing.Relations = relations
 
-	// defaults
-	imgKey := "resource.id"
-	imgVal := pID
-
-	if isbn, _ := rec.ValueAt("020", "a"); isbn != "" { // TODO lookslikeISBN(isbn)
-		imgKey = "isbn"
-		imgVal = isbn
-	}
-
 	var covers []FileFetch
 	for _, f := range rec.DataFieldsAt("856") {
 		if url := f.ValueAt("u"); url != "" {
 			if mime := f.ValueAt("q"); strings.HasPrefix(mime, "image") || strings.Contains(url, ".jpg") || strings.Contains(url, ".jpeg") {
 				covers = append(covers, FileFetch{
 					ResourceID: pID,
-					IDPair:     [2]string{imgKey, imgVal},
 					URL:        url,
 				})
 			}
