@@ -36,6 +36,7 @@ package marc
 import (
 	"errors"
 	"golang.org/x/text/language"
+	"github.com/knakk/sirkulator/internal/localizer"
 )
 
 //go:generate go run gen_language.go
@@ -86,7 +87,7 @@ func (l Language) ISO3() string {
 // Only Norwegian and English are currently supported. If a Norwegian label is required and
 // not present, the English label will be returned.
 func (l Language) Label(tag language.Tag) string {
-	match, _, _ := matcher.Match(tag)
+	match, _, _ := localizer.Matcher.Match(tag)
 	if match == language.Norwegian && languages[l.code][1] != "" {
 		return languages[l.code][1]
 	}
@@ -97,7 +98,6 @@ func (l Language) Label(tag language.Tag) string {
 )
 
 func main() {
-
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(wikidata, url.QueryEscape(query)), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -124,10 +124,10 @@ func main() {
 		}
 		switch rec[1] {
 		case "iso639":
-			// skip header row
+			// Skip header row.
 			continue
 		case "pnb", "lvs", "ekk":
-			// skip known deprecated or wrongly mapped codes in wikipedia
+			// Skip known deprecated or wrongly mapped codes in wikidata.
 			continue
 		}
 
@@ -135,8 +135,8 @@ func main() {
 			diff = append(diff, [2]string{rec[0], rec[1]})
 		}
 
-		// lowercase and trim "(språk)" suffix from norwegian label
-		rec[2] = strings.ToLower(strings.TrimSuffix(rec[2], "(språk)"))
+		// Lowercase and trim " (språk)" suffix from the Norwegian label.
+		rec[3] = strings.ToLower(strings.TrimSuffix(rec[3], " (språk)"))
 		recs = append(recs, rec)
 	}
 

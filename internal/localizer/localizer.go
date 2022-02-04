@@ -24,7 +24,7 @@ var locales = []Localizer{
 	},
 }
 
-var matcher = language.NewMatcher([]language.Tag{language.English, language.Norwegian})
+var Matcher = language.NewMatcher([]language.Tag{language.English, language.Norwegian})
 var defaultLocale = 0 // en
 
 // SetDefaltLocale sets the defaul locale. It will panic if
@@ -49,7 +49,7 @@ func SetDefaultLocale(lang language.Tag) {
 			tags = append(tags, locale.Lang)
 		}
 	}
-	matcher = language.NewMatcher(tags)
+	Matcher = language.NewMatcher(tags)
 }
 
 func Get(lang language.Tag) Localizer {
@@ -66,7 +66,7 @@ func Get(lang language.Tag) Localizer {
 func GetFromAcceptLang(lang string) Localizer {
 	t, _, _ := language.ParseAcceptLanguage(lang)
 	// We ignore the error: the default language will be selected for t == nil.
-	tag, _, _ := matcher.Match(t...)
+	tag, _, _ := Matcher.Match(t...)
 	return Get(tag)
 }
 
