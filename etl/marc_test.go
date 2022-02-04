@@ -19,7 +19,57 @@ func TestParseYearRange(t *testing.T) {
 		{"1949-", sirkulator.YearRange{FromYear: 1949}},
 		{"1828-1906", sirkulator.YearRange{FromYear: 1828, ToYear: 1906}},
 		{"1828 - 1906", sirkulator.YearRange{FromYear: 1828, ToYear: 1906}},
+		{"1800-tallet", sirkulator.YearRange{FromYear: 1800, ToYear: 1900, Aproximate: true}},
+		{"1500-tallet", sirkulator.YearRange{FromYear: 1500, ToYear: 1600, Aproximate: true}},
+		{"fl. 1200-tallet", sirkulator.YearRange{FromYear: 1200, ToYear: 1300, Aproximate: true}},
+		{"17. årh.", sirkulator.YearRange{FromYear: 1600, ToYear: 1700, Aproximate: true}},       // Technically 1601-1700
+		{"16. årh.", sirkulator.YearRange{FromYear: 1500, ToYear: 1600, Aproximate: true}},       // Technically 1501-1600
+		{"2. årh.", sirkulator.YearRange{FromYear: 100, ToYear: 200, Aproximate: true}},          // Technically 101-200
+		{"2. årh. f.Kr.", sirkulator.YearRange{FromYear: -200, ToYear: -100, Aproximate: true}},  // Technically 200BC-101BC
+		{"2. årh. f.Kr.?", sirkulator.YearRange{FromYear: -200, ToYear: -100, Aproximate: true}}, // Technically 200BC-101BC
+		{"13th cent", sirkulator.YearRange{FromYear: 1200, ToYear: 1300, Aproximate: true}},      // Technically 1201-1300
+		{"16th cent", sirkulator.YearRange{FromYear: 1500, ToYear: 1600, Aproximate: true}},      // Technically 1501-1600
+		{"382-336 f.Kr.", sirkulator.YearRange{FromYear: -382, ToYear: -336}},
+		{"død 1836", sirkulator.YearRange{ToYear: 1836}},
+		{"d. 1650", sirkulator.YearRange{ToYear: 1650}},
+		{"d. ca. 1480", sirkulator.YearRange{ToYear: 1480, Aproximate: true}},
+		{"d. 514 f.Kr.", sirkulator.YearRange{ToYear: -514}},
+		{"-1755", sirkulator.YearRange{ToYear: 1755}},
+		{"--1989", sirkulator.YearRange{ToYear: 1989}},
+		{"b. 1883", sirkulator.YearRange{FromYear: 1883}},
+		{"f. 1891", sirkulator.YearRange{FromYear: 1891}},
+		{"f. ca 1685", sirkulator.YearRange{FromYear: 1685, Aproximate: true}},
+		{"(1961- )", sirkulator.YearRange{FromYear: 1961}},
+		{"[1774-1857]", sirkulator.YearRange{FromYear: 1774, ToYear: 1857}},
+		{"ca. 1030-ca. 1112", sirkulator.YearRange{FromYear: 1030, ToYear: 1112, Aproximate: true}},
 	}
+	// TODO cases:
+	//  2./3. årh.
+	//  4./3. årh. f.Kr.
+	//  virksom 1849
+	//  virksom 18. årh.
+	//  virksom omkr. 1840
+	//  Virksom ca. 1761
+	//  virksom 1685-1711
+	//  aktiv på 1000-tallet
+	//  19-? | 17-?
+	//  19??
+	//  1980?
+	//  1700-1800-tallet
+	//  1700-tallet-1800-tallet
+	//  1700-tallet?
+	//  19
+	//  f. 20. årh. | f. 18. årh.
+	//  19. årh.-20. årh.?
+	//  1871-?
+	//  1907?-1979 | 1181?-1246
+	//  1960-....
+	//  1945-03-25
+	//  ca 1705
+	//  1872-ca. 1950?
+	//  1862-ca. 1930
+	//  1881 [eller 1889]-1943
+	//  43 B.C.-17 or 18 A.D
 
 	for _, test := range tests {
 		if got := parseYearRange(test.input); got != test.want {

@@ -311,90 +311,89 @@ func parsePages(s string) int {
 }
 
 func parseYearRange(s string) sirkulator.YearRange {
-	// TODO cases:
-	//  1800-tallet | 1500-tallet
-	//  17. årh. | 16. årh.  2. årh.
-	//  2. årh. f.Kr.
-	//  2. årh. f.Kr.?
-	//  2./3. årh.
-	//  4./3. årh. f.Kr.
-	//  382-336 f.Kr.
-	//  f. 1891
-	//  f. ca 1685 | f. ca 1740
-	//  virksom 1849
-	//  virksom 18. årh.
-	//  virksom omkr. 1840
-	//  Virksom ca. 1761
-	//  virksom 1685-1711
-	//  aktiv på 1000-tallet
-	//  b. 1883
-	//  19-? | 17-?
-	//  19??
-	//  1980?
-	//  død 1836
-	//  d. 1650 | d. 1657
-	//  d. ca. 1480
-	//  d. 514 f.Kr.
-	//  fl. 1200-tallet
-	//  500-tallet
-	//  1700-1800-tallet
-	//  1700-tallet-1800-tallet
-	//  1700-tallet?
-	//  19
-	//  f. 20. årh. | f. 18. årh.
-	//  19. årh.-20. årh.?
-	//  13th cent | 16th cent
-	//  -1465 | -1755
-	//  --1989
-	//  1871-?
-	//  1907?-1979 | 1181?-1246
-	//  1960-....
-	//  1945-03-25
-	//  ca 1705
-	//  1872-ca. 1950?
-	//  1862-ca. 1930
-	//  (1961- )
-	//  1881 [eller 1889]-1943
-	//  ca. 1030-ca. 1112
-	//  1977-,
-	//  [1774-1857]
-	//  43 B.C.-17 or 18 A.D
-	parsingFrom := false
+	//parsingFrom := false
 	parsingTo := false
 	res := sirkulator.YearRange{}
 	start := 0
 	pos := 0
+	s = strings.ToLower(s)
+	var r rune
+	var w int
+	peekHas := func(sub string) bool {
+		if pos-w < 0 || len(s) < pos-w {
+			return false
+		}
+		if strings.HasPrefix(s[pos-w:], sub) {
+			pos += len(sub) - w // consume substring
+			return true
+		}
+		return false
+	}
+	consumeYear := func() int {
+		for {
+			r, w = utf8.DecodeRuneInString(s[pos:])
+			pos += w
+			if r < 48 || r > 57 {
+				// not a number
+				pos -= w
+				break
+			}
+		}
+		n, _ := strconv.Atoi(s[start:pos]) // ignoring err since we know we got all digits
+		return n
+	}
 	for pos <= len(s) {
-		r, w := utf8.DecodeRuneInString(s[pos:])
+		r, w = utf8.DecodeRuneInString(s[pos:])
 		pos += w
 		switch r {
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			if !parsingFrom && !parsingTo && res.FromYear == 0 {
-				parsingFrom = true
-				start = pos - w
+			start = pos - w
+			if parsingTo {
+				res.ToYear = consumeYear()
+			} else {
+				res.FromYear = consumeYear()
 			}
-			if res.FromYear != 0 && !parsingTo {
-				start = pos - w
+		case '-':
+			if peekHas("-tallet") {
+				res.Aproximate = true
+				res.ToYear = res.FromYear + 100
+			} else {
 				parsingTo = true
 			}
-		default:
-			if pos > start && (parsingFrom || parsingTo) {
-				n, err := strconv.Atoi(s[start : pos-w])
-				if err == nil {
-					if parsingFrom {
-						res.FromYear = n
-						parsingFrom = false
-					} else if parsingTo {
-						res.ToYear = n
-					}
-				}
+		case 'c':
+			if peekHas("ca") {
+				res.Aproximate = true
 			}
+		case 'd':
+			if peekHas("død ") || peekHas("d. ") {
+				parsingTo = true
+			}
+		case 'f':
+			if peekHas("f.kr.") {
+				res.FromYear *= -1
+				res.ToYear *= -1
+			}
+		case 't':
+			if peekHas("th cent") {
+				res.FromYear = (res.FromYear - 1) * 100
+				res.ToYear = res.FromYear + 100
+				res.Aproximate = true
+			}
+		case 'å':
+			if peekHas("årh. f.kr") {
+				res.FromYear *= -100
+				res.ToYear = res.FromYear + 100
+				res.Aproximate = true
+			} else if peekHas("årh.") {
+				res.FromYear = (res.FromYear - 1) * 100
+				res.ToYear = res.FromYear + 100
+				res.Aproximate = true
+			}
+		default:
 			if r == utf8.RuneError { // eof
 				return res
 			}
-
 		}
-
 	}
 	return res
 }
