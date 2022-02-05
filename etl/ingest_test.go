@@ -271,6 +271,7 @@ func TestIngestISBN(t *testing.T) {
 	// Ingest by ISBN number
 	ing := NewIngestor(db)
 	ing.idFunc = testID()
+	ing.ImageDownload = true
 	if err := ing.IngestISBN(context.Background(), "8213002962"); err != nil {
 		t.Fatal(err)
 	}

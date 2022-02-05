@@ -25,8 +25,9 @@ type Ingestor struct {
 	idFunc func() string
 
 	// Options
-	ImageAsync bool // if true, download images after IngestISBN has returned
-	ImageWidth int  // scale to this with, calculating width to preserve aspect ratio
+	ImageDownload bool // if true, download images found in imported records
+	ImageAsync    bool // if true, download images after IngestISBN has returned
+	ImageWidth    int  // scale to this with, calculating width to preserve aspect ratio
 	//ImageWebp  bool // convert to webp before storing
 }
 
@@ -273,6 +274,10 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 	// Store all resources and relations in a transaction:
 	if err := persistIngestion(conn, data); err != nil {
 		return err // TODO annotate
+	}
+
+	if !ig.ImageDownload {
+		return nil
 	}
 
 	if ig.ImageAsync {
