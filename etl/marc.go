@@ -51,8 +51,14 @@ func createAgent(f marc.DataField, idFunc func() string) sirkulator.Resource {
 			}
 			person.YearRange = parseYearRange(lifespan)
 			res.Data = person
+			// TODO consider dropping lifespan from persons born before 0 CE.
+			// It is mostly needed for disambiguating betwen different
+			// persons with similar or identical names. The further we
+			// go back in time, the less likely this is. There is only one Herodotus (or?)
+			// In addition, we don't have a language-independent way of
+			// denoting BCE/CE.
+			res.Label = fmt.Sprintf("%s (%s)", res.Label, person.YearRange)
 		}
-		res.Label = fmt.Sprintf("%s (%s)", res.Label, lifespan)
 	}
 	res.ID = idFunc()
 	return res
@@ -349,20 +355,20 @@ func parseYearRange(s string) sirkulator.YearRange {
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			start = pos - w
 			if parsingTo {
-				res.ToYear = consumeYear()
+				res.To = consumeYear()
 			} else {
-				res.FromYear = consumeYear()
+				res.From = consumeYear()
 			}
 		case '-':
 			if peekHas("-tallet") {
-				res.Aproximate = true
-				res.ToYear = res.FromYear + 100
+				res.Approx = true
+				res.To = res.From + 100
 			} else {
 				parsingTo = true
 			}
 		case 'c':
 			if peekHas("ca") {
-				res.Aproximate = true
+				res.Approx = true
 			}
 		case 'd':
 			if peekHas("død ") || peekHas("d. ") {
@@ -370,24 +376,24 @@ func parseYearRange(s string) sirkulator.YearRange {
 			}
 		case 'f':
 			if peekHas("f.kr.") {
-				res.FromYear *= -1
-				res.ToYear *= -1
+				res.From *= -1
+				res.To *= -1
 			}
 		case 't':
 			if peekHas("th cent") {
-				res.FromYear = (res.FromYear - 1) * 100
-				res.ToYear = res.FromYear + 100
-				res.Aproximate = true
+				res.From = (res.From - 1) * 100
+				res.To = res.From + 100
+				res.Approx = true
 			}
 		case 'å':
 			if peekHas("årh. f.kr") {
-				res.FromYear *= -100
-				res.ToYear = res.FromYear + 100
-				res.Aproximate = true
+				res.From *= -100
+				res.To = res.From + 100
+				res.Approx = true
 			} else if peekHas("årh.") {
-				res.FromYear = (res.FromYear - 1) * 100
-				res.ToYear = res.FromYear + 100
-				res.Aproximate = true
+				res.From = (res.From - 1) * 100
+				res.To = res.From + 100
+				res.Approx = true
 			}
 		default:
 			if r == utf8.RuneError { // eof

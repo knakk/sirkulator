@@ -246,7 +246,7 @@ func TestIngestISBN(t *testing.T) {
 	personWant := sirkulator.Person{
 		Name: "Per Arvid Åsen",
 		YearRange: sirkulator.YearRange{
-			FromYear: 1949,
+			From: 1949,
 		},
 	}
 	b := mustJson(personWant)

@@ -1,9 +1,13 @@
 package sirkulator
 
 import (
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/knakk/sirkulator/internal/localizer"
 	"github.com/teris-io/shortid"
+	"golang.org/x/text/language"
 )
 
 /*type PersistableResource interface {
@@ -52,22 +56,176 @@ type SimpleResource struct {
 	Links [][2]string // [2]string{"wikidata", "q213"} [2]string{"viaf", "234234"} etc
 }
 
+// YearRange represents a span of years, with a from and to year,
+// and a specification if it is accurate (Approx=false) or approximate (Approx=true).
+// The year value 0 is interpreted as unknown/no value, which means that
+// we cannot represent the acutaly year 0.
+// Either From or To can be 0, denoting unknown start or end of span.
+// A zero value of the struct, where both From and To are 0, is not really
+// usefull and is to be interpreted as unknown/no value.
+// TODO consider pointer to int so that we can distinquish between unkown
+// and year 0.
 type YearRange struct {
-	FromYear   int  `json:"from_year"`
-	ToYear     int  `json:"to_year"`
-	Aproximate bool `json:"approx"`
-	// TODO consider AproxFrom and AproxTo instead of Aproximate
-	// TODO consider "Virksom" bool
+	From   int  `json:"from"`
+	To     int  `json:"to"`
+	Approx bool `json:"approx"` // TODO or "CA"?
+	// TODO consider ApproxFrom and ApproxTo instead of Approx
+	// TODO consider Active (=Virksom) bool
 }
 
+// String returns a (ideally language-agnostic) string representation of YearRange.
+// TODO find language independent representation of BC/AD
 func (yr YearRange) String() string {
-	if yr.Aproximate {
+	var s strings.Builder
+	if yr.Approx {
+		s.WriteString("ca. ")
+	}
+	if yr.From != 0 {
+		if yr.From < 0 {
+			s.WriteString(strconv.Itoa(yr.From * -1))
+			if yr.To > 0 {
+				s.WriteString(" BCE")
+			}
+		} else {
+			s.WriteString(strconv.Itoa(yr.From))
+		}
+	} else {
+		s.WriteString("?")
+	}
+	s.WriteString("–") // or -
+	if yr.To != 0 {
+		if yr.To < 0 {
+			s.WriteString(strconv.Itoa(yr.To * -1))
+			if yr.From < 0 {
+				s.WriteString(" BCE")
+			}
+		} else {
+			s.WriteString(strconv.Itoa(yr.To))
+			if yr.From < 0 {
+				s.WriteString(" AD")
+			}
+		}
 
 	}
-	if yr.FromYear != 0 {
+	return s.String()
+}
+
+// Label returns a localized string representation of YearRange.
+func (yr YearRange) Label(tag language.Tag) string {
+	lang, _, _ := localizer.Matcher.Match(tag)
+	switch lang {
+	case language.English:
+		return yr.enLabel()
+	case language.Norwegian:
+		return yr.noLabel()
+	default:
+		panic("YearRange.Label: unsupported language " + lang.String())
+	}
+}
+
+func (yr YearRange) noLabel() string {
+	var s strings.Builder
+	if yr.Approx {
+		if yr.From%100 == 0 && yr.To%100 == 0 {
+			if yr.To-yr.From > 100 {
+				s.WriteString(strconv.Itoa(yr.From / 100))
+				s.WriteString("/")
+				s.WriteString(strconv.Itoa(yr.To - 100))
+			} else {
+				if yr.From < 0 {
+					s.WriteString(strconv.Itoa(yr.From * -1))
+				} else {
+					s.WriteString(strconv.Itoa(yr.From))
+				}
+			}
+			s.WriteString("-tallet")
+			if yr.To < 0 {
+				s.WriteString(" f.Kr")
+			}
+			return s.String()
+		}
+		s.WriteString("ca. ")
+	}
+	if yr.From != 0 {
+		if yr.From < 0 {
+			s.WriteString(strconv.Itoa(yr.From * -1))
+			if yr.To > 0 {
+				s.WriteString(" f.Kr")
+			}
+		} else {
+			s.WriteString(strconv.Itoa(yr.From))
+		}
+	} else {
+		s.WriteString("?")
+	}
+	s.WriteString("–") // or -
+	if yr.To != 0 {
+		if yr.To < 0 {
+			s.WriteString(strconv.Itoa(yr.To * -1))
+			if yr.From < 0 {
+				s.WriteString(" f.Kr")
+			}
+		} else {
+			s.WriteString(strconv.Itoa(yr.To))
+			if yr.From < 0 {
+				s.WriteString(" e.Kr")
+			}
+		}
 
 	}
-	return "" // yr.FromYear == 0 && yr.ToYear == 0
+	return s.String()
+}
+
+func (yr YearRange) enLabel() string {
+	var s strings.Builder
+	if yr.Approx {
+		if yr.From%100 == 0 && yr.To%100 == 0 {
+			if yr.To-yr.From > 100 {
+				s.WriteString(strconv.Itoa((yr.From / 100) + 1))
+				s.WriteString("/")
+				s.WriteString(strconv.Itoa(yr.To / 100))
+			} else {
+				if yr.From < 0 {
+					s.WriteString(strconv.Itoa((yr.From/100)*-1 + 1))
+				} else {
+					s.WriteString(strconv.Itoa(yr.To / 100))
+				}
+			}
+			s.WriteString("th century")
+			if yr.To < 0 {
+				s.WriteString(" BCE")
+			}
+			return s.String()
+		}
+		s.WriteString("ca. ")
+	}
+	if yr.From != 0 {
+		if yr.From < 0 {
+			s.WriteString(strconv.Itoa(yr.From * -1))
+			if yr.To > 0 {
+				s.WriteString(" BCE")
+			}
+		} else {
+			s.WriteString(strconv.Itoa(yr.From))
+		}
+	} else {
+		s.WriteString("?")
+	}
+	s.WriteString("–") // or -
+	if yr.To != 0 {
+		if yr.To < 0 {
+			s.WriteString(strconv.Itoa(yr.To * -1))
+			if yr.From < 0 {
+				s.WriteString(" BCE")
+			}
+		} else {
+			s.WriteString(strconv.Itoa(yr.To))
+			if yr.From < 0 {
+				s.WriteString(" AD")
+			}
+		}
+	}
+	return s.String()
 }
 
 type Contribution struct {

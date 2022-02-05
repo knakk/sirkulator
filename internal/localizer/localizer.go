@@ -24,8 +24,12 @@ var locales = []Localizer{
 	},
 }
 
-var Matcher = language.NewMatcher([]language.Tag{language.English, language.Norwegian})
-var defaultLocale = 0 // en
+var (
+	// Matcher will return the first supported language from the give language tags.
+	Matcher = language.NewMatcher([]language.Tag{language.English, language.Norwegian})
+
+	defaultLocale = 0 // en
+)
 
 // SetDefaltLocale sets the defaul locale. It will panic if
 // the given tag is not among locales.

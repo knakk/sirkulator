@@ -14,34 +14,34 @@ func TestParseYearRange(t *testing.T) {
 		input string
 		want  sirkulator.YearRange
 	}{
-		{"1981", sirkulator.YearRange{FromYear: 1981}},
-		{"  1981", sirkulator.YearRange{FromYear: 1981}},
-		{"1949-", sirkulator.YearRange{FromYear: 1949}},
-		{"1828-1906", sirkulator.YearRange{FromYear: 1828, ToYear: 1906}},
-		{"1828 - 1906", sirkulator.YearRange{FromYear: 1828, ToYear: 1906}},
-		{"1800-tallet", sirkulator.YearRange{FromYear: 1800, ToYear: 1900, Aproximate: true}},
-		{"1500-tallet", sirkulator.YearRange{FromYear: 1500, ToYear: 1600, Aproximate: true}},
-		{"fl. 1200-tallet", sirkulator.YearRange{FromYear: 1200, ToYear: 1300, Aproximate: true}},
-		{"17. årh.", sirkulator.YearRange{FromYear: 1600, ToYear: 1700, Aproximate: true}},       // Technically 1601-1700
-		{"16. årh.", sirkulator.YearRange{FromYear: 1500, ToYear: 1600, Aproximate: true}},       // Technically 1501-1600
-		{"2. årh.", sirkulator.YearRange{FromYear: 100, ToYear: 200, Aproximate: true}},          // Technically 101-200
-		{"2. årh. f.Kr.", sirkulator.YearRange{FromYear: -200, ToYear: -100, Aproximate: true}},  // Technically 200BC-101BC
-		{"2. årh. f.Kr.?", sirkulator.YearRange{FromYear: -200, ToYear: -100, Aproximate: true}}, // Technically 200BC-101BC
-		{"13th cent", sirkulator.YearRange{FromYear: 1200, ToYear: 1300, Aproximate: true}},      // Technically 1201-1300
-		{"16th cent", sirkulator.YearRange{FromYear: 1500, ToYear: 1600, Aproximate: true}},      // Technically 1501-1600
-		{"382-336 f.Kr.", sirkulator.YearRange{FromYear: -382, ToYear: -336}},
-		{"død 1836", sirkulator.YearRange{ToYear: 1836}},
-		{"d. 1650", sirkulator.YearRange{ToYear: 1650}},
-		{"d. ca. 1480", sirkulator.YearRange{ToYear: 1480, Aproximate: true}},
-		{"d. 514 f.Kr.", sirkulator.YearRange{ToYear: -514}},
-		{"-1755", sirkulator.YearRange{ToYear: 1755}},
-		{"--1989", sirkulator.YearRange{ToYear: 1989}},
-		{"b. 1883", sirkulator.YearRange{FromYear: 1883}},
-		{"f. 1891", sirkulator.YearRange{FromYear: 1891}},
-		{"f. ca 1685", sirkulator.YearRange{FromYear: 1685, Aproximate: true}},
-		{"(1961- )", sirkulator.YearRange{FromYear: 1961}},
-		{"[1774-1857]", sirkulator.YearRange{FromYear: 1774, ToYear: 1857}},
-		{"ca. 1030-ca. 1112", sirkulator.YearRange{FromYear: 1030, ToYear: 1112, Aproximate: true}},
+		{"1981", sirkulator.YearRange{From: 1981}},
+		{"  1981", sirkulator.YearRange{From: 1981}},
+		{"1949-", sirkulator.YearRange{From: 1949}},
+		{"1828-1906", sirkulator.YearRange{From: 1828, To: 1906}},
+		{"1828 - 1906", sirkulator.YearRange{From: 1828, To: 1906}},
+		{"1800-tallet", sirkulator.YearRange{From: 1800, To: 1900, Approx: true}},
+		{"1500-tallet", sirkulator.YearRange{From: 1500, To: 1600, Approx: true}},
+		{"fl. 1200-tallet", sirkulator.YearRange{From: 1200, To: 1300, Approx: true}},
+		{"17. årh.", sirkulator.YearRange{From: 1600, To: 1700, Approx: true}},       // Technically 1601-1700
+		{"16. årh.", sirkulator.YearRange{From: 1500, To: 1600, Approx: true}},       // Technically 1501-1600
+		{"2. årh.", sirkulator.YearRange{From: 100, To: 200, Approx: true}},          // Technically 101-200
+		{"2. årh. f.Kr.", sirkulator.YearRange{From: -200, To: -100, Approx: true}},  // Technically 200BC-101BC
+		{"2. årh. f.Kr.?", sirkulator.YearRange{From: -200, To: -100, Approx: true}}, // Technically 200BC-101BC
+		{"13th cent", sirkulator.YearRange{From: 1200, To: 1300, Approx: true}},      // Technically 1201-1300
+		{"16th cent", sirkulator.YearRange{From: 1500, To: 1600, Approx: true}},      // Technically 1501-1600
+		{"382-336 f.Kr.", sirkulator.YearRange{From: -382, To: -336}},
+		{"død 1836", sirkulator.YearRange{To: 1836}},
+		{"d. 1650", sirkulator.YearRange{To: 1650}},
+		{"d. ca. 1480", sirkulator.YearRange{To: 1480, Approx: true}},
+		{"d. 514 f.Kr.", sirkulator.YearRange{To: -514}},
+		{"-1755", sirkulator.YearRange{To: 1755}},
+		{"--1989", sirkulator.YearRange{To: 1989}},
+		{"b. 1883", sirkulator.YearRange{From: 1883}},
+		{"f. 1891", sirkulator.YearRange{From: 1891}},
+		{"f. ca 1685", sirkulator.YearRange{From: 1685, Approx: true}},
+		{"(1961- )", sirkulator.YearRange{From: 1961}},
+		{"[1774-1857]", sirkulator.YearRange{From: 1774, To: 1857}},
+		{"ca. 1030-ca. 1112", sirkulator.YearRange{From: 1030, To: 1112, Approx: true}},
 	}
 	// TODO cases:
 	//  2./3. årh.
@@ -298,36 +298,36 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					ID:    "t2",
 					Type:  sirkulator.TypePerson,
-					Label: "Liv Køltzow (1945-)",
+					Label: "Liv Køltzow (1945–)",
 					Links: [][2]string{{"bibsys", "90086277"}},
 					Data: sirkulator.Person{
 						Name: "Liv Køltzow",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1945,
+							From: 1945,
 						},
 					},
 				},
 				{
 					ID:    "t3",
 					Type:  sirkulator.TypePerson,
-					Label: "Hans Petter Blad (1962-)",
+					Label: "Hans Petter Blad (1962–)",
 					Links: [][2]string{{"bibsys", "90916002"}},
 					Data: sirkulator.Person{
 						Name: "Hans Petter Blad",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1962,
+							From: 1962,
 						},
 					},
 				},
 				{
 					ID:    "t4",
 					Type:  sirkulator.TypePerson,
-					Label: "Kaja Schjerven Mollerin (1980-)",
+					Label: "Kaja Schjerven Mollerin (1980–)",
 					Links: [][2]string{{"bibsys", "6088516"}},
 					Data: sirkulator.Person{
 						Name: "Kaja Schjerven Mollerin",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1980,
+							From: 1980,
 						},
 					},
 				},
@@ -580,25 +580,25 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					ID:    "t2",
 					Type:  sirkulator.TypePerson,
-					Label: "Kerstin Ekman (1933-)",
+					Label: "Kerstin Ekman (1933–)",
 					Links: [][2]string{{"bibsys", "90058909"}},
 					Data: sirkulator.Person{
 						Name: "Kerstin Ekman",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1933,
+							From: 1933,
 						},
 					},
 				},
 				{
 					ID:    "t3",
 					Type:  sirkulator.TypePerson,
-					Label: "Gunnel Malmström (1921-2007)",
+					Label: "Gunnel Malmström (1921–2007)",
 					Links: [][2]string{{"bibsys", "90589668"}},
 					Data: sirkulator.Person{
 						Name: "Gunnel Malmström",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1921,
-							ToYear:   2007,
+							From: 1921,
+							To:   2007,
 						},
 					},
 				},
@@ -847,26 +847,26 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					Type:  sirkulator.TypePerson,
 					ID:    "t2",
-					Label: "Ove Fredrik Arbo Høeg (1898-1993)",
+					Label: "Ove Fredrik Arbo Høeg (1898–1993)",
 					Links: [][2]string{{"bibsys", "1533887371289"}},
 					Data: sirkulator.Person{
 						Name: "Ove Fredrik Arbo Høeg",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1898,
-							ToYear:   1993,
+							From: 1898,
+							To:   1993,
 						},
 					},
 				},
 				{
 					Type:  sirkulator.TypePerson,
 					ID:    "t3",
-					Label: "Ove Arbo Høeg (1898-1993)",
+					Label: "Ove Arbo Høeg (1898–1993)",
 					Links: [][2]string{{"bibsys", "90103766"}},
 					Data: sirkulator.Person{
 						Name: "Ove Arbo Høeg",
 						YearRange: sirkulator.YearRange{
-							FromYear: 1898,
-							ToYear:   1993,
+							From: 1898,
+							To:   1993,
 						},
 					},
 				},
