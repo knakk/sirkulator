@@ -18,7 +18,7 @@ CREATE TABLE resource_edit_log (
     PRIMARY KEY(resource_id, at)
 );
 
--- A relation describes a relation between to known resources.
+-- A relation describes a relation between two known resources.
 --
 -- If one part of the relation is a publication, it should be in the
 -- originating position (from_id).
@@ -52,12 +52,15 @@ CREATE INDEX idx_link_id ON link (id);
 -- the resource from which the relation is pointing, but the
 -- resource it is pointing to, is unknown, and must be manually
 -- matched by a human by looking at the information in data.
+--
+-- TODO consider other nouns as name for this table; a review in the
+--      context of books usually means something else..
 CREATE TABLE review (
     from_id     TEXT REFERENCES resource (id),
     type        TEXT NOT NULL,
     data        JSON,
     queued_at   INTEGER NOT NULL, -- time.Now().Unix()
-
+    -- status   TEXT, -- maybe? new|parked|etc, Status could also be stored in data column
     PRIMARY KEY(from_id, type, data)
 );
 

@@ -409,3 +409,33 @@ func TestIngestISBN(t *testing.T) {
 	// https://urn.nb.no/URN:NBN:no-nb_digibok_2014021108035
 	// https://www.nb.no/items/4b5337744e197a56fa0aeb2df01feb60?page=0
 }
+
+func TestIngestRemote(t *testing.T) {
+	t.Skip("depends on external resource")
+	db, err := sql.OpenMem()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	ing := NewIngestor(db)
+	ing.idFunc = testID()
+	ing.UseRemote = true
+	if err := ing.IngestISBN(context.Background(), "9788253043203"); err != nil {
+		t.Fatal(err)
+	}
+	conn := db.Get(nil)
+	defer db.Put(conn)
+	fn := func(stmt *sqlite.Stmt) error {
+		t.Logf("%s\t%s\t%q\n", stmt.ColumnText(0), stmt.ColumnText(1), stmt.ColumnText(2))
+		return nil
+	}
+	const q = "SELECT id, type, label FROM resource"
+	if err := sqlitex.Exec(conn, q, fn); err != nil {
+		t.Fatal(err)
+	}
+	t.FailNow()
+}

@@ -6,6 +6,7 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"image"
 	"image/jpeg"
@@ -25,6 +26,7 @@ type Ingestor struct {
 	idFunc func() string
 
 	// Options
+	UseRemote     bool // if true, use external sources in additin to local
 	ImageDownload bool // if true, download images found in imported records
 	ImageAsync    bool // if true, download images after IngestISBN has returned
 	ImageWidth    int  // scale to this with, calculating width to preserve aspect ratio
@@ -40,6 +42,8 @@ func NewIngestor(db *sqlitex.Pool) *Ingestor {
 }
 
 func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
+	// TODO clean isbn: remove dashes and spaces from string
+
 	// First, check if publication is allready in DB
 	// TODO
 	//
@@ -47,23 +51,26 @@ func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
 	//      we can gain something new info diffing existing record,
 	//      but then, we have to consider the changes we have made (in resource_edit_log?)
 
-	// Next, check if record is available in local oai DB
+	// The preferred source is local oai DB
+	var data Ingestion
 	rec, err := ig.localRecord(ctx, "isbn", isbn)
-	if errors.Is(err, sirkulator.ErrNotFound) {
-		// Record not in local DB; go search the internet
-		rec, err = ig.remoteRecord("isbn", isbn)
+	if err == nil {
+		data, err = ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
+		if err != nil {
+			return err
+		}
+	} else if errors.Is(err, sirkulator.ErrNotFound) {
+		// Record not in local DB - search external sources
+		data, err = ig.remoteRecord(ctx, "isbn", isbn)
+		if err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
-
-	data, err := ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
-	if err != nil {
-		return err
-	}
+	// We got data, either from local or remote source, now try to persist it:
 	return ig.Ingest(ctx, data)
 }
 
+// TODO move to sql package?
 func (ig *Ingestor) localRecord(ctx context.Context, idtype, id string) (oai.Record, error) {
 	var rec oai.Record
 	conn := ig.db.Get(ctx)
@@ -104,20 +111,81 @@ func (ig *Ingestor) localRecord(ctx context.Context, idtype, id string) (oai.Rec
 	if err := sqlitex.Exec(conn, q, fn, idtype, id); err != nil {
 		return rec, err
 	}
-	// TODO what if rec is emtpty? check for rec.ID != ""
+	if rec.ID == "" {
+		return rec, sirkulator.ErrNotFound
+	}
 
 	return rec, nil
 }
 
-func (ig *Ingestor) remoteRecord(idtype, id string) (oai.Record, error) {
-	return oai.Record{}, errors.New("remoteRecord: TODO")
+type sruResponse struct {
+	XMLName         xml.Name `xml:"searchRetrieveResponse"`
+	Text            string   `xml:",chardata"`
+	Xmlns           string   `xml:"xmlns,attr"`
+	Version         string   `xml:"version"`
+	NumberOfRecords int      `xml:"numberOfRecords"`
+	Records         struct {
+		Text   string `xml:",chardata"`
+		Record struct {
+			Metadata []byte `xml:",innerxml"` // marcxml
+		} `xml:"record"`
+	} `xml:"records"`
+}
+
+// externalSources is a list of prioritized external sources.
+var externalSources = []struct {
+	Name  string
+	Fetch func(ctx context.Context, itdtype, id string, idFunc func() string) (Ingestion, error)
+}{
+	{
+		Name: "bibsys/sru",
+		Fetch: func(ctx context.Context, itdtype, id string, idFunc func() string) (Ingestion, error) {
+			if itdtype != "isbn" {
+				return Ingestion{}, sirkulator.ErrInvalid // ErrUnsupprted?
+			}
+			const url = "https://bibsys.alma.exlibrisgroup.com/view/sru/47BIBSYS_NETWORK?version=1.2&operation=searchRetrieve&recordSchema=marcxml&query=alma.isbn="
+			res, err := http.Open(ctx, url+id)
+			if err != nil {
+				return Ingestion{}, err
+			}
+			defer res.Close()
+			var sruRes sruResponse
+			if err := xml.NewDecoder(res).Decode(&sruRes); err != nil {
+				return Ingestion{}, err
+			} else if sruRes.NumberOfRecords == 0 {
+				return Ingestion{}, sirkulator.ErrNotFound
+			} else if sruRes.NumberOfRecords > 1 {
+				// Bail out if we get more than one record
+				return Ingestion{}, sirkulator.ErrConflict // TODO or craft custom error here
+			}
+			var mrc marc.Record
+			if err := marc.Unmarshal(sruRes.Records.Record.Metadata, &mrc); err != nil {
+				return Ingestion{}, err
+			}
+			return ingestMarcRecord("bibsys", mrc, idFunc)
+		},
+	},
+}
+
+// remoteRecord will go through the list of externalSources and try to get an
+// Ingestion from the remote record. It will at most use one external source.
+func (ig *Ingestor) remoteRecord(ctx context.Context, idtype, id string) (Ingestion, error) {
+	for _, src := range externalSources {
+		if data, err := src.Fetch(ctx, idtype, id, ig.idFunc); err == nil {
+			// We return as soon as we have a valid response.
+			// TODO (future idea) consider combining severeal remote records.
+			return data, nil
+		}
+		// TODO which errors are interesting to callers? ErrTemporary - to signal it might
+		// be worthwile to try again?
+	}
+	return Ingestion{}, sirkulator.ErrNotFound
 }
 
 // persistIngestion will store all resources, relations and reviews in
 // the Ingestion. No further validation of input is performed - all of
 // the given data is assumed to be valid at this point, as not to
 // trigger any SQL constraints when inserting into DB.
-// TODO: handle data.Covers
 func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	defer sqlitex.Save(conn)(&err)
 
@@ -250,7 +318,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 			stmt.SetText("$type", link[0])
 			stmt.SetText("$id", link[1])
 			id, err := sqlitex.ResultText(stmt)
-			if err != nil {
+			if err != nil && !errors.Is(err, sqlitex.ErrNoResults) {
 				return err // TODO annotate
 			}
 			if id == "" {

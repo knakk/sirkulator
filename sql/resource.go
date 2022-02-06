@@ -14,8 +14,7 @@ func readResource(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt
 		res.Type = t
 		res.ID = stmt.ColumnText(0)
 		res.Label = stmt.ColumnText(1)
-		ds := stmt.ColumnText(2)
-		if err := json.Unmarshal([]byte(ds), res.Data); err != nil {
+		if err := json.Unmarshal([]byte(stmt.ColumnText(2)), res.Data); err != nil {
 			return err
 		}
 		return nil
@@ -42,5 +41,8 @@ func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirku
 	if err := sqlitex.Exec(conn, q, readData(&res, t), t.String(), id); err != nil {
 		return res, fmt.Errorf("sql.GetResource(%s, %s): %w", t.String(), id, err)
 	}
+	// TODO NotFound error; readData fn should set found bool
 	return res, nil
 }
+
+//func GetOAIRecord(conn *sqlite.Conn, source,id string) (oai.Record, error) {}

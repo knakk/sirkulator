@@ -303,6 +303,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		return strings.Contains(covers[i].URL, "original") && !strings.Contains(covers[j].URL, "original")
 	})
 	ing.Covers = covers
+
+	// TODO verify that we have enough data for a valid record, ie with Label != ""
+
 	return ing, nil
 }
 
