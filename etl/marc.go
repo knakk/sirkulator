@@ -14,20 +14,38 @@ import (
 
 // createAgent creates a Resource of type Person/Corporation from the given MARC datafield.
 // If the returned Resource has an empty ID, it is to be considered invalid.
-func createAgent(f marc.DataField, idFunc func() string) sirkulator.Resource {
-	res := sirkulator.Resource{}
-	switch f.Tag {
-	case "100", "600", "700":
-		res.Type = sirkulator.TypePerson
-	case "110", "710":
-		res.Type = sirkulator.TypeCorporation
-	}
-	if name := f.ValueAt("a"); name != "" {
-		res.Label = invertName(name)
-	} else {
+func createAgent(f marc.DataField, idFunc func() string) (res sirkulator.Resource) {
+	name := f.ValueAt("a")
+	if name == "" {
 		// No name means invalid resource, return without ID
 		return res
 	}
+
+	switch f.Tag {
+	case "100", "600", "700":
+		res.Type = sirkulator.TypePerson
+		res.Label = invertName(name)
+		person := sirkulator.Person{
+			Name: res.Label,
+		}
+		if lifespan := f.ValueAt("d"); lifespan != "" {
+			person.YearRange = parseYearRange(lifespan)
+			// TODO consider dropping lifespan from persons born before 0 CE.
+			// It is mostly needed for disambiguating betwen different
+			// persons with similar or identical names. The further we
+			// go back in time, the less likely this is. There is only one Herodotus (or?)
+			// In addition, we don't have a language-independent way of
+			// denoting BCE/CE.
+			res.Label = fmt.Sprintf("%s (%s)", res.Label, person.YearRange)
+		}
+		res.Data = person
+	case "110", "610", "710":
+		res.Type = sirkulator.TypeCorporation
+		res.Label = name
+	default:
+		panic("createAgent: unhandled Marc data field " + f.Tag)
+	}
+
 	for _, v := range f.ValuesAt("0") {
 		// TODO strings.ToLower(v)
 		if strings.HasPrefix(v, "(NO-TrBIB)") {
@@ -44,22 +62,7 @@ func createAgent(f marc.DataField, idFunc func() string) sirkulator.Resource {
 		}
 		// TODO (DE-588) Deutsche Nationalbibliothek
 	}
-	if lifespan := f.ValueAt("d"); lifespan != "" {
-		if res.Type == sirkulator.TypePerson {
-			person := sirkulator.Person{
-				Name: res.Label,
-			}
-			person.YearRange = parseYearRange(lifespan)
-			res.Data = person
-			// TODO consider dropping lifespan from persons born before 0 CE.
-			// It is mostly needed for disambiguating betwen different
-			// persons with similar or identical names. The further we
-			// go back in time, the less likely this is. There is only one Herodotus (or?)
-			// In addition, we don't have a language-independent way of
-			// denoting BCE/CE.
-			res.Label = fmt.Sprintf("%s (%s)", res.Label, person.YearRange)
-		}
-	}
+
 	res.ID = idFunc()
 	return res
 }
@@ -80,6 +83,7 @@ func matchOrCreate(agents *[]sirkulator.Resource, f marc.DataField, idFunc func(
 	if agent.ID != "" {
 		*agents = append(*agents, agent)
 	}
+	// TODO take reviews as param, and add review if no id links in agent?
 	return agent
 }
 
@@ -192,8 +196,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			p.NumPages = n
 		}
 	}
-	// Creator, Main entry (Person)
-	if f, ok := rec.DataFieldAt("100"); ok {
+	// Creator/Main entry
+	// 100=Person, 110=Corporation
+	for _, f := range rec.DataFieldsAt("100", "110") {
 		agent := createAgent(f, idFunc)
 		agents = append(agents, agent)
 
@@ -203,6 +208,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		if role == "" {
 			// default
 			// TODO different default for mediatypes other than books/monographs
+			// TODO different default for other conditions (110?)
 			role = "aut"
 		}
 		relations = append(relations, sirkulator.Relation{
@@ -226,7 +232,8 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	// Subjects
 	// https://rdakatalogisering.unit.no/6xx-emneinnforsler/
 	// 600 Subject of person
-	for _, f := range rec.DataFieldsAt("600") {
+	// 610 Subject of organization
+	for _, f := range rec.DataFieldsAt("600", "610") {
 		if agent := matchOrCreate(&agents, f, idFunc); agent.ID != "" {
 			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
@@ -258,7 +265,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	}
 
 	// 7xx contributors
-	for _, f := range rec.DataFieldsAt("700") {
+	for _, f := range rec.DataFieldsAt("700", "710") {
 		if agent := matchOrCreate(&agents, f, idFunc); agent.ID != "" {
 			relator, _ := marc.ParseRelator(f.ValueAt("4"))
 			role := relator.Code()

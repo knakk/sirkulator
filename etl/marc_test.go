@@ -870,6 +870,24 @@ func TestIngestOAIRecord(t *testing.T) {
 						},
 					},
 				},
+				{
+					Type:  sirkulator.TypeCorporation,
+					ID:    "t4",
+					Label: "Norges sopp- og nyttevekstforbund",
+					Links: [][2]string{{"bibsys", "5032677"}},
+				},
+				{
+					Type:  sirkulator.TypeCorporation,
+					ID:    "t5",
+					Label: "Nordic People and Plants (prosjekt)",
+					Links: [][2]string{{"bibsys", "1614124828252"}},
+				},
+				{
+					Type:  sirkulator.TypeCorporation,
+					ID:    "t6",
+					Label: "Universitetet i Oslo",
+					Links: [][2]string{{"bibsys", "11071432"}},
+				},
 			},
 			Relations: []sirkulator.Relation{
 				{
@@ -883,6 +901,24 @@ func TestIngestOAIRecord(t *testing.T) {
 					ToID:   "t3",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t4",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": string("aut")},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t5",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": string("aut")},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t6",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": string("aut")},
 				},
 			},
 			Reviews: []sirkulator.Relation{
@@ -909,6 +945,294 @@ func TestIngestOAIRecord(t *testing.T) {
 		}
 
 		got, err := ingestMarcRecord("bibsys/pub", marc.MustParseString(isbn9788230021743), testID())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if diff := cmp.Diff(want, got); diff != "" {
+			t.Errorf("ingestMarcRecord() mismatch (-want +got):\n%s", diff)
+		}
+	})
+
+	t.Run("non-fiction with many contributors", func(t *testing.T) {
+		const isbn9788253043203 = `
+			<record xmlns="http://www.loc.gov/MARC21/slim">
+				<leader>0194922   220038500 4500</leader>
+				<controlfield tag="001">999921641921002201</controlfield>
+				<controlfield tag="005">20220131131755.0</controlfield>
+				<controlfield tag="007">ta</controlfield>
+				<controlfield tag="008">220105s2022    no a   e ||||||0| 0 nob|</controlfield>
+				<datafield ind1=" " ind2=" " tag="020">
+					<subfield code="a">9788253043203</subfield>
+					<subfield code="c">Nkr 499.00</subfield>
+					<subfield code="q">innbundet</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="035">
+					<subfield code="a">(NO-OsBA)0646223</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="035">
+					<subfield code="a">oai:bibbi.bs.no:0646223</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="040">
+					<subfield code="a">NO-OsBA</subfield>
+					<subfield code="b">nob</subfield>
+					<subfield code="e">rda</subfield>
+					<subfield code="d">NO-OsNB</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="080">
+					<subfield code="a">727.8(481.13)</subfield>
+				</datafield>
+				<datafield ind1="0" ind2="4" tag="082">
+					<subfield code="a">727.8244821</subfield>
+					<subfield code="q">NO-OsBA</subfield>
+					<subfield code="2">23/nor</subfield>
+				</datafield>
+				<datafield ind1="0" ind2="0" tag="245">
+					<subfield code="a">Deichman Bjørvika</subfield>
+					<subfield code="b">Lundhagem og Atelier Oslo arkitekter</subfield>
+					<subfield code="c">redaktører Lars Müller og arkitektene ; med bidrag fra Niklas Maak, Elif Shafak, Liv Sæteren ; fotoessays av Einar Aslaksen, Iwan Baan, Hélène Binet ; oversettere: Jan Christopher Næss og Lene Stokseth</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="1" tag="264">
+					<subfield code="a">Oslo</subfield>
+					<subfield code="b">Pax forlag</subfield>
+					<subfield code="c">[2022]</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="300">
+					<subfield code="a">271 sider</subfield>
+					<subfield code="b">illustrasjoner i farger</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="336">
+					<subfield code="a">tekst</subfield>
+					<subfield code="0">http://rdaregistry.info/termList/RDAContentType/1020</subfield>
+					<subfield code="2">rdaco</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="337">
+					<subfield code="a">uformidlet</subfield>
+					<subfield code="0">http://rdaregistry.info/termList/RDAMediaType/1007</subfield>
+					<subfield code="2">rdamt</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="338">
+					<subfield code="a">bind</subfield>
+					<subfield code="0">http://rdaregistry.info/termList/RDACarrierType/1049</subfield>
+					<subfield code="2">rdact</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="7" tag="650">
+					<subfield code="a">Bibliotekbygninger</subfield>
+					<subfield code="z">Oslo</subfield>
+					<subfield code="2">tekord</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="610">
+					<subfield code="a">Deichman Bjørvika</subfield>
+					<subfield code="0">(NO-TrBIB)1642068353945</subfield>
+					<subfield code="2">bare</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="650">
+					<subfield code="a">Folkebibliotek</subfield>
+					<subfield code="g">arkitektur</subfield>
+					<subfield code="z">Oslo</subfield>
+					<subfield code="0">(NO-OsBA)1263818</subfield>
+					<subfield code="2">bibbi</subfield>
+					<subfield code="9">nob</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="650">
+					<subfield code="a">Folkebibliotek</subfield>
+					<subfield code="g">arkitektur</subfield>
+					<subfield code="z">Oslo</subfield>
+					<subfield code="0">(NO-OsBA)1263818</subfield>
+					<subfield code="2">bibbi</subfield>
+					<subfield code="9">nno</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="700">
+					<subfield code="a">Müller, Lars</subfield>
+					<subfield code="4">edt</subfield>
+					<subfield code="0">(NO-TrBIB)90961231</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="700">
+					<subfield code="a">Shafak, Elif</subfield>
+					<subfield code="d">1971-</subfield>
+					<subfield code="4">aut</subfield>
+					<subfield code="0">(NO-TrBIB)8035652</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="700">
+					<subfield code="a">Maak, Niklas</subfield>
+					<subfield code="d">1972-</subfield>
+					<subfield code="4">aut</subfield>
+					<subfield code="0">(NO-TrBIB)12010078</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="700">
+					<subfield code="a">Sæteren, Liv</subfield>
+					<subfield code="4">aut</subfield>
+					<subfield code="0">(NO-TrBIB)9009005</subfield>
+				</datafield>
+				<datafield ind1="2" ind2=" " tag="710">
+					<subfield code="a">Lund Hagem arkitekter AS</subfield>
+				</datafield>
+				<datafield ind1="2" ind2=" " tag="710">
+					<subfield code="a">Atelier Oslo</subfield>
+					<subfield code="0">(NO-TrBIB)12073195</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="856">
+					<subfield code="a">aja.bs.no</subfield>
+					<subfield code="q">image/jpeg</subfield>
+					<subfield code="u">https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/original.jpg</subfield>
+					<subfield code="3">Omslagsbilde</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="856">
+					<subfield code="a">aja.bs.no</subfield>
+					<subfield code="q">image/jpeg</subfield>
+					<subfield code="u">https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/thumbnail.jpg</subfield>
+					<subfield code="3">Miniatyrbilde</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="913">
+					<subfield code="a">Norbok</subfield>
+					<subfield code="b">NB</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="913">
+					<subfield code="a">Norbok</subfield>
+					<subfield code="b">NB</subfield>
+				</datafield>
+			</record>
+			`
+		want := Ingestion{
+			Resources: []sirkulator.Resource{
+				{
+					ID:    "t1",
+					Label: "Deichman Bjørvika: Lundhagem og Atelier Oslo arkitekter (2022)",
+					Type:  sirkulator.TypePublication,
+					Data: sirkulator.Publication{
+						Title:     "Deichman Bjørvika",
+						Subtitle:  "Lundhagem og Atelier Oslo arkitekter",
+						Publisher: "Pax forlag",
+						Year:      2022,
+						//YearFirst: 2022
+						Language:   "nob",
+						Nonfiction: true,
+						NumPages:   271,
+					},
+				},
+				{
+					Type:  sirkulator.TypeCorporation,
+					ID:    "t2",
+					Label: "Deichman Bjørvika",
+					Links: [][2]string{{"bibsys", "1642068353945"}},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t3",
+					Label: "Lars Müller",
+					Links: [][2]string{{"bibsys", "90961231"}},
+					Data: sirkulator.Person{
+						Name: "Lars Müller",
+					},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t4",
+					Label: "Elif Shafak (1971–)",
+					Links: [][2]string{{"bibsys", "8035652"}},
+					Data: sirkulator.Person{
+						Name: "Elif Shafak",
+						YearRange: sirkulator.YearRange{
+							From: 1971,
+						},
+					},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t5",
+					Label: "Niklas Maak (1972–)",
+					Links: [][2]string{{"bibsys", "12010078"}},
+					Data: sirkulator.Person{
+						Name: "Niklas Maak",
+						YearRange: sirkulator.YearRange{
+							From: 1972,
+						},
+					},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t6",
+					Label: "Liv Sæteren",
+					Links: [][2]string{{"bibsys", "9009005"}},
+					Data: sirkulator.Person{
+						Name: "Liv Sæteren",
+					},
+				},
+				{
+					Type:  sirkulator.TypeCorporation,
+					ID:    "t7",
+					Label: "Lund Hagem arkitekter AS",
+				},
+				{
+					Type:  sirkulator.TypeCorporation,
+					ID:    "t8",
+					Label: "Atelier Oslo",
+					Links: [][2]string{{"bibsys", "12073195"}},
+				},
+			},
+			Relations: []sirkulator.Relation{
+				{
+					FromID: "t1",
+					ToID:   "t2",
+					Type:   "has_subject",
+				},
+				{
+					FromID: "t1",
+					ToID:   "t3",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "edt"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t4",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t5",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t6",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t7",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": string("aut")},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t8",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": string("aut")},
+				},
+			},
+			Reviews: []sirkulator.Relation{
+				{
+					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Pax forlag"},
+				},
+			},
+			Covers: []FileFetch{
+				{
+					ResourceID: "t1",
+					URL:        "https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/original.jpg",
+				},
+				{
+					ResourceID: "t1",
+					URL:        "https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/thumbnail.jpg",
+				},
+			},
+		}
+
+		got, err := ingestMarcRecord("bibsys/pub", marc.MustParseString(isbn9788253043203), testID())
 		if err != nil {
 			t.Fatal(err)
 		}

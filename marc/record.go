@@ -107,10 +107,12 @@ func (r Record) DataFieldAt(tag string) (DataField, bool) {
 	return DataField{}, false
 }
 
-func (r Record) DataFieldsAt(tag string) (res []DataField) {
-	for _, f := range r.DataFields {
-		if f.Tag == tag {
-			res = append(res, f)
+func (r Record) DataFieldsAt(tags ...string) (res []DataField) {
+	for _, tag := range tags {
+		for _, f := range r.DataFields {
+			if f.Tag == tag {
+				res = append(res, f)
+			}
 		}
 	}
 	return res
