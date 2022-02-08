@@ -4,23 +4,30 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 )
 
 // Unmarshal parsers the MARCXML-encoded data and stores the result in the given Record.
 func Unmarshal(b []byte, rec *Record) error {
 	dec := xml.NewDecoder(bytes.NewBuffer(b))
+
 	for {
 		t, err := dec.Token()
 		if err != nil {
-			return err
+			return fmt.Errorf("marc: Unmarshal: %w", err)
 		}
+
 		switch elem := t.(type) {
 		case xml.SyntaxError:
-			return errors.New(elem.Error())
+			return fmt.Errorf("marc: Unmarshal: %s", elem.Error())
 		case xml.StartElement:
 			if elem.Name.Local == "record" {
-				return dec.DecodeElement(&rec, &elem)
+				if err := dec.DecodeElement(&rec, &elem); err != nil {
+					return fmt.Errorf("marc: Unmarshal: %w", err)
+				}
+
+				return nil
 			}
 		}
 	}
@@ -32,6 +39,7 @@ func MustParse(b []byte) Record {
 	if err := Unmarshal(b, &r); err != nil {
 		panic(err)
 	}
+
 	return r
 }
 
@@ -41,6 +49,7 @@ func MustParseString(s string) Record {
 	if err := Unmarshal([]byte(s), &r); err != nil {
 		panic(err)
 	}
+
 	return r
 }
 
@@ -57,16 +66,17 @@ func NewDecoder(r io.Reader) *Decoder {
 }
 
 // DecodeAll consumes the input stream and returns all decoded records.
-// If there is an error, it will return, together with the succesfully
+// If there is an error, it will return, together with the successfully
 // parsed MARC records up til then.
 func (d *Decoder) DecodeAll() ([]Record, error) {
 	res := make([]Record, 0)
-	for r, err := d.Decode(); err != io.EOF; r, err = d.Decode() {
+	for r, err := d.Decode(); !errors.Is(err, io.EOF); r, err = d.Decode() {
 		if err != nil {
 			return res, err
 		}
 		res = append(res, r)
 	}
+
 	return res, nil
 }
 
@@ -76,15 +86,18 @@ func (d *Decoder) Decode() (Record, error) {
 	for {
 		t, err := d.xmlDec.Token()
 		if err != nil {
-			return rec, err
+			return rec, fmt.Errorf("marc: Decoder.Decode: %w", err)
 		}
 		switch elem := t.(type) {
 		case xml.SyntaxError:
-			return rec, errors.New(elem.Error())
+			return rec, fmt.Errorf("marc: Decoder.Decode: %s", elem.Error())
 		case xml.StartElement:
 			if elem.Name.Local == "record" {
-				err := d.xmlDec.DecodeElement(&rec, &elem)
-				return rec, err
+				if err := d.xmlDec.DecodeElement(&rec, &elem); err != nil {
+					return rec, fmt.Errorf("marc: Decoder.Decode: %w", err)
+				}
+
+				return rec, nil
 			}
 		}
 	}

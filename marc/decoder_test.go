@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// Verify that MARC records can be decoded
+// Verify that MARC records can be decoded.
 func TestDecode(t *testing.T) {
 	files, err := filepath.Glob("testdata/*")
 	if err != nil {

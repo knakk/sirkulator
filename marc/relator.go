@@ -3,6 +3,7 @@ package marc
 import (
 	"errors"
 
+	"github.com/knakk/sirkulator/internal/localizer"
 	"golang.org/x/text/language"
 )
 
@@ -80,7 +81,7 @@ var relators = map[string][2]string{
 	"tcd": {"Technical director", "teknisk leder"},
 }
 
-// Realator is a known Marc relator, associated with a 3-letter code.
+// Relator is a known Marc relator, associated with a 3-letter code.
 // The codes are maintained by Library of Congress.
 type Relator struct {
 	code string
@@ -103,7 +104,7 @@ func (r Relator) Code() string {
 // Label returns a string representation of the Marc relator in the desired language.
 // Only Norwegian and English are currently supported.
 func (r Relator) Label(tag language.Tag) string {
-	match, _, _ := matcher.Match(tag)
+	match, _, _ := localizer.Matcher.Match(tag)
 	if match == language.Norwegian {
 		return relators[r.code][1]
 	}

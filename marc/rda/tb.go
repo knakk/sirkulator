@@ -2,7 +2,7 @@ package rda
 
 import "golang.org/x/text/language"
 
-// RDA Type Of Binding (rdatb)
+// RDA Type Of Binding (rdatb).
 type TB string
 
 const (

@@ -5,13 +5,7 @@ package marc
 
 import (
 	"encoding/xml"
-
-	"golang.org/x/text/language"
 )
-
-// TODO expose from localizer
-// used by Language.Label(tag language.Tag) and Relator.Label(tag language.Tag)
-var matcher = language.NewMatcher([]language.Tag{language.English, language.Norwegian})
 
 // Record represents a MARC record.
 type Record struct {
@@ -35,21 +29,28 @@ type DataField struct {
 	SubFields []SubField `xml:"subfield"`
 }
 
+// ValueAt returns the first value at the first occurrence
+// of the code in the the DataField. It returns an empty
+// string if none is found.
 func (d DataField) ValueAt(code string) string {
 	for _, f := range d.SubFields {
 		if f.Code == code {
 			return f.Value
 		}
 	}
+
 	return ""
 }
 
+// ValuesAt returns a string slice of all occurrences of
+// code in the DataField.
 func (d DataField) ValuesAt(code string) (res []string) {
 	for _, f := range d.SubFields {
 		if f.Code == code {
 			res = append(res, f.Value)
 		}
 	}
+
 	return res
 }
 
@@ -59,10 +60,13 @@ type SubField struct {
 	Value string `xml:",chardata"`
 }
 
+// IsEmpty returns true if the MARC Record i empty (zero value).
 func (r Record) IsEmpty() bool {
 	return r.Leader == "" && len(r.ControlFields) == 0 && len(r.DataFields) == 0
 }
 
+// ValueAt returns the first occurrence of code in the requested DataField, along
+// with a boolean denoting if a value was found or not.
 func (r Record) ValueAt(tag, code string) (string, bool) {
 	for _, f := range r.DataFields {
 		if f.Tag == tag {
@@ -73,9 +77,12 @@ func (r Record) ValueAt(tag, code string) (string, bool) {
 			}
 		}
 	}
+
 	return "", false
 }
 
+// ValuesAt returns a string slice of all occurrences of code in
+// all occurrences of DataFields of the given tag.
 func (r Record) ValuesAt(tag, code string) (res []string) {
 	for _, f := range r.DataFields {
 		if f.Tag == tag {
@@ -86,27 +93,36 @@ func (r Record) ValuesAt(tag, code string) (res []string) {
 			}
 		}
 	}
+
 	return res
 }
 
+// ControlFieldAt returns the control fiel of the given tag, along
+// with a boolean denoting if it was found or not.
 func (r Record) ControlFieldAt(tag string) (ControlField, bool) {
 	for _, f := range r.ControlFields {
 		if f.Tag == tag {
 			return f, true
 		}
 	}
+
 	return ControlField{}, false
 }
 
+// DataFieldAt returns the first occurrence of DataField with
+// the given tag, along with a boolean denoting if it was found or not.
 func (r Record) DataFieldAt(tag string) (DataField, bool) {
 	for _, f := range r.DataFields {
 		if f.Tag == tag {
 			return f, true
 		}
 	}
+
 	return DataField{}, false
 }
 
+// DataFieldsAt returns all occurrences of DataFields with
+// the given tags.
 func (r Record) DataFieldsAt(tags ...string) (res []DataField) {
 	for _, tag := range tags {
 		for _, f := range r.DataFields {
@@ -115,5 +131,6 @@ func (r Record) DataFieldsAt(tags ...string) (res []DataField) {
 			}
 		}
 	}
+
 	return res
 }
