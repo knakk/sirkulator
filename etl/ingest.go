@@ -15,7 +15,7 @@ import (
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator"
-	"github.com/knakk/sirkulator/http"
+	"github.com/knakk/sirkulator/http/client"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/oai"
 	"golang.org/x/image/draw"
@@ -144,7 +144,7 @@ var externalSources = []struct {
 				return Ingestion{}, sirkulator.ErrInvalid // ErrUnsupprted?
 			}
 			const url = "https://bibsys.alma.exlibrisgroup.com/view/sru/47BIBSYS_NETWORK?version=1.2&operation=searchRetrieve&recordSchema=marcxml&query=alma.isbn="
-			res, err := http.Open(ctx, url+id)
+			res, err := client.Open(ctx, url+id)
 			if err != nil {
 				return Ingestion{}, err
 			}
@@ -258,7 +258,7 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 	}
 	defer ig.db.Put(conn)
 	for _, f := range files {
-		r, err := http.Open(ctx, f.URL)
+		r, err := client.Open(ctx, f.URL)
 		if err != nil {
 			continue
 		}
@@ -277,12 +277,13 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 			continue
 		}
 		stmt := conn.Prep(`
-			INSERT INTO files.image (id, type, width, height, data, source)
-				VALUES ($id, $type, $width, $height, $data, $source)`)
+			INSERT INTO files.image (id, type, width, height, size, data, source)
+				VALUES ($id, $type, $width, $height, $size, $data, $source)`)
 		stmt.SetText("$id", f.ResourceID)
 		stmt.SetText("$type", "jpeg")
 		stmt.SetInt64("$width", 200)
 		stmt.SetInt64("$height", int64(height))
+		stmt.SetInt64("$size", int64(b.Len()))
 		stmt.SetBytes("$data", b.Bytes())
 		stmt.SetText("$source", f.URL)
 		if _, err = stmt.Step(); err != nil {
@@ -349,7 +350,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 	}
 
 	if ig.ImageAsync {
-		go ig.downloadImages(ctx, data.Covers)
+		go ig.downloadImages(context.Background(), data.Covers)
 	} else {
 		ig.downloadImages(ctx, data.Covers)
 	}

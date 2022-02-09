@@ -3,6 +3,7 @@ CREATE TABLE files.image (
     type    TEXT NOT NULL,    -- CHECK(type IN ("jpeg", "webp", "png", "svg", "avif"))
     width   INTEGER NOT NULL,
     height  INTEGER NOT NULL,
+    size    INTEGER NOT NULL, -- in bytes
     data    BLOB NOT NULL,
     source  TEXT              -- originating URL if known
 );
