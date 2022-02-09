@@ -74,6 +74,7 @@ func (app *App) Render(ctx context.Context, w io.Writer) {
 		<% } %>
 	</title>
     <link rel="stylesheet" href="/assets/main.css">
+    <script src="/assets/htmx.min.js"></script>
 </head>
 <body>
     <header>

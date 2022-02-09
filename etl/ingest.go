@@ -41,6 +41,14 @@ func NewIngestor(db *sqlitex.Pool) *Ingestor {
 	}
 }
 
+func NewPreviewIngestor(db *sqlitex.Pool) *Ingestor {
+	return &Ingestor{
+		db:            db,
+		ImageDownload: false,
+		idFunc:        func() string { return "" }, // resources with blank IDs will not be persisted
+	}
+}
+
 func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
 	// TODO clean isbn: remove dashes and spaces from string
 
@@ -68,6 +76,21 @@ func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
 	}
 	// We got data, either from local or remote source, now try to persist it:
 	return ig.Ingest(ctx, data)
+}
+
+func (ig *Ingestor) PreviewISBN(ctx context.Context, isbn string) (Ingestion, error) {
+	var data Ingestion
+	rec, err := ig.localRecord(ctx, "isbn", isbn)
+	if err == nil {
+		data, err = ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
+		if err != nil {
+			return data, err
+		}
+	} else if errors.Is(err, sirkulator.ErrNotFound) {
+		data, err = ig.remoteRecord(ctx, "isbn", isbn)
+		return data, err
+	}
+	return data, sirkulator.ErrNotFound
 }
 
 // TODO move to sql package?

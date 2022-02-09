@@ -10,7 +10,9 @@ import (
 	"os/signal"
 	"strings"
 
+	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator/http"
+	"github.com/knakk/sirkulator/sql"
 	"golang.org/x/text/language"
 )
 
@@ -18,6 +20,7 @@ import (
 type Main struct {
 	Config     Config
 	HTTPServer *http.Server
+	DB         *sqlitex.Pool
 }
 
 func (m Main) Run(ctx context.Context) error {
@@ -39,6 +42,7 @@ type Config struct {
 	Port      int
 	Lang      language.Tag
 	AssetsDir string
+	DataDir   string
 }
 
 func parseFlags(args []string) Config {
@@ -59,6 +63,7 @@ func parseFlags(args []string) Config {
 	})
 	fs.IntVar(&conf.Port, "port", 9999, "port")
 	fs.StringVar(&conf.AssetsDir, "assets", "", "assets directory, overriding default embedded static assets")
+	fs.StringVar(&conf.DataDir, "db", "data", "data directory")
 	fs.Parse(args)
 	return conf
 }
@@ -66,6 +71,12 @@ func parseFlags(args []string) Config {
 func main() {
 	// Parse flags into a valid Config, will exit(1) on errors.
 	conf := parseFlags(os.Args[1:])
+
+	// Create databases and init connection pool
+	db, err := sql.OpenAt("data")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Set up base context and shutdown signal handler.
 	ctx, cancel := context.WithCancel(context.Background())
@@ -75,7 +86,8 @@ func main() {
 
 	m := Main{
 		Config:     conf,
-		HTTPServer: http.NewServer(ctx, conf.AssetsDir),
+		HTTPServer: http.NewServer(ctx, conf.AssetsDir, db),
+		DB:         db,
 	}
 
 	// Run the program: starts all services and listeners.

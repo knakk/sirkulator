@@ -80,41 +80,32 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
             <h3><%= l.Translate("Import") %></h3>
         </summary>
         <div class="border pad">
-            <div class="row border">
-                <div class="column pad">
-                    <label for="identifiers">Idenifikatorer</label>
-                    <textarea id="identifiers" rows="3"></textarea><br/>
-                </div>
-                <div class="column pad content-bottom">
-                    <p>ISBN, ISSN eller EAN<br/>1 per linje</p>
-                    <p></br></p>
-                    <div class="row">
-                        <div class="column"><button>Preview</button></div>
-                        <div class="column pad-left"><button>Import</button></div>
+            <form hx-post="/metadata/import" hx-target="#import-results" hx-indicator=".htmx-inflight">
+                <div class="row border">
+                    <div class="column pad">
+                        <label for="identifiers">Idenifikatorer</label>
+                        <textarea name="identifiers" rows="3"></textarea><br/>
+                    </div>
+                    <div class="column pad content-bottom">
+                        <p>ISBN, ISSN eller EAN<br/>1 per linje</p>
+                        <p></br></p>
+                        <div class="row">
+                            <div class="column">
+                                <button hx-post="/metadata/preview" hx-indicator=".htmx-inflight" hx-target="#import-results">Preview</button>
+                            </div>
+                            <div class="column pad-left" class="submit">
+                                <button>Import
+                            </button>
+                        </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
         <div class="border pad">
-            <h4>Forhåndsvisning (ikke importert)</h4>
-            <div class="row border">
-                <div class="column pad">
-                    <p>ISBN: 82-02-01856-0</p>
-                </div>
-                <div class="column" style="flex:3">
-                    <dl>
-                        <dt>Utgivelse</dt>
-                        <dd>Illustrert algeflora</dd>
-                    </dl>
-                    <dl>
-                        <dt>Person</dt>
-                        <dd>Per Arvid Åsen</dd>
-                    </dl>
-                    <dl>
-                        <dt>Forlag</dt>
-                        <dd>Cappelen</dd>
-                    </dl>
-                </div>
+            <div id="import-indicator"class="htmx-import-indicator htmx-inflight">wait...</div>
+            <div id="import-results" class="htmx-request-indicator htmx-inflight">
+
             </div>
         </div>
     </details>

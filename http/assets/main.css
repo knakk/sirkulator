@@ -33,6 +33,7 @@ footer { background: #f5f5f5; padding: 1rem 0; font-family: monospace; }
 
 table    { width: 100% }
 thead th { text-align: left; }
+table td { vertical-align: top;}
 
 label    { font-weight: bold; }
 
@@ -67,3 +68,12 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 @keyframes border-dance {
       0% { background-position: left top, right bottom, left bottom, right top; }
     100% { background-position: left 15px top, right 15px bottom, left bottom 15px, right top 15px; } }
+
+
+/* htmx-stuff */
+.htmx-request-indicator               { opacity:1; }
+.htmx-request .htmx-request-indicator { opacity:0.33; }
+.htmx-request.htmx-request-indicator  { opacity:0.33; }
+.htmx-import-indicator                { opacity: 0 }
+.htmx-request .htmx-import-indicator  { opacity: 1; }
+.htmx-request.htmx-import-indicator   { opacity: 1; }

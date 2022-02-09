@@ -5,3 +5,4 @@ scratch
 *.ego.go
 out.gotext.json 
 *.db
+*.js

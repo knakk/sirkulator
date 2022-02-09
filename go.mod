@@ -12,7 +12,7 @@ require (
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 )
 
-require golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
+require golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 
 // Build tools
 require github.com/benbjohnson/ego v0.4.3

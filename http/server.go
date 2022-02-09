@@ -3,12 +3,15 @@ package http
 import (
 	"context"
 	"embed"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
+	"crawshaw.io/sqlite/sqlitex"
 	"github.com/go-chi/chi/v5"
+	"github.com/knakk/sirkulator/etl"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
 	"golang.org/x/text/language"
@@ -20,6 +23,7 @@ var embeddedFS embed.FS
 type Server struct {
 	ln  net.Listener
 	srv *http.Server
+	db  *sqlitex.Pool
 
 	// The follwing fields should be set before calls to Open:
 
@@ -29,9 +33,10 @@ type Server struct {
 	Lang language.Tag
 }
 
-func NewServer(ctx context.Context, assetsDir string) *Server {
+func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool) *Server {
 	s := Server{
 		Addr: "localhost:0", // assign random port as default, usefull for testing
+		db:   db,
 	}
 	s.srv = &http.Server{
 		BaseContext:       func(net.Listener) context.Context { return ctx },
@@ -98,7 +103,11 @@ func (s *Server) router(assetsDir string) chi.Router {
 
 		r.Get("/", s.tmplHome)
 		r.Get("/circulation", s.tmplCirculation)
-		r.Get("/metadata", s.tmplMetadata)
+		r.Route("/metadata", func(r chi.Router) {
+			r.Get("/", s.tmplMetadata)           // s.pageMetadata ?
+			r.Post("/import", s.importResources) // s.tmplImportResponse ?
+			r.Post("/preview", s.importPreview)
+		})
 	})
 
 	return r
@@ -152,6 +161,65 @@ func (s *Server) tmplMetadata(w http.ResponseWriter, r *http.Request) {
 			Lang: s.Lang,
 			Path: r.URL.Path,
 		},
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) importResources(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	ids := r.PostForm.Get("identifiers")
+	if ids == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	ing := etl.NewIngestor(s.db)
+	ing.ImageDownload = true
+	ing.ImageAsync = true
+	numOK := 0
+	for _, id := range strings.Split(ids, "\n") {
+		// TODO detect type of ID: ISBN/EAN/ISSN
+		if err := ing.IngestISBN(r.Context(), id); err == nil {
+			numOK++
+		}
+	}
+	fmt.Fprintf(w, "<div><h3>%d Imported OK!</h3></div>", numOK)
+}
+
+func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	ids := r.PostForm.Get("identifiers")
+	if ids == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	ing := etl.NewPreviewIngestor(s.db)
+	ing.ImageDownload = false
+	ing.ImageAsync = true
+	var res []html.ImportPreviewEntry
+	for _, id := range strings.Split(ids, "\n") {
+		// TODO detect type of ID: ISBN/EAN/ISSN
+		p := html.ImportPreviewEntry{
+			IDType: "ISBN",
+			ID:     id,
+		}
+		data, err := ing.PreviewISBN(r.Context(), id)
+		if err == nil {
+			p.Data = data
+		} else {
+			p.Err = err.Error()
+		}
+		res = append(res, p)
+
+	}
+
+	tmpl := html.ImportPreviewTmpl{
+		Entries: res,
 	}
 	tmpl.Render(r.Context(), w)
 }
