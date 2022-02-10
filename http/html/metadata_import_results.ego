@@ -1,0 +1,28 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator/etl"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ImportResultEntry struct {
+	IDType string // isbn/ean/issn
+	ID     string
+	Err    string
+	Data   etl.Ingestion
+}
+
+type ImportResultsTmpl struct {
+    NumOK int // TODO remove
+    Entries []ImportResultEntry
+}
+
+func (ir *ImportResultsTmpl) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+
+%>
+<div>
+    <%= l.Translate("%d imported OK!", ir.NumOK) %>
+</div>
+<% } %>

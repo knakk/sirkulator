@@ -34,6 +34,33 @@ func (r ResourceType) String() string {
 	return [...]string{"unknown", "publication", "publisher", "person", "corporation", "literary_award", "series"}[r]
 }
 
+func (r ResourceType) enLabel() string {
+	if r > 7 || r < 0 {
+		r = 0 // "unknown"
+	}
+	return [...]string{"unknown", "publication", "publisher", "person", "corporation", "literary award", "series"}[r]
+}
+
+func (r ResourceType) noLabel() string {
+	if r > 7 || r < 0 {
+		r = 0 // "ukjent"
+	}
+	return [...]string{"ukjent", "utgivelse", "forlag", "person", "korporasjon", "pris", "serie"}[r]
+}
+
+// Label returns a localized string representation of ResourceType.
+func (r ResourceType) Label(tag language.Tag) string {
+	lang, _, _ := localizer.Matcher.Match(tag)
+	switch lang {
+	case language.English:
+		return r.enLabel()
+	case language.Norwegian:
+		return r.noLabel()
+	default:
+		panic("ResourceType.Label: unsupported language " + lang.String())
+	}
+}
+
 // 1) Abstract/generic/shared types:
 
 type Resource struct {

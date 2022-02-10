@@ -3,7 +3,7 @@ package html
 
 import (
     "github.com/knakk/sirkulator/etl"
-   // "github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/internal/localizer"
 )
 
 type ImportPreviewEntry struct {
@@ -18,7 +18,7 @@ type ImportPreviewTmpl struct {
 }
 
 func (p *ImportPreviewTmpl) Render(ctx context.Context, w io.Writer) {
-//    l, _ := ctx.Value("localizer").(localizer.Localizer)
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
 
 %>
 <div>
@@ -30,7 +30,7 @@ func (p *ImportPreviewTmpl) Render(ctx context.Context, w io.Writer) {
                         <td><strong><%= e.IDType %>: <%= e.ID %></strong></td>
                         <% for i, r := range e.Data.Resources { %>
                             <% if i > 0 { %><tr><td></td><% } %>
-                            <td><%= r.Type %></td>
+                            <td><%= r.Type.Label(l.Lang) %></td>
                             <td><%= r.Label %></td>
                             <% if i > 0 { %></tr><% } %>
                         <% } %>

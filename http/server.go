@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"embed"
-	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -178,14 +177,26 @@ func (s *Server) importResources(w http.ResponseWriter, r *http.Request) {
 	ing := etl.NewIngestor(s.db)
 	ing.ImageDownload = true
 	ing.ImageAsync = true
+	var res []html.ImportResultEntry
 	numOK := 0
 	for _, id := range strings.Split(ids, "\n") {
 		// TODO detect type of ID: ISBN/EAN/ISSN
-		if err := ing.IngestISBN(r.Context(), id); err == nil {
+		entry := html.ImportResultEntry{
+			IDType: "ISBN",
+			ID:     id,
+		}
+		err := ing.IngestISBN(r.Context(), id)
+		if err != nil {
+			entry.Err = err.Error()
+		} else {
 			numOK++
 		}
 	}
-	fmt.Fprintf(w, "<div><h3>%d Imported OK!</h3></div>", numOK)
+	tmpl := html.ImportResultsTmpl{
+		NumOK:   numOK, // TODO remove
+		Entries: res,
+	}
+	tmpl.Render(r.Context(), w)
 }
 
 func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {

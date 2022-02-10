@@ -42,6 +42,69 @@
             "translation": "Configuration",
             "translatorComment": "Copied from source.",
             "fuzzy": true
+        },
+        {
+            "id": "Show recent transactions",
+            "message": "Show recent transactions",
+            "translation": "Show recent transactions",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Show metadata for review",
+            "message": "Show metadata for review",
+            "translation": "Show metadata for review",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Search/browse catalogue",
+            "message": "Search/browse catalogue",
+            "translation": "Search/browse catalogue",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Import",
+            "message": "Import",
+            "translation": "Import",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Identifiers",
+            "message": "Identifiers",
+            "translation": "Identifiers",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "ISBN, ISSN or EAN",
+            "message": "ISBN, ISSN or EAN",
+            "translation": "ISBN, ISSN or EAN",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "1 per line",
+            "message": "1 per line",
+            "translation": "1 per line",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Preview",
+            "message": "Preview",
+            "translation": "Preview",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "wait...",
+            "message": "wait...",
+            "translation": "wait...",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
         }
     ]
 }

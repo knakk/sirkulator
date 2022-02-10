@@ -83,30 +83,29 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
             <form hx-post="/metadata/import" hx-target="#import-results" hx-indicator=".htmx-inflight">
                 <div class="row border">
                     <div class="column pad">
-                        <label for="identifiers">Idenifikatorer</label>
+                        <label for="identifiers"><%= l.Translate("Identifiers") %></label>
                         <textarea name="identifiers" rows="3"></textarea><br/>
                     </div>
                     <div class="column pad content-bottom">
-                        <p>ISBN, ISSN eller EAN<br/>1 per linje</p>
+                        <p>
+                            <%= l.Translate("ISBN, ISSN or EAN") %><br/>
+                            <%= l.Translate("1 per line") %></p>
                         <p></br></p>
                         <div class="row">
                             <div class="column">
-                                <button hx-post="/metadata/preview" hx-indicator=".htmx-inflight" hx-target="#import-results">Preview</button>
+                                <button hx-post="/metadata/preview" hx-indicator=".htmx-inflight" hx-target="#import-results"><%= l.Translate("Preview") %></button>
                             </div>
                             <div class="column pad-left" class="submit">
-                                <button>Import
-                            </button>
-                        </div>
+                                <button><%= l.Translate("Import") %></button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
         <div class="border pad">
-            <div id="import-indicator"class="htmx-import-indicator htmx-inflight">wait...</div>
-            <div id="import-results" class="htmx-request-indicator htmx-inflight">
-
-            </div>
+            <div id="import-indicator"class="htmx-import-indicator htmx-inflight"><%= l.Translate("wait...") %></div>
+            <div id="import-results" class="htmx-request-indicator htmx-inflight"></div>
         </div>
     </details>
 </ego:App>

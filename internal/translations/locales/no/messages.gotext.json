@@ -35,6 +35,61 @@
             "id": "Show recent transactions",
             "message": "Show recent transactions",
             "translation": "Vis siste transaksjoner"
+        },
+        {
+            "id": "Show metadata for review",
+            "message": "Show metadata for review",
+            "translation": "Vis opplysninger til gjennomsyn"
+        },
+        {
+            "id": "Search/browse catalogue",
+            "message": "Search/browse catalogue",
+            "translation": "Søk/bla i katalogen"
+        },
+        {
+            "id": "Import",
+            "message": "Import",
+            "translation": "Importer"
+        },
+        {
+            "id": "Identifiers",
+            "message": "Identifiers",
+            "translation": "Identifikatorer"
+        },
+        {
+            "id": "ISBN, ISSN or EAN",
+            "message": "ISBN, ISSN or EAN",
+            "translation": "ISBN, ISSN eller EAN"
+        },
+        {
+            "id": "1 per line",
+            "message": "1 per line",
+            "translation": "1 per linje"
+        },
+        {
+            "id": "Preview",
+            "message": "Preview",
+            "translation": "Forhåndsvis"
+        },
+        {
+            "id": "wait...",
+            "message": "wait...",
+            "translation": "vent..."
+        },
+        {
+            "id": "{NumOK} imported OK!",
+            "message": "{NumOK} imported OK!",
+            "translation": "{NumOK} importert OK!",
+            "placeholders": [
+                {
+                    "id": "NumOK",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "ir.NumOK"
+                }
+            ]
         }
     ]
 }
