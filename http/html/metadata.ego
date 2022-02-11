@@ -38,36 +38,18 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
                                 <option>Sted</option>
                             </select>
                         </th>
-                        <th><input type="search" placeholder="Søk i navn"></th>
+                        <th>
+                            <input name="q"
+                                hx-post="/metadata/search"
+                                hx-trigger="keyup changed delay:200ms, search"
+                                hx-target="#search-results"
+                                type="search" placeholder="Søk">
+                        </th>
                         <th>Opprettet</th>
                         <th>Endret</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Person</td>
-                        <td><a href="/">Petter Goksøyr Åsen</a></td>
-                        <td>2022-01-08 12:00:13</td>
-                        <td>2022-01-08 12:02:01</td>
-                    </tr>
-                    <tr>
-                        <td>Utgivelse</td>
-                        <td><a href="/">Per Arvid Åsen: Illustrert algeflora (1980)</a></td>
-                        <td>2021-12-04 09:12:00</td>
-                        <td>2022-01-08 12:02:01</td>
-                    </tr>
-                    <tr>
-                        <td>Person</td>
-                        <td><a href="/">Per Arvid Åsen</a></td>
-                        <td>2022-01-08 12:00:13</td>
-                        <td>2022-01-08 12:02:01</td>
-                    </tr>
-                    <tr>
-                        <td>Forlag</td>
-                        <td><a href="/">Cappelen</a></td>
-                        <td>2022-01-08 12:00:13</td>
-                        <td>2022-01-08 12:02:01</td>
-                    </tr>
+                <tbody id="search-results">
                 </tbody>
             </table>
         </div>

@@ -269,7 +269,7 @@ func TestIngestISBN(t *testing.T) {
 	}
 
 	// Ingest by ISBN number
-	ing := NewIngestor(db)
+	ing := NewIngestor(db, nil)
 	ing.idFunc = testID()
 	ing.ImageDownload = true
 	if err := ing.IngestISBN(context.Background(), "8213002962"); err != nil {
@@ -421,7 +421,7 @@ func TestIngestRemote(t *testing.T) {
 			t.Error(err)
 		}
 	}()
-	ing := NewIngestor(db)
+	ing := NewIngestor(db, nil)
 	ing.idFunc = testID()
 	ing.UseRemote = true
 	if err := ing.IngestISBN(context.Background(), "9788253043203"); err != nil {

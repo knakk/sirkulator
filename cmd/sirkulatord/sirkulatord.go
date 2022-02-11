@@ -12,6 +12,7 @@ import (
 
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator/http"
+	"github.com/knakk/sirkulator/search"
 	"github.com/knakk/sirkulator/sql"
 	"golang.org/x/text/language"
 )
@@ -78,6 +79,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Setup search index
+	idx, err := search.Open("data/index")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Set up base context and shutdown signal handler.
 	ctx, cancel := context.WithCancel(context.Background())
 	shutdown := make(chan os.Signal, 1)
@@ -86,7 +93,7 @@ func main() {
 
 	m := Main{
 		Config:     conf,
-		HTTPServer: http.NewServer(ctx, conf.AssetsDir, db),
+		HTTPServer: http.NewServer(ctx, conf.AssetsDir, db, idx),
 		DB:         db,
 	}
 

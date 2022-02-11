@@ -10,6 +10,7 @@ import (
 	"errors"
 	"image"
 	"image/jpeg"
+	"log"
 	"time"
 
 	"crawshaw.io/sqlite"
@@ -18,11 +19,13 @@ import (
 	"github.com/knakk/sirkulator/http/client"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/oai"
+	"github.com/knakk/sirkulator/search"
 	"golang.org/x/image/draw"
 )
 
 type Ingestor struct {
 	db     *sqlitex.Pool
+	idx    *search.Index
 	idFunc func() string
 
 	// Options
@@ -33,9 +36,10 @@ type Ingestor struct {
 	//ImageWebp  bool // convert to webp before storing
 }
 
-func NewIngestor(db *sqlitex.Pool) *Ingestor {
+func NewIngestor(db *sqlitex.Pool, idx *search.Index) *Ingestor {
 	return &Ingestor{
 		db:         db,
+		idx:        idx,
 		ImageWidth: 200,                 // default resize width
 		idFunc:     sirkulator.GetNewID, // can be overwritten with a deterministic function in tests
 	}
@@ -378,7 +382,30 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 		ig.downloadImages(ctx, data.Covers)
 	}
 
+	// Index documents asynchronously
+	go ig.indexResources(data.Resources)
+
 	return nil
+}
+
+func (ig *Ingestor) indexResources(res []sirkulator.Resource) {
+	if ig.idx == nil {
+		return
+	}
+
+	var docs []search.Document
+	for _, r := range res {
+		docs = append(docs, search.Document{
+			ID:    r.ID,
+			Type:  r.Type.String(),
+			Label: r.Label,
+			Gain:  1.0,
+		})
+	}
+	if err := ig.idx.Store(docs...); err != nil {
+		log.Println(err) // TODO or not
+	}
+	// TODO update indexed_at column in main.resource SQL db
 }
 
 type Ingestion struct {

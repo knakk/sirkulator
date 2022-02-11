@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"embed"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/knakk/sirkulator/etl"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/search"
 	"golang.org/x/text/language"
 )
 
@@ -23,6 +25,7 @@ type Server struct {
 	ln  net.Listener
 	srv *http.Server
 	db  *sqlitex.Pool
+	idx *search.Index
 
 	// The follwing fields should be set before calls to Open:
 
@@ -32,10 +35,11 @@ type Server struct {
 	Lang language.Tag
 }
 
-func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool) *Server {
+func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *search.Index) *Server {
 	s := Server{
 		Addr: "localhost:0", // assign random port as default, usefull for testing
 		db:   db,
+		idx:  idx,
 	}
 	s.srv = &http.Server{
 		BaseContext:       func(net.Listener) context.Context { return ctx },
@@ -106,6 +110,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Get("/", s.tmplMetadata)           // s.pageMetadata ?
 			r.Post("/import", s.importResources) // s.tmplImportResponse ?
 			r.Post("/preview", s.importPreview)
+			r.Post("/search", s.searchResources)
 		})
 	})
 
@@ -125,6 +130,9 @@ func (s *Server) Open() (err error) {
 func (s *Server) Close() error {
 	ctx, cancel := context.WithTimeout(s.srv.BaseContext(s.ln), 1*time.Second)
 	defer cancel()
+	if s.idx != nil {
+		s.idx.Close() // TODO check err?
+	}
 	return s.srv.Shutdown(ctx)
 }
 
@@ -174,7 +182,7 @@ func (s *Server) importResources(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	ing := etl.NewIngestor(s.db)
+	ing := etl.NewIngestor(s.db, s.idx)
 	ing.ImageDownload = true
 	ing.ImageAsync = true
 	var res []html.ImportResultEntry
@@ -233,4 +241,29 @@ func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {
 		Entries: res,
 	}
 	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		fmt.Println(err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	q := r.PostForm.Get("q")
+	if q == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	res, err := s.idx.Search(r.Context(), q, 10)
+	if err != nil {
+		// TODO do we filter out all user errors above in parseform?
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	tmpl := html.SearchResultsTmpl{
+		Results: res,
+	}
+	tmpl.Render(r.Context(), w)
+
 }

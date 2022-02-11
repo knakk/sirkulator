@@ -1,0 +1,25 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator/search"
+    //"github.com/knakk/sirkulator/internal/localizer"
+)
+
+
+type SearchResultsTmpl struct {
+    Results search.Results
+}
+
+func (sr *SearchResultsTmpl) Render(ctx context.Context, w io.Writer) {
+    //l, _ := ctx.Value("localizer").(localizer.Localizer)
+
+    for _, hit := range sr.Results.Hits { %>
+        <tr>
+            <td><%= hit.Type %></td>
+            <td><%= hit.Label %></td>
+            <td></td>
+            <td></td>
+        </tr>
+<%   } %>
+<% } %>
