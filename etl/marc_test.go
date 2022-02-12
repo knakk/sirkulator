@@ -283,6 +283,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Type:  sirkulator.TypePublication,
 					Label: "Liv Køltzow - Liv Køltzow: dagbøker i utvalg 1964-2008 (2021)",
+					Links: [][2]string{{"isbn", "9788203365133"}},
 					Data: sirkulator.Publication{
 						Title:      "Liv Køltzow",
 						Subtitle:   "dagbøker i utvalg 1964-2008",
@@ -565,6 +566,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Type:  sirkulator.TypePublication,
 					Label: "Kerstin Ekman - Hendelser ved vann (1994)",
+					Links: [][2]string{{"isbn", "8203200168"}, {"isbn", "8273504166"}},
 					Data: sirkulator.Publication{
 						Title:            "Hendelser ved vann",
 						TitleOriginal:    "Händelser vid vatten",
@@ -832,6 +834,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Label: "Ove Fredrik Arbo Høeg - Planter og tradisjon: floraen i levende tale og tradisjon i Norge 1925-1973 (2021)",
 					Type:  sirkulator.TypePublication,
+					Links: [][2]string{{"isbn", "9788230021743"}},
 					Data: sirkulator.Publication{
 						Title:     "Planter og tradisjon",
 						Subtitle:  "floraen i levende tale og tradisjon i Norge 1925-1973",
@@ -1099,6 +1102,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Label: "Deichman Bjørvika: Lundhagem og Atelier Oslo arkitekter (2022)",
 					Type:  sirkulator.TypePublication,
+					Links: [][2]string{{"isbn", "9788253043203"}},
 					Data: sirkulator.Publication{
 						Title:     "Deichman Bjørvika",
 						Subtitle:  "Lundhagem og Atelier Oslo arkitekter",

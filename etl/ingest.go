@@ -8,9 +8,11 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"log"
+	"strings"
 	"time"
 
 	"crawshaw.io/sqlite"
@@ -53,11 +55,20 @@ func NewPreviewIngestor(db *sqlitex.Pool) *Ingestor {
 	}
 }
 
+var isbnCleaner = strings.NewReplacer("-", "", " ", "") // TODO move to isbn package
+
 func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
-	// TODO clean isbn: remove dashes and spaces from string
+	isbn = isbnCleaner.Replace(isbn)
 
 	// First, check if publication is allready in DB
-	// TODO
+	found, err := ig.existsISBN(ctx, isbn)
+	if err != nil {
+		return fmt.Errorf("Ingestor.IngestISBN(%s): %w", isbn, err)
+	}
+	if found {
+		return sirkulator.ErrConflict
+	}
+
 	//
 	// TODO future idea: maybe if in local DB, go look on the internet and see if
 	//      we can gain something new info diffing existing record,
@@ -82,7 +93,25 @@ func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
 	return ig.Ingest(ctx, data)
 }
 
+func (ig *Ingestor) existsISBN(ctx context.Context, isbn string) (bool, error) {
+	conn := ig.db.Get(ctx)
+	if conn == nil {
+		return false, context.Canceled
+	}
+	defer ig.db.Put(conn)
+	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn' AND id=$id")
+	stmt.SetText("$id", isbn)
+	if _, err := sqlitex.ResultText(stmt); err != nil {
+		if errors.Is(err, sqlitex.ErrNoResults) {
+			return false, nil
+		}
+		return false, fmt.Errorf("Ingestor.existsISBN(%s): %w ", isbn, err)
+	}
+	return true, nil
+}
+
 func (ig *Ingestor) PreviewISBN(ctx context.Context, isbn string) (Ingestion, error) {
+	isbn = isbnCleaner.Replace(isbn)
 	var data Ingestion
 	rec, err := ig.localRecord(ctx, "isbn", isbn)
 	if err == nil {
@@ -212,7 +241,7 @@ func (ig *Ingestor) remoteRecord(ctx context.Context, idtype, id string) (Ingest
 // persistIngestion will store all resources, relations and reviews in
 // the Ingestion. No further validation of input is performed - all of
 // the given data is assumed to be valid at this point, as not to
-// trigger any SQL constraints when inserting into DB.
+// trigger any SQL constraint errors when inserting into DB.
 func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	defer sqlitex.Save(conn)(&err)
 
@@ -232,6 +261,20 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 		stmt.SetBytes("$data", b)
 		if _, err := stmt.Step(); err != nil {
 			return err // TODO annotate
+		}
+
+		// Persist resource links. Duplicate entries will be ignored.
+		for _, link := range res.Links {
+			stmt := conn.Prep(`
+				INSERT OR IGNORE INTO link (resource_id, type, id)
+					VALUES ($resource_id, $type, $id)
+			`)
+			stmt.SetText("$resource_id", res.ID)
+			stmt.SetText("$type", link[0])
+			stmt.SetText("$id", link[1])
+			if _, err := stmt.Step(); err != nil {
+				return err // TODO annotate
+			}
 		}
 	}
 

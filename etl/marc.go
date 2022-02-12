@@ -142,6 +142,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			}
 		}
 	}
+
 	if f, ok := rec.DataFieldAt("041"); ok {
 		lang := f.ValueAt("h")
 		if _, err := marc.ParseLanguage(lang); err == nil {
@@ -283,14 +284,28 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		}
 	}
 
-	ing.Resources = append(ing.Resources,
-		sirkulator.Resource{
-			ID:    pID,
-			Type:  sirkulator.TypePublication,
-			Label: label,
-			Data:  p,
-		},
-	)
+	res := sirkulator.Resource{
+		ID:    pID,
+		Type:  sirkulator.TypePublication,
+		Label: label,
+		Data:  p,
+	}
+
+	// Publication identifiers: ISBN, ISSN, EAN
+	for _, isbn := range rec.ValuesAt("020", "a") {
+		// TODO clean ISBN number
+		res.Links = append(res.Links, [2]string{"isbn", isbn})
+	}
+	for _, issn := range rec.ValuesAt("022", "a") {
+		// TODO clean ISSN number
+		res.Links = append(res.Links, [2]string{"issn", issn})
+	}
+	for _, ean := range rec.ValuesAt("024", "a") {
+		// TODO clean EAN number
+		res.Links = append(res.Links, [2]string{"ean", ean})
+	}
+
+	ing.Resources = append(ing.Resources, res)
 	ing.Resources = append(ing.Resources, agents...)
 	ing.Relations = relations
 

@@ -40,7 +40,7 @@ func mustJson(o interface{}) []byte {
 	return b
 }
 
-const isbn8213002962 = `
+const isbn8202018560 = `
 <record xmlns="http://www.loc.gov/MARC21/slim">
     <leader>01659cam a2200457 c 4500</leader>
     <controlfield tag="001">998110670684702201</controlfield>
@@ -226,7 +226,7 @@ func TestIngestISBN(t *testing.T) {
 		}
 	}))
 	defer ts.Close()
-	marcxml := fmt.Sprintf(isbn8213002962, ts.URL)
+	marcxml := fmt.Sprintf(isbn8202018560, ts.URL)
 	oairecord := mustGzip(marcxml)
 
 	// Setup and populate DB
@@ -257,7 +257,7 @@ func TestIngestISBN(t *testing.T) {
 			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
 				VALUES ('bibsys/pub', '999608854204702201', x'%x', 0, 0);
 			INSERT INTO oai.record_id (source_id, record_id, type, id)
-				VALUES ('bibsys/pub', '999608854204702201', 'isbn', '8213002962');
+				VALUES ('bibsys/pub', '999608854204702201', 'isbn', '8202018560');
 			INSERT INTO resource (id, type, label, data, created_at, updated_at)
 				VALUES ('p0','person', 'Per Arvid Åsen (1949-)', x'%x', 0, 0);
 			INSERT INTO link (resource_id, type, id)
@@ -272,7 +272,7 @@ func TestIngestISBN(t *testing.T) {
 	ing := NewIngestor(db, nil)
 	ing.idFunc = testID()
 	ing.ImageDownload = true
-	if err := ing.IngestISBN(context.Background(), "8213002962"); err != nil {
+	if err := ing.IngestISBN(context.Background(), "8202018560"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -380,6 +380,11 @@ func TestIngestISBN(t *testing.T) {
 	}
 	if diff := cmp.Diff(wantReviews, gotReviews); diff != "" {
 		t.Errorf("relations mismatch (-want +got):\n%s", diff)
+	}
+
+	// Verify that ISBN number was stored as link
+	if pid, _ := sqlitex.ResultText(conn.Prep("SELECT resource_id FROM link WHERE type='isbn' and id='8202018560'")); pid != "t1" {
+		t.Errorf("excepted isbn link from 't1' to 8202018560; got %q", pid)
 	}
 
 	// Verify image was downloaded and scaled
