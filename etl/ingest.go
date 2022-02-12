@@ -254,6 +254,7 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 		stmt.SetText("$type", res.Type.String())
 		stmt.SetText("$id", res.ID)
 		stmt.SetText("$label", res.Label)
+		// TODO set created_at && update_at to time.Now.Unix()
 		b, err := json.Marshal(res.Data)
 		if err != nil {
 			return err // TODO annotate

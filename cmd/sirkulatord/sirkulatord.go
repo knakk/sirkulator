@@ -37,6 +37,8 @@ func (m Main) Run(ctx context.Context) error {
 
 func (m Main) Close() error {
 	return nil
+	// TODO figure out gracefull shutdown
+	//return m.HTTPServer.Close()
 }
 
 type Config struct {

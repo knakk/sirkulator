@@ -6,6 +6,11 @@ import (
 	"golang.org/x/text/language"
 )
 
+var (
+	ErrDeprecated = errors.New("vocab: deprecated")
+	ErrUnknown    = errors.New("vocab: unknown")
+)
+
 // Term is a vocabulary term.
 type Term interface {
 	// Code is the coded value of a Term.
@@ -20,8 +25,3 @@ type Term interface {
 
 	//Alias(language.Tag) []string
 }
-
-var (
-	ErrDeprecated = errors.New("vocab: deprecated")
-	ErrUnknown    = errors.New("vocab: unknown")
-)

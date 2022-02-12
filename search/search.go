@@ -89,7 +89,7 @@ func (idx *Index) Store(docs ...Document) error {
 		d := bluge.NewDocument(doc.ID).
 			AddField(bluge.NewTextField("type", doc.Type).SearchTermPositions().StoreValue()).
 			AddField(bluge.NewTextField("label", doc.Label).SearchTermPositions().StoreValue()).
-			AddField(bluge.NewNumericField("gain", doc.Gain))
+			AddField(bluge.NewNumericField("gain", doc.Gain)) // TODO https://github.com/mschoch/bluge-custom-score
 		if err := idx.writer.Update(d.ID(), d); err != nil {
 			return fmt.Errorf("search: Index.Store: writing doc %s: %w", d.ID(), err)
 		}
@@ -106,7 +106,7 @@ func (idx Index) batchStore(docs []Document) error {
 		d := bluge.NewDocument(doc.ID).
 			AddField(bluge.NewTextField("type", doc.Type).SearchTermPositions().StoreValue()).
 			AddField(bluge.NewTextField("label", doc.Label).SearchTermPositions().StoreValue()).
-			AddField(bluge.NewNumericField("gain", doc.Gain))
+			AddField(bluge.NewNumericField("gain", doc.Gain)) // TODO https://github.com/mschoch/bluge-custom-score
 		batch.Update(d.ID(), d)
 	}
 

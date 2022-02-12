@@ -128,6 +128,7 @@ func (s *Server) Open() (err error) {
 }
 
 func (s *Server) Close() error {
+	// TODO verify that this is run
 	ctx, cancel := context.WithTimeout(s.srv.BaseContext(s.ln), 1*time.Second)
 	defer cancel()
 	if s.idx != nil {
@@ -250,10 +251,6 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	q := r.PostForm.Get("q")
-	if q == "" {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
 	res, err := s.idx.Search(r.Context(), q, 10)
 	if err != nil {
 		// TODO do we filter out all user errors above in parseform?
