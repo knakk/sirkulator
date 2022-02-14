@@ -242,18 +242,24 @@ func (ig *Ingestor) remoteRecord(ctx context.Context, idtype, id string) (Ingest
 // the Ingestion. No further validation of input is performed - all of
 // the given data is assumed to be valid at this point, as not to
 // trigger any SQL constraint errors when inserting into DB.
+//
+// CreatedAt/UpdatdAt timestamps on resources will be set
+// TODO consider setting them earlier
 func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	defer sqlitex.Save(conn)(&err)
 
-	for _, res := range data.Resources {
+	now := time.Now()
+
+	for i, res := range data.Resources {
 		stmt := conn.Prep(`
 			INSERT INTO resource (type, id, label, data, created_at, updated_at)
-				VALUES ($type, $id, $label, $data, 0, 0)
+				VALUES ($type, $id, $label, $data, $now, $now)
 		`)
 
 		stmt.SetText("$type", res.Type.String())
 		stmt.SetText("$id", res.ID)
 		stmt.SetText("$label", res.Label)
+		stmt.SetInt64("$now", now.Unix())
 		// TODO set created_at && update_at to time.Now.Unix()
 		b, err := json.Marshal(res.Data)
 		if err != nil {
@@ -263,6 +269,10 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 		if _, err := stmt.Step(); err != nil {
 			return err // TODO annotate
 		}
+
+		// Update timestamps
+		data.Resources[i].CreatedAt = now
+		data.Resources[i].UpdatedAt = now
 
 		// Persist resource links. Duplicate entries will be ignored.
 		for _, link := range res.Links {

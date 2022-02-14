@@ -14,10 +14,12 @@ import (
 // from index in a search results.
 type Document struct {
 	// Mandatory fields
-	ID    string
-	Type  string
-	Label string
-	Gain  float64
+	ID        string
+	Type      string
+	Label     string
+	Gain      float64
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
 	// Other fields ([0] = key, [1] = value)
 	Fields [][2]string
@@ -89,6 +91,8 @@ func (idx *Index) Store(docs ...Document) error {
 		d := bluge.NewDocument(doc.ID).
 			AddField(bluge.NewTextField("type", doc.Type).SearchTermPositions().StoreValue()).
 			AddField(bluge.NewTextField("label", doc.Label).SearchTermPositions().StoreValue()).
+			AddField(bluge.NewDateTimeField("created", doc.CreatedAt).StoreValue()).
+			AddField(bluge.NewDateTimeField("updated", doc.UpdatedAt).StoreValue()).
 			AddField(bluge.NewNumericField("gain", doc.Gain)) // TODO https://github.com/mschoch/bluge-custom-score
 		if err := idx.writer.Update(d.ID(), d); err != nil {
 			return fmt.Errorf("search: Index.Store: writing doc %s: %w", d.ID(), err)
@@ -106,6 +110,8 @@ func (idx Index) batchStore(docs []Document) error {
 		d := bluge.NewDocument(doc.ID).
 			AddField(bluge.NewTextField("type", doc.Type).SearchTermPositions().StoreValue()).
 			AddField(bluge.NewTextField("label", doc.Label).SearchTermPositions().StoreValue()).
+			AddField(bluge.NewDateTimeField("created", doc.CreatedAt).StoreValue()).
+			AddField(bluge.NewDateTimeField("updated", doc.UpdatedAt).StoreValue()).
 			AddField(bluge.NewNumericField("gain", doc.Gain)) // TODO https://github.com/mschoch/bluge-custom-score
 		batch.Update(d.ID(), d)
 	}

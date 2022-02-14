@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
@@ -281,12 +282,18 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePerson,
 		Label: "Per Arvid Åsen (1949-)",
 		ID:    "p0",
+		Links: [][2]string{{"bibsys", "90294124"}},
 		Data:  &personWant,
 	}
 	perGot, err := sql.GetResource(conn, sirkulator.TypePerson, "p0")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// reset timestamps we don't want to compare
+	perGot.CreatedAt = time.Time{}
+	perGot.UpdatedAt = time.Time{}
+
 	if diff := cmp.Diff(perWant, perGot); diff != "" {
 		t.Errorf("person mismatch (-want +got):\n%s", diff)
 	}
@@ -305,12 +312,18 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePublication,
 		Label: "Per Arvid Åsen - Illustrert algeflora (1980)",
 		ID:    "t1",
+		Links: [][2]string{{"isbn", "8202018560"}},
 		Data:  &pubData,
 	}
 	pubGot, err := sql.GetResource(conn, sirkulator.TypePublication, "t1")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// reset timestamps we don't want to compare
+	pubGot.CreatedAt = time.Time{}
+	pubGot.UpdatedAt = time.Time{}
+
 	if diff := cmp.Diff(pubWant, pubGot); diff != "" {
 		t.Errorf("publication mismatch (-want +got):\n%s", diff)
 	}
