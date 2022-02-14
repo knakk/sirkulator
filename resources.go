@@ -27,6 +27,17 @@ const (
 	TypeSeries
 )
 
+func AllResourceTypes() []ResourceType {
+	return []ResourceType{
+		TypePublication,
+		TypePublisher,
+		TypePerson,
+		TypeCorporation,
+		TypeLiteraryAward,
+		TypeSeries,
+	}
+}
+
 func (r ResourceType) String() string {
 	if r > 7 || r < 0 {
 		r = 0 // "unknown"

@@ -1,7 +1,10 @@
 <%
 package html
 
-import "github.com/knakk/sirkulator/internal/localizer"
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
 
 type MetadataTemplate struct {
     Page
@@ -30,17 +33,20 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
                 <thead>
                     <tr>
                         <th>
-                            <select>
-                                <option>Alle typer</option>
-                                <option>Person</option>
-                                <option>Korporasjon</option>
-                                <option>Utgivelse</option>
-                                <option>Sted</option>
+                            <select name="type"
+                                hx-post="/metadata/search"
+                                hx-include="[name='q']"
+                                hx-target="#search-results">
+                                <option value="">Alle typer</option>
+                                <% for _, t := range sirkulator.AllResourceTypes() { %>
+                                    <option value="<%= t.String() %>"><%= t.Label(l.Lang) %></option>
+                                <% } %>
                             </select>
                         </th>
                         <th>
                             <input name="q"
                                 hx-post="/metadata/search"
+                                hx-include="[name='type']"
                                 hx-trigger="keyup changed delay:200ms, search"
                                 hx-target="#search-results"
                                 type="search" placeholder="Søk">

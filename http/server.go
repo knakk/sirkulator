@@ -283,7 +283,8 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	q := r.PostForm.Get("q")
-	res, err := s.idx.Search(r.Context(), q, 10)
+	resType := r.PostForm.Get("type")
+	res, err := s.idx.Search(r.Context(), q, resType, 10)
 	if err != nil {
 		// TODO do we filter out all user errors above in parseform?
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

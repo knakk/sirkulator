@@ -122,13 +122,18 @@ func (idx Index) batchStore(docs []Document) error {
 	return nil
 }
 
-func (idx *Index) Search(ctx context.Context, q string, limit int) (Results, error) {
+func (idx *Index) Search(ctx context.Context, q string, resType string, limit int) (Results, error) {
 	res := Results{}
 	var query bluge.Query
 	if q == "" {
 		query = bluge.NewMatchAllQuery()
 	} else {
 		query = bluge.NewFuzzyQuery(q).SetField("label")
+	}
+	if resType != "" {
+		query = bluge.NewBooleanQuery().
+			AddMust(query).
+			AddMust(bluge.NewMatchQuery(resType).SetField("type"))
 	}
 	req := bluge.NewTopNSearch(limit, query).WithStandardAggregations()
 	r, _ := idx.writer.Reader() // err is always nil: https://github.com/blugelabs/bluge/issues/35

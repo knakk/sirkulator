@@ -4,7 +4,7 @@ package html
 import (
     "strings"
     "github.com/knakk/sirkulator/search"
-    //"github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/internal/localizer"
 )
 
 
@@ -13,7 +13,7 @@ type SearchResultsTmpl struct {
 }
 
 func (sr *SearchResultsTmpl) Render(ctx context.Context, w io.Writer) {
-    //l, _ := ctx.Value("localizer").(localizer.Localizer)
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
 
     for _, hit := range sr.Results.Hits { %>
         <tr>
@@ -27,4 +27,8 @@ func (sr *SearchResultsTmpl) Render(ctx context.Context, w io.Writer) {
             <td></td>
         </tr>
 <%   } %>
+    <tr>
+        <td></td>
+        <td colspan="3"><small><%= l.Translate("%d hits (%v)", sr.Results.Total, sr.Results.Time ) %></small></td>
+    </tr>
 <% } %>
