@@ -2,6 +2,7 @@
 package html
 
 import (
+    "strings"
     "github.com/knakk/sirkulator/search"
     //"github.com/knakk/sirkulator/internal/localizer"
 )
@@ -17,7 +18,11 @@ func (sr *SearchResultsTmpl) Render(ctx context.Context, w io.Writer) {
     for _, hit := range sr.Results.Hits { %>
         <tr>
             <td><%= hit.Type %></td>
-            <td><%= hit.Label %></td>
+            <td>
+                <a href="<%= fmt.Sprintf("/metadata/%s/%s", strings.ToLower(hit.Type), hit.ID) %>">
+                    <%= hit.Label %>
+                </a>
+            </td>
             <td></td>
             <td></td>
         </tr>

@@ -35,13 +35,29 @@ func readData(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt *sq
 	}
 }
 
+func readLinks(res *sirkulator.Resource) func(stmt *sqlite.Stmt) error {
+	return func(stmt *sqlite.Stmt) error {
+		res.Links = append(res.Links, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		return nil
+	}
+}
+
 func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirkulator.Resource, error) {
 	var res sirkulator.Resource
-	const q = "SELECT id, label, data FROM resource WHERE type=? AND id=?"
-	if err := sqlitex.Exec(conn, q, readData(&res, t), t.String(), id); err != nil {
+
+	const qResouce = "SELECT id, label, data FROM resource WHERE type=? AND id=?"
+	if err := sqlitex.Exec(conn, qResouce, readData(&res, t), t.String(), id); err != nil {
 		return res, fmt.Errorf("sql.GetResource(%s, %s): %w", t.String(), id, err)
 	}
-	// TODO NotFound error; readData fn should set found bool
+	if res.ID == "" {
+		return res, sirkulator.ErrNotFound
+	}
+
+	const qLinks = "SELECT type, id FROM link WHERE resource_id=?"
+	if err := sqlitex.Exec(conn, qLinks, readLinks(&res), id); err != nil {
+		return res, fmt.Errorf("sql.GetResource(%s, %s): %w", t.String(), id, err)
+	}
+
 	return res, nil
 }
 

@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -11,10 +12,12 @@ import (
 
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/go-chi/chi/v5"
+	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/etl"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
 	"github.com/knakk/sirkulator/search"
+	"github.com/knakk/sirkulator/sql"
 	"golang.org/x/text/language"
 )
 
@@ -104,13 +107,15 @@ func (s *Server) router(assetsDir string) chi.Router {
 	r.Route("/", func(r chi.Router) {
 		r.Use(WithLocalizer())
 
-		r.Get("/", s.tmplHome)
-		r.Get("/circulation", s.tmplCirculation)
+		r.Get("/", s.pageHome)
+		r.Get("/circulation", s.pageCirculation)
 		r.Route("/metadata", func(r chi.Router) {
-			r.Get("/", s.tmplMetadata)           // s.pageMetadata ?
+			r.Get("/", s.pageMetadata)
 			r.Post("/import", s.importResources) // s.tmplImportResponse ?
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
+			r.Get("/person/{id}", s.pagePerson)
+			//r.Get("/publication/{id}", s.pagePublication)
 		})
 	})
 
@@ -137,7 +142,7 @@ func (s *Server) Close() error {
 	return s.srv.Shutdown(ctx)
 }
 
-func (s *Server) tmplHome(w http.ResponseWriter, r *http.Request) {
+func (s *Server) pageHome(w http.ResponseWriter, r *http.Request) {
 	// 404 not found handler goes here
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -153,7 +158,7 @@ func (s *Server) tmplHome(w http.ResponseWriter, r *http.Request) {
 	tmpl.Render(r.Context(), w)
 }
 
-func (s *Server) tmplCirculation(w http.ResponseWriter, r *http.Request) {
+func (s *Server) pageCirculation(w http.ResponseWriter, r *http.Request) {
 	tmpl := html.CircTemplate{
 		Page: html.Page{
 			Lang: s.Lang,
@@ -163,12 +168,39 @@ func (s *Server) tmplCirculation(w http.ResponseWriter, r *http.Request) {
 	tmpl.Render(r.Context(), w)
 }
 
-func (s *Server) tmplMetadata(w http.ResponseWriter, r *http.Request) {
+func (s *Server) pageMetadata(w http.ResponseWriter, r *http.Request) {
 	tmpl := html.MetadataTemplate{
 		Page: html.Page{
 			Lang: s.Lang,
 			Path: r.URL.Path,
 		},
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		// TODO which statuscode/response is appropriate?
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer s.db.Put(conn)
+	res, err := sql.GetResource(conn, sirkulator.TypePerson, id)
+	if errors.Is(err, sirkulator.ErrNotFound) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	tmpl := html.PersonTemplate{
+		Page: html.Page{
+			Lang: s.Lang,
+			Path: r.URL.Path,
+		},
+		Resource: res,
 	}
 	tmpl.Render(r.Context(), w)
 }
