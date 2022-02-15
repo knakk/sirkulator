@@ -195,12 +195,20 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	contrib, err := sql.GetAgentContributions(conn, id)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	tmpl := html.PersonTemplate{
 		Page: html.Page{
 			Lang: s.Lang,
 			Path: r.URL.Path,
 		},
-		Resource: res,
+		Resource:      res,
+		Contributions: contrib,
 	}
 	tmpl.Render(r.Context(), w)
 }

@@ -39,50 +39,74 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d imported OK!":          15,
-	"1 per line":               12,
-	"Circulation":              1,
-	"Configuration":            5,
-	"Holdings":                 4,
-	"Home":                     0,
-	"ISBN, ISSN or EAN":        11,
-	"Identifiers":              10,
-	"Import":                   9,
-	"Metadata":                 3,
-	"Orders":                   2,
-	"Preview":                  13,
-	"Search/browse catalogue":  8,
-	"Show metadata for review": 7,
-	"Show recent transactions": 6,
-	"wait...":                  14,
+	"%d hits (%v)":                   27,
+	"%d imported OK!":                15,
+	"1 per line":                     12,
+	"Birthyear":                      19,
+	"Circulation":                    1,
+	"Configuration":                  5,
+	"Deathyear":                      20,
+	"Holdings":                       4,
+	"Home":                           0,
+	"ISBN, ISSN or EAN":              11,
+	"Identificators and links":       22,
+	"Identifiers":                    10,
+	"Import":                         9,
+	"Lifespan":                       18,
+	"Metadata":                       3,
+	"Name":                           17,
+	"Orders":                         2,
+	"Other relations":                26,
+	"Preview":                        13,
+	"Properties":                     16,
+	"Publication":                    25,
+	"Publications and contributions": 23,
+	"Role":                           24,
+	"Search/browse catalogue":        8,
+	"Show metadata for review":       7,
+	"Show recent transactions":       6,
+	"approximate":                    21,
+	"wait...":                        14,
 }
 
-var enIndex = []uint32{ // 17 elements
+var enIndex = []uint32{ // 29 elements
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000051,
 	0x0000006a, 0x00000082, 0x00000089, 0x00000095,
 	0x000000a7, 0x000000b2, 0x000000ba, 0x000000c2,
-	0x000000d5,
-} // Size: 92 bytes
+	0x000000d5, 0x000000e0, 0x000000e5, 0x000000ee,
+	0x000000f8, 0x00000102, 0x0000010e, 0x00000127,
+	0x00000146, 0x0000014b, 0x00000157, 0x00000167,
+	0x0000017a,
+} // Size: 140 bytes
 
-const enData string = "" + // Size: 213 bytes
+const enData string = "" + // Size: 378 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Show recent transactions\x02Show metadata for review\x02Search/bro" +
 	"wse catalogue\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
-	"e\x02Preview\x02wait...\x02%[1]d imported OK!"
+	"e\x02Preview\x02wait...\x02%[1]d imported OK!\x02Properties\x02Name\x02L" +
+	"ifespan\x02Birthyear\x02Deathyear\x02approximate\x02Identificators and l" +
+	"inks\x02Publications and contributions\x02Role\x02Publication\x02Other r" +
+	"elations\x02%[1]d hits (%[2]v)"
 
-var noIndex = []uint32{ // 17 elements
+var noIndex = []uint32{ // 29 elements
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000055,
 	0x00000075, 0x0000008a, 0x00000093, 0x000000a3,
 	0x000000b8, 0x000000c4, 0x000000d1, 0x000000d9,
-	0x000000ed,
-} // Size: 92 bytes
+	0x000000ed, 0x000000f8, 0x000000fd, 0x00000105,
+	0x00000111, 0x0000011a, 0x00000126, 0x00000140,
+	0x00000155, 0x0000015b, 0x00000165, 0x00000176,
+	0x0000018a,
+} // Size: 140 bytes
 
-const noData string = "" + // Size: 237 bytes
+const noData string = "" + // Size: 394 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vis siste transaksjoner\x02Vis opplysninger til gjennomsyn" +
 	"\x02Søk/bla i katalogen\x02Importer\x02Identifikatorer\x02ISBN, ISSN ell" +
-	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02%[1]d importert OK!"
+	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02%[1]d importert OK!" +
+	"\x02Egenskaper\x02Navn\x02Levetid\x02Fødselsår\x02Dødsår\x02omtrentelig" +
+	"\x02Identifikatorer og lenker\x02Utgivelser og bidrag\x02Rolle\x02Utgive" +
+	"lse\x02Andre relasjoner\x02%[1]d treff (%[2]v)"
 
-	// Total table size 634 bytes (0KiB); checksum: C0548E06
+	// Total table size 1052 bytes (1KiB); checksum: 68284043

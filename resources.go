@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/marc"
 	"github.com/teris-io/shortid"
 	"golang.org/x/text/language"
 )
@@ -36,6 +37,15 @@ func AllResourceTypes() []ResourceType {
 		TypeLiteraryAward,
 		TypeSeries,
 	}
+}
+
+func ParseResourceType(s string) ResourceType {
+	for _, t := range AllResourceTypes() {
+		if s == t.String() {
+			return t
+		}
+	}
+	return TypeUnknown
 }
 
 func (r ResourceType) String() string {
@@ -266,9 +276,14 @@ func (yr YearRange) enLabel() string {
 	return s.String()
 }
 
-type Contribution struct {
-	Role  string
-	Agent SimpleResource // Corporation|Person
+type AgentContribution struct {
+	SimpleResource
+	Roles []marc.Relator
+}
+
+type PublicationContribution struct {
+	Agent SimpleResource
+	Roles []marc.Relator
 }
 
 // 2) Concrete types

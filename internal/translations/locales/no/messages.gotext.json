@@ -90,6 +90,84 @@
                     "expr": "ir.NumOK"
                 }
             ]
+        },
+        {
+            "id": "Properties",
+            "message": "Properties",
+            "translation": "Egenskaper"
+        },
+        {
+            "id": "Name",
+            "message": "Name",
+            "translation": "Navn"
+        },
+        {
+            "id": "Lifespan",
+            "message": "Lifespan",
+            "translation": "Levetid"
+        },
+        {
+            "id": "Birthyear",
+            "message": "Birthyear",
+            "translation": "Fødselsår"
+        },
+        {
+            "id": "Deathyear",
+            "message": "Deathyear",
+            "translation": "Dødsår"
+        },
+        {
+            "id": "approximate",
+            "message": "approximate",
+            "translation": "omtrentelig"
+        },
+        {
+            "id": "Identificators and links",
+            "message": "Identificators and links",
+            "translation": "Identifikatorer og lenker"
+        },
+        {
+            "id": "Publications and contributions",
+            "message": "Publications and contributions",
+            "translation": "Utgivelser og bidrag"
+        },
+        {
+            "id": "Role",
+            "message": "Role",
+            "translation": "Rolle"
+        },
+        {
+            "id": "Publication",
+            "message": "Publication",
+            "translation": "Utgivelse"
+        },
+        {
+            "id": "Other relations",
+            "message": "Other relations",
+            "translation": "Andre relasjoner"
+        },
+        {
+            "id": "{Total} hits ({Time})",
+            "message": "{Total} hits ({Time})",
+            "translation": "{Total} treff ({Time})",
+            "placeholders": [
+                {
+                    "id": "Total",
+                    "string": "%[1]d",
+                    "type": "uint64",
+                    "underlyingType": "uint64",
+                    "argNum": 1,
+                    "expr": "sr.Results.Total"
+                },
+                {
+                    "id": "Time",
+                    "string": "%[2]v",
+                    "type": "time.Duration",
+                    "underlyingType": "int64",
+                    "argNum": 2,
+                    "expr": "sr.Results.Time"
+                }
+            ]
         }
     ]
 }

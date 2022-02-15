@@ -2,15 +2,34 @@
 package html
 
 import (
+    "fmt"
     "strconv"
+    "strings"
 
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/marc"
 )
 
 type PersonTemplate struct {
     Page
     Resource sirkulator.Resource
+    Contributions []sirkulator.AgentContribution
+}
+
+func resourceLink(r sirkulator.SimpleResource) string {
+    return fmt.Sprintf("/metadata/%s/%s", r.Type, r.ID)
+}
+
+func printRoles(roles []marc.Relator, l localizer.Localizer) string {
+    var sb strings.Builder
+    for i, role := range roles {
+        if i > 0 {
+            sb.WriteString(", ")
+        }
+        sb.WriteString(role.Label(l.Lang))
+    }
+    return sb.String()
 }
 
 func notZero(n int) string {
@@ -73,6 +92,26 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
             <h3><%= l.Translate("Publications and contributions") %></h3>
         </summary>
         <div class="border pad">
+            <table>
+                <thead>
+                    <tr>
+                        <th><%= l.Translate("Role") %></th>
+                        <th><%= l.Translate("Publication") %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for _, c := range tmpl.Contributions { %>
+                        <tr>
+                            <td>
+                                <%= printRoles(c.Roles, l) %>
+                            </td>
+                            <td>
+                                <a href="<%= resourceLink(c.SimpleResource) %>"><%= c.Label %></a>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
 
         </div>
     </details>

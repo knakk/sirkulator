@@ -105,6 +105,125 @@
             "translation": "wait...",
             "translatorComment": "Copied from source.",
             "fuzzy": true
+        },
+        {
+            "id": "{NumOK} imported OK!",
+            "message": "{NumOK} imported OK!",
+            "translation": "{NumOK} imported OK!",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "NumOK",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "ir.NumOK"
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Properties",
+            "message": "Properties",
+            "translation": "Properties",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Name",
+            "message": "Name",
+            "translation": "Name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Lifespan",
+            "message": "Lifespan",
+            "translation": "Lifespan",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Birthyear",
+            "message": "Birthyear",
+            "translation": "Birthyear",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Deathyear",
+            "message": "Deathyear",
+            "translation": "Deathyear",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "approximate",
+            "message": "approximate",
+            "translation": "approximate",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Identificators and links",
+            "message": "Identificators and links",
+            "translation": "Identificators and links",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Publications and contributions",
+            "message": "Publications and contributions",
+            "translation": "Publications and contributions",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Role",
+            "message": "Role",
+            "translation": "Role",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Publication",
+            "message": "Publication",
+            "translation": "Publication",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Other relations",
+            "message": "Other relations",
+            "translation": "Other relations",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "{Total} hits ({Time})",
+            "message": "{Total} hits ({Time})",
+            "translation": "{Total} hits ({Time})",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Total",
+                    "string": "%[1]d",
+                    "type": "uint64",
+                    "underlyingType": "uint64",
+                    "argNum": 1,
+                    "expr": "sr.Results.Total"
+                },
+                {
+                    "id": "Time",
+                    "string": "%[2]v",
+                    "type": "time.Duration",
+                    "underlyingType": "int64",
+                    "argNum": 2,
+                    "expr": "sr.Results.Time"
+                }
+            ],
+            "fuzzy": true
         }
     ]
 }

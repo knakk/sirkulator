@@ -3,11 +3,13 @@ package sql
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/marc"
 )
 
 func readResource(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt *sqlite.Stmt) error {
@@ -59,6 +61,45 @@ func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirku
 	const qLinks = "SELECT type, id FROM link WHERE resource_id=?"
 	if err := sqlitex.Exec(conn, qLinks, readLinks(&res), id); err != nil {
 		return res, fmt.Errorf("sql.GetResource(%s, %s): %w", t.String(), id, err)
+	}
+
+	return res, nil
+}
+
+func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentContribution, error) {
+	var res []sirkulator.AgentContribution
+
+	const q = `
+	SELECT
+		r.to_id,
+		resource.type as res_type,
+		resource.label as res_label,
+		GROUP_CONCAT(json_extract(r.data, '$.role')) as role
+	FROM
+		relation r
+		JOIN resource ON (from_id=resource.id)
+	WHERE
+		r.type='has_contributor'
+	AND to_id=?
+	GROUP BY r.from_id`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		c := sirkulator.AgentContribution{}
+		c.ID = stmt.ColumnText(0)
+		c.Type = sirkulator.ParseResourceType(stmt.ColumnText(1))
+		c.Label = stmt.ColumnText(2)
+		for _, role := range strings.Split(stmt.ColumnText(3), ",") {
+			rel, err := marc.ParseRelator(role)
+			if err == nil {
+				c.Roles = append(c.Roles, rel)
+			}
+		}
+		res = append(res, c)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetAgentContributions(%s): %w", id, err)
 	}
 
 	return res, nil
