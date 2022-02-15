@@ -426,14 +426,12 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 		return err // TODO annotate
 	}
 
-	if !ig.ImageDownload {
-		return nil
-	}
-
-	if ig.ImageAsync {
-		go ig.downloadImages(context.Background(), data.Covers)
-	} else {
-		ig.downloadImages(ctx, data.Covers)
+	if ig.ImageDownload {
+		if ig.ImageAsync {
+			go ig.downloadImages(context.Background(), data.Covers)
+		} else {
+			ig.downloadImages(ctx, data.Covers)
+		}
 	}
 
 	// Index documents asynchronously
@@ -450,10 +448,12 @@ func (ig *Ingestor) indexResources(res []sirkulator.Resource) {
 	var docs []search.Document
 	for _, r := range res {
 		docs = append(docs, search.Document{
-			ID:    r.ID,
-			Type:  r.Type.String(),
-			Label: r.Label,
-			Gain:  1.0,
+			ID:        r.ID,
+			Type:      r.Type.String(),
+			Label:     r.Label,
+			Gain:      1.0,
+			CreatedAt: r.CreatedAt,
+			UpdatedAt: r.UpdatedAt,
 		})
 	}
 	if err := ig.idx.Store(docs...); err != nil {

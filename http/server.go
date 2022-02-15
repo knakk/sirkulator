@@ -284,7 +284,18 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 	}
 	q := r.PostForm.Get("q")
 	resType := r.PostForm.Get("type")
-	res, err := s.idx.Search(r.Context(), q, resType, 10)
+
+	// TODO sortby/direction is rather cumbersome without client side state in javascript;
+	// consider something like alpine.js (but only if there are many other use cases)
+	sortBy := r.PostForm.Get("sort_by")
+	sortAsc := false
+	sortDir := "-" // descending
+	if r.PostForm.Get("sort_asc") == "false" {
+		sortAsc = true // toggle
+		sortDir = ""   // ascending
+	}
+
+	res, err := s.idx.Search(r.Context(), q, resType, sortBy, sortDir, 10)
 	if err != nil {
 		// TODO do we filter out all user errors above in parseform?
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -293,6 +304,8 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := html.SearchResultsTmpl{
 		Results: res,
+		SortBy:  sortBy,
+		SortAsc: sortAsc,
 	}
 	tmpl.Render(r.Context(), w)
 

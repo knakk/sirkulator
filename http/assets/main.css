@@ -33,7 +33,7 @@ footer { background: #f5f5f5; padding: 1rem 0; font-family: monospace; }
 
 table    { width: 100% }
 thead th { text-align: left; }
-table td { vertical-align: top;}
+table td { vertical-align: top; min-width: 250px; }
 
 label    { font-weight: bold; }
 
@@ -47,6 +47,8 @@ nav li        { display: inline-flex; flex-direction: column; justify-content: s
 nav li.active { border-bottom: 4px solid var(--textcolor); font-weight: bold}
 nav li::after { content: attr(data-title); height: 0; visibility: hidden; overflow: hidden; user-select: none;
                 pointer-events: none; font-weight: bold; }
+
+.clickable    { cursor: pointer }
 
 .row     { display: flex; flex-wrap: wrap; width: 100%; }
 .column  { display: flex; flex-direction: column; flex: 1; }

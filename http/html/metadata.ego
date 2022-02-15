@@ -51,8 +51,18 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
                                 hx-target="#search-results"
                                 type="search" placeholder="Søk">
                         </th>
-                        <th>Opprettet</th>
-                        <th>Endret</th>
+                        <th class="clickable" hx-post="/metadata/search"
+                            hx-include="[name='q'], [name='type'], [name='sort_asc']"
+                            hx-vals='{"sort_by": "created"}'
+                            hx-target="#search-results">
+                            Opprettet ▲▼
+                        </th>
+                        <th class="clickable" hx-post="/metadata/search"
+                            hx-include="[name='q'], [name='type'], [name='sort_asc']"
+                            hx-vals='{"sort_by": "updated"}'
+                            hx-target="#search-results">
+                            Endret ▲▼
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="search-results">

@@ -10,7 +10,11 @@ import (
 
 type SearchResultsTmpl struct {
     Results search.Results
+    SortBy string
+    SortAsc bool
 }
+
+const dateFormat = "2006-01-02 15:04:05"
 
 func (sr *SearchResultsTmpl) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
@@ -23,12 +27,15 @@ func (sr *SearchResultsTmpl) Render(ctx context.Context, w io.Writer) {
                     <%= hit.Label %>
                 </a>
             </td>
-            <td></td>
-            <td></td>
+            <td><%= hit.CreatedAt.Format(dateFormat) %></td>
+            <td><%= hit.UpdatedAt.Format(dateFormat) %></td>
         </tr>
 <%   } %>
     <tr>
-        <td></td>
+        <td>
+            <input type="hidden" name="sort_by" value="<%= sr.SortBy %>">
+            <input type="hidden" name="sort_asc" value="<%= sr.SortAsc %>">
+        </td>
         <td colspan="3"><small><%= l.Translate("%d hits (%v)", sr.Results.Total, sr.Results.Time ) %></small></td>
     </tr>
 <% } %>

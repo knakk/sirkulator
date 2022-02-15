@@ -122,7 +122,8 @@ func (idx Index) batchStore(docs []Document) error {
 	return nil
 }
 
-func (idx *Index) Search(ctx context.Context, q string, resType string, limit int) (Results, error) {
+// TODO too many params method: take query struct insted
+func (idx *Index) Search(ctx context.Context, q, resType, sortBy, sortDir string, limit int) (Results, error) {
 	res := Results{}
 	var query bluge.Query
 	if q == "" {
@@ -136,6 +137,14 @@ func (idx *Index) Search(ctx context.Context, q string, resType string, limit in
 			AddMust(bluge.NewMatchQuery(resType).SetField("type"))
 	}
 	req := bluge.NewTopNSearch(limit, query).WithStandardAggregations()
+
+	switch sortBy {
+	case "created", "updated":
+		req.SortBy([]string{sortDir + sortBy, "label"}) // sortDir "-"" = descending
+	default:
+		// sort by score
+	}
+
 	r, _ := idx.writer.Reader() // err is always nil: https://github.com/blugelabs/bluge/issues/35
 	defer r.Close()             // TODO catch and return error
 	dmi, err := r.Search(ctx, req)
@@ -158,6 +167,16 @@ func (idx *Index) Search(ctx context.Context, q string, resType string, limit in
 				hit.Type = string(value)
 			case "label":
 				hit.Label = string(value)
+			case "created":
+				t, err := bluge.DecodeDateTime(value)
+				if err == nil {
+					hit.CreatedAt = t
+				}
+			case "updated":
+				t, err := bluge.DecodeDateTime(value)
+				if err == nil {
+					hit.UpdatedAt = t
+				}
 			}
 			return true
 		})
