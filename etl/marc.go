@@ -291,7 +291,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		Data:  p,
 	}
 
-	// Publication identifiers: ISBN, ISSN, EAN
+	// Publication identifiers: ISBN, ISSN, GTIN (EAN)
 	for _, isbn := range rec.ValuesAt("020", "a") {
 		// TODO clean ISBN number
 		res.Links = append(res.Links, [2]string{"isbn", isbn})
@@ -300,9 +300,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		// TODO clean ISSN number
 		res.Links = append(res.Links, [2]string{"issn", issn})
 	}
-	for _, ean := range rec.ValuesAt("024", "a") {
-		// TODO clean EAN number
-		res.Links = append(res.Links, [2]string{"ean", ean})
+	for _, gtin := range rec.ValuesAt("024", "a") {
+		// TODO clean GTIN (EAN) number
+		res.Links = append(res.Links, [2]string{"gtin", gtin})
 	}
 
 	ing.Resources = append(ing.Resources, res)

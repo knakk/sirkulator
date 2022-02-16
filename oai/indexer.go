@@ -173,11 +173,11 @@ func IndexBibsysPublication(res *ProcessedRecord, mrc marc.Record) {
 		res.Identifiers = append(res.Identifiers, [2]string{"ismn", strings.Replace(ismn, "-", "", -1)})
 	}
 
-	for _, ean := range mrc.ValuesAt("025", "a") {
-		if len(ean) < 13 { // TODO proper validation?
+	for _, gtin := range mrc.ValuesAt("025", "a") {
+		if len(gtin) < 13 { // TODO proper validation?
 			continue
 		}
-		res.Identifiers = append(res.Identifiers, [2]string{"ean", strings.Replace(ean, "-", "", -1)})
+		res.Identifiers = append(res.Identifiers, [2]string{"gtin", strings.Replace(gtin, "-", "", -1)})
 	}
 
 	if author, ok := mrc.ValueAt("100", "a"); ok {

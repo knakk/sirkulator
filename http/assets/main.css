@@ -25,6 +25,8 @@ a              { color: blue; text-decoration: none;}
 a:hover        { text-decoration: underline; }
 a:visited      { color: blue }
 
+a[href^="http"]::after { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23fff' stroke='%2336c' d='M1.5 4.518h5.982V10.5H1.5z'/%3E%3Cpath fill='%2336c' d='M5.765 1H11v5.39L9.427 7.937l-1.31-1.31L5.393 9.35l-2.69-2.688 2.81-2.808L4.2 2.544z'/%3E%3Cpath fill='%23fff' d='m9.995 2.004.022 4.885L8.2 5.07 5.32 7.95 4.09 6.723l2.882-2.88-1.85-1.852z'/%3E%3C/svg%3E%0A"); }
+
 body   { display: grid; grid-template-rows: auto 1fr auto; height: 100vh;
          font-family: system-ui, sans-serif; color: var(--textcolor)}
 header { background: khaki; }
@@ -34,6 +36,7 @@ footer { background: #f5f5f5; padding: 1rem 0; font-family: monospace; }
 table    { width: 100% }
 thead th { text-align: left; }
 table td { vertical-align: top; }
+table td.right { text-align: right; padding-right: 1em; }
 
 label    { font-weight: bold; }
 
@@ -52,6 +55,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 
 .row     { display: flex; flex-wrap: wrap; width: 100%; }
 .column  { display: flex; flex-direction: column; flex: 1; }
+.column-wide { flex: 2 }
 
 .pad      { padding: 1rem; }
 .pad-left { padding-left: 1rem; }
@@ -82,4 +86,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 
 /* Page specific */
 
+/* metadata page */
 table.metadata-search-results td { min-width: 250px; }
+
+/* person page */

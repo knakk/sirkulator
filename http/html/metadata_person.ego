@@ -9,6 +9,7 @@ import (
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/internal/localizer"
     "github.com/knakk/sirkulator/marc"
+    "github.com/knakk/sirkulator/vocab"
 )
 
 type PersonTemplate struct {
@@ -48,7 +49,7 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
             <h3><%= tmpl.Resource.Label %></h3>
         </summary>
         <div class="border row">
-            <div class="column pad">
+            <div class="column column-wide pad">
                 <h4><%= l.Translate("Properties") %></h4>
                 <p><br/></p>
                 <form>
@@ -74,12 +75,22 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
             <div class="column pad">
                 <h4><%= l.Translate("Identificators and links") %></h4>
                 <p><br/></p>
-                <dl>
-                    <% for _, link := range tmpl.Resource.Links { %>
-                        <dt><%= link[0] %></dt>
-                        <dd><%= link[1] %></dd>
+                <table>
+                    <% for _, link := range tmpl.Resource.Links {
+                        id := vocab.ParseIdentifier(link[0], link[1])
+                        %>
+                        <tr>
+                            <td class="right"><%= id.Label %></td>
+                            <td>
+                                <% if id.URL != "" { %>
+                                    <a href="<%= id.URL %>"><%= id.Value %></a>
+                                <% } else { %>
+                                    <%= id.Value %>
+                                <% } %>
+                            </td>
+                        </tr>
                     <% } %>
-                </dl>
+                </table>
 
             </div>
         </div>
