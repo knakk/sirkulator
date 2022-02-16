@@ -5,6 +5,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -24,6 +25,7 @@ import (
 //go:embed assets/*.css
 var embeddedFS embed.FS
 
+// Server represents the HTTP server responsible for serving Sirkulators admin interface.
 type Server struct {
 	ln  net.Listener
 	srv *http.Server
@@ -38,9 +40,10 @@ type Server struct {
 	Lang language.Tag
 }
 
+// NewServer returns a new Server with the given database and index and assets settings.
 func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *search.Index) *Server {
 	s := Server{
-		Addr: "localhost:0", // assign random port as default, usefull for testing
+		Addr: "localhost:0", // assign random port as default, useful for testing
 		db:   db,
 		idx:  idx,
 	}
@@ -50,7 +53,7 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 		WriteTimeout:      10 * time.Second,
 		ReadHeaderTimeout: 20 * time.Second,
 		IdleTimeout:       120 * time.Second,
-		//ErrorLog: TODO
+		// ErrorLog: TODO
 	}
 	s.srv.Handler = s.router(assetsDir)
 	return &s
@@ -81,6 +84,8 @@ func FileServer(r chi.Router, path string, root http.FileSystem, assetDir string
 	})
 }
 
+// WithLocalizer is a middleware which stores a Localizer in the request context,
+// with language extracted from the Accept-Language HTTP headers if present.
 func WithLocalizer() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +106,6 @@ func (s *Server) router(assetsDir string) chi.Router {
 		fs = http.Dir(assetsDir)
 	}
 	FileServer(r, "/assets", fs, assetsDir)
-	//r.Get("/favicon.ico", ...)
 
 	// Main UI routes
 	r.Route("/", func(r chi.Router) {
@@ -115,14 +119,15 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
 			r.Get("/person/{id}", s.pagePerson)
-			//r.Get("/publication/{id}", s.pagePublication)
+			// r.Get("/publication/{id}", s.pagePublication)
 		})
 	})
 
 	return r
-
 }
 
+// Open starts to listen at the Server's host:port address, and starts
+// serving incomming connections.
 func (s *Server) Open() (err error) {
 	if s.ln, err = net.Listen("tcp", s.Addr); err != nil {
 		return err
@@ -132,6 +137,7 @@ func (s *Server) Open() (err error) {
 	return nil
 }
 
+// Close closes the Server, and peform a graceful shutdown (TODO verify)
 func (s *Server) Close() error {
 	// TODO verify that this is run
 	ctx, cancel := context.WithTimeout(s.srv.BaseContext(s.ln), 1*time.Second)
@@ -183,7 +189,7 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 	conn := s.db.Get(r.Context())
 	if conn == nil {
 		// TODO which statuscode/response is appropriate?
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		return
 	}
 	defer s.db.Put(conn)
@@ -192,13 +198,13 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		ServerError(w, err)
 		return
 	}
 
 	contrib, err := sql.GetAgentContributions(conn, id)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		ServerError(w, err)
 		return
 	}
 
@@ -253,15 +259,18 @@ func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+
 	ids := r.PostForm.Get("identifiers")
 	if ids == "" {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+
 	ing := etl.NewPreviewIngestor(s.db)
 	ing.ImageDownload = false
 	ing.ImageAsync = true
 	var res []html.ImportPreviewEntry
+
 	for _, id := range strings.Split(ids, "\n") {
 		// TODO detect type of ID: ISBN/EAN/ISSN
 		p := html.ImportPreviewEntry{
@@ -281,6 +290,7 @@ func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {
 	tmpl := html.ImportPreviewTmpl{
 		Entries: res,
 	}
+
 	tmpl.Render(r.Context(), w)
 }
 
@@ -306,7 +316,7 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 	res, err := s.idx.Search(r.Context(), q, resType, sortBy, sortDir, 10)
 	if err != nil {
 		// TODO do we filter out all user errors above in parseform?
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		ServerError(w, err)
 		return
 	}
 
@@ -316,5 +326,21 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 		SortAsc: sortAsc,
 	}
 	tmpl.Render(r.Context(), w)
+}
 
+// ServerError logs the given error before responding to the request
+// with an Internal Server error.
+// TODO consider taking an error code and (optional) message,
+// which can be conveyed to client, ie.:
+//   "Error code: xyz. If the problem persist, please inform system administrator
+//   with references to the error code."
+func ServerError(w http.ResponseWriter, err error) {
+	// Internal Server errors are normally something that "should not happen",
+	// and therefor interesting to log.
+	log.Println(err)
+
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(http.StatusInternalServerError)
+	fmt.Fprintln(w, http.StatusText(http.StatusInternalServerError))
 }

@@ -13,8 +13,10 @@ var defaultClient = http.Client{
 	Timeout: 5 * time.Second,
 }
 
+const maxDownloadBytes = 10e+6
+
+// Download opens the given URL, reads it body and returns it.
 func Download(ctx context.Context, url string) ([]byte, error) {
-	const maxDownloadBytes = 10e+6
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http.Download: NewRequestWithContext: %w", err)
@@ -31,8 +33,9 @@ func Download(ctx context.Context, url string) ([]byte, error) {
 	return b, nil
 }
 
+// Open opens the given URL, returning a handle to the response body. The
+// caller is responsible for closing the body.
 func Open(ctx context.Context, url string) (io.ReadCloser, error) {
-	const maxDownloadBytes = 10e+6
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http.Download: NewRequestWithContext: %w", err)

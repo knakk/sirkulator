@@ -33,7 +33,7 @@ footer { background: #f5f5f5; padding: 1rem 0; font-family: monospace; }
 
 table    { width: 100% }
 thead th { text-align: left; }
-table td { vertical-align: top; min-width: 250px; }
+table td { vertical-align: top; }
 
 label    { font-weight: bold; }
 
@@ -79,3 +79,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 .htmx-import-indicator                { opacity: 0 }
 .htmx-request .htmx-import-indicator  { opacity: 1; }
 .htmx-request.htmx-import-indicator   { opacity: 1; }
+
+/* Page specific */
+
+table.metadata-search-results td { min-width: 250px; }

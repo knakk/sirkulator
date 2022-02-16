@@ -29,7 +29,7 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
             <h3><%= l.Translate("Search/browse catalogue") %></h3>
         </summary>
         <div>
-            <table>
+            <table class="metadata-search-results">
                 <thead>
                     <tr>
                         <th>
