@@ -31,11 +31,15 @@ type Identifier struct {
 // and the URL will be empty.
 func ParseIdentifier(code, value string) Identifier {
 	if id, found := identifiers[code]; found {
+		var url string
+		if id[1] != "" {
+			url = fmt.Sprintf(id[1], value)
+		}
 		return Identifier{
 			Code:  code,
 			Value: value,
 			Label: id[0],
-			URL:   fmt.Sprintf(id[1], value),
+			URL:   url,
 		}
 	}
 

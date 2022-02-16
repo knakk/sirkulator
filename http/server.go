@@ -119,7 +119,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
 			r.Get("/person/{id}", s.pagePerson)
-			// r.Get("/publication/{id}", s.pagePublication)
+			r.Get("/publication/{id}", s.pagePublication)
 		})
 	})
 
@@ -209,6 +209,41 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := html.PersonTemplate{
+		Page: html.Page{
+			Lang: s.Lang,
+			Path: r.URL.Path,
+		},
+		Resource:      res,
+		Contributions: contrib,
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		// TODO which statuscode/response is appropriate?
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+	res, err := sql.GetResource(conn, sirkulator.TypePublication, id)
+	if errors.Is(err, sirkulator.ErrNotFound) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	contrib, err := sql.GetPublcationContributors(conn, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	tmpl := html.PublicationTemplate{
 		Page: html.Page{
 			Lang: s.Lang,
 			Path: r.URL.Path,

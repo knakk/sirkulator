@@ -71,7 +71,7 @@ func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentCont
 
 	const q = `
 	SELECT
-		r.to_id,
+		r.from_id,
 		resource.type as res_type,
 		resource.label as res_label,
 		GROUP_CONCAT(json_extract(r.data, '$.role')) as role
@@ -99,7 +99,46 @@ func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentCont
 	}
 
 	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
-		return res, fmt.Errorf("sql.GetAgentContributions(%s): %w", id, err)
+		return res, fmt.Errorf("sql.GetAgentContributions(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetPublcationContributors(conn *sqlite.Conn, id string) ([]sirkulator.PublicationContribution, error) {
+	var res []sirkulator.PublicationContribution
+
+	const q = `
+	SELECT
+		r.to_id,
+		resource.type as res_type,
+		resource.label as res_label,
+		GROUP_CONCAT(json_extract(r.data, '$.role')) as role
+	FROM
+		relation r
+		JOIN resource ON (to_id=resource.id)
+	WHERE
+		r.type='has_contributor'
+	AND from_id=?
+	GROUP BY r.to_id`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		c := sirkulator.PublicationContribution{}
+		c.Agent.ID = stmt.ColumnText(0)
+		c.Agent.Type = sirkulator.ParseResourceType(stmt.ColumnText(1))
+		c.Agent.Label = stmt.ColumnText(2)
+		for _, role := range strings.Split(stmt.ColumnText(3), ",") {
+			rel, err := marc.ParseRelator(role)
+			if err == nil {
+				c.Roles = append(c.Roles, rel)
+			}
+		}
+		res = append(res, c)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetPublicationContributions(%q): %w", id, err)
 	}
 
 	return res, nil
