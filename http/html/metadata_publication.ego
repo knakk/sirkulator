@@ -13,11 +13,15 @@ type PublicationTemplate struct {
     Page
     Resource sirkulator.Resource
     Contributions []sirkulator.PublicationContribution
+    Image *sirkulator.Image
 }
 
 func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
+
     publication := tmpl.Resource.Data.(*sirkulator.Publication)
+    img := tmpl.Image
+
 %><ego:App Page=tmpl.Page>
     <details open>
         <summary>
@@ -43,6 +47,15 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                 </form>
             </div>
             <div class="column pad">
+                <% if img != nil { %>
+                    <h4><%= l.Translate("Cover-image") %></h4>
+                    <img
+                        src="/image/<%= img.ID %>"
+                        width="<%= img.Width %>"
+                        height="<%= img.Height %>"
+                        alt="<%= l.Translate("Publication cover-image") %>"
+                        >
+                <% } %>
                 <h4><%= l.Translate("Identificators and links") %></h4>
                 <p><br/></p>
                 <table>
@@ -50,7 +63,7 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                         id := vocab.ParseIdentifier(link[0], link[1])
                         %>
                         <tr>
-                            <td class="right"><%= id.Label %></td>
+                            <td><%= id.Label %></td>
                             <td>
                                 <% if id.URL != "" { %>
                                     <a href="<%= id.URL %>"><%= id.Value %></a>

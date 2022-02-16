@@ -39,12 +39,15 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d hits (%v)":                   27,
+	"%d hits (%v)":                   33,
 	"%d imported OK!":                15,
 	"1 per line":                     12,
+	"Agent":                          32,
 	"Birthyear":                      19,
 	"Circulation":                    1,
 	"Configuration":                  5,
+	"Contributions":                  31,
+	"Cover-image":                    29,
 	"Deathyear":                      20,
 	"Holdings":                       4,
 	"Home":                           0,
@@ -60,16 +63,20 @@ var messageKeyToIndex = map[string]int{
 	"Preview":                        13,
 	"Properties":                     16,
 	"Publication":                    25,
+	"Publication cover-image":        30,
 	"Publications and contributions": 23,
 	"Role":                           24,
 	"Search/browse catalogue":        8,
 	"Show metadata for review":       7,
 	"Show recent transactions":       6,
+	"Subtitle":                       28,
+	"Tittel":                         27,
 	"approximate":                    21,
 	"wait...":                        14,
 }
 
-var enIndex = []uint32{ // 29 elements
+var enIndex = []uint32{ // 35 elements
+	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000051,
 	0x0000006a, 0x00000082, 0x00000089, 0x00000095,
@@ -77,19 +84,23 @@ var enIndex = []uint32{ // 29 elements
 	0x000000d5, 0x000000e0, 0x000000e5, 0x000000ee,
 	0x000000f8, 0x00000102, 0x0000010e, 0x00000127,
 	0x00000146, 0x0000014b, 0x00000157, 0x00000167,
-	0x0000017a,
-} // Size: 140 bytes
+	0x0000016e, 0x00000177, 0x00000183, 0x0000019b,
+	// Entry 20 - 3F
+	0x000001a9, 0x000001af, 0x000001c2,
+} // Size: 164 bytes
 
-const enData string = "" + // Size: 378 bytes
+const enData string = "" + // Size: 450 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Show recent transactions\x02Show metadata for review\x02Search/bro" +
 	"wse catalogue\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
 	"e\x02Preview\x02wait...\x02%[1]d imported OK!\x02Properties\x02Name\x02L" +
 	"ifespan\x02Birthyear\x02Deathyear\x02approximate\x02Identificators and l" +
 	"inks\x02Publications and contributions\x02Role\x02Publication\x02Other r" +
-	"elations\x02%[1]d hits (%[2]v)"
+	"elations\x02Tittel\x02Subtitle\x02Cover-image\x02Publication cover-image" +
+	"\x02Contributions\x02Agent\x02%[1]d hits (%[2]v)"
 
-var noIndex = []uint32{ // 29 elements
+var noIndex = []uint32{ // 35 elements
+	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000055,
 	0x00000075, 0x0000008a, 0x00000093, 0x000000a3,
@@ -97,16 +108,19 @@ var noIndex = []uint32{ // 29 elements
 	0x000000ed, 0x000000f8, 0x000000fd, 0x00000105,
 	0x00000111, 0x0000011a, 0x00000126, 0x00000140,
 	0x00000155, 0x0000015b, 0x00000165, 0x00000176,
-	0x0000018a,
-} // Size: 140 bytes
+	0x0000017d, 0x00000189, 0x00000196, 0x000001af,
+	// Entry 20 - 3F
+	0x000001b6, 0x000001bd, 0x000001d1,
+} // Size: 164 bytes
 
-const noData string = "" + // Size: 394 bytes
+const noData string = "" + // Size: 465 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vis siste transaksjoner\x02Vis opplysninger til gjennomsyn" +
 	"\x02Søk/bla i katalogen\x02Importer\x02Identifikatorer\x02ISBN, ISSN ell" +
 	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02%[1]d importert OK!" +
 	"\x02Egenskaper\x02Navn\x02Levetid\x02Fødselsår\x02Dødsår\x02omtrentelig" +
 	"\x02Identifikatorer og lenker\x02Utgivelser og bidrag\x02Rolle\x02Utgive" +
-	"lse\x02Andre relasjoner\x02%[1]d treff (%[2]v)"
+	"lse\x02Andre relasjoner\x02Tittel\x02Undertittel\x02Forsidebilde\x02Utgi" +
+	"velsens forsidebilde\x02Bidrag\x02Aktør\x02%[1]d treff (%[2]v)"
 
-	// Total table size 1052 bytes (1KiB); checksum: 68284043
+	// Total table size 1243 bytes (1KiB); checksum: 67E4AF58

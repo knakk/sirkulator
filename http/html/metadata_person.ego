@@ -83,7 +83,7 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                         id := vocab.ParseIdentifier(link[0], link[1])
                         %>
                         <tr>
-                            <td class="right"><%= id.Label %></td>
+                            <td><%= id.Label %></td>
                             <td>
                                 <% if id.URL != "" { %>
                                     <a href="<%= id.URL %>"><%= id.Value %></a>

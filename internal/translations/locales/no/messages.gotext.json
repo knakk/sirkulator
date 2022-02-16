@@ -147,6 +147,36 @@
             "translation": "Andre relasjoner"
         },
         {
+            "id": "Tittel",
+            "message": "Tittel",
+            "translation": "Tittel"
+        },
+        {
+            "id": "Subtitle",
+            "message": "Subtitle",
+            "translation": "Undertittel"
+        },
+        {
+            "id": "Cover-image",
+            "message": "Cover-image",
+            "translation": "Forsidebilde"
+        },
+        {
+            "id": "Publication cover-image",
+            "message": "Publication cover-image",
+            "translation": "Utgivelsens forsidebilde"
+        },
+        {
+            "id": "Contributions",
+            "message": "Contributions",
+            "translation": "Bidrag"
+        },
+        {
+            "id": "Agent",
+            "message": "Agent",
+            "translation": "Aktør"
+        },
+        {
             "id": "{Total} hits ({Time})",
             "message": "{Total} hits ({Time})",
             "translation": "{Total} treff ({Time})",

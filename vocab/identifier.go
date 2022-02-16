@@ -16,6 +16,12 @@ var identifiers = map[string][2]string{
 	"wiki-no":  {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki"},
 	"wikidata": {"Wikidata", "https://www.wikidata.org/wiki/%s"},
 	"worldcat": {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
+
+	// TODO candidates:
+	//discogs-artist  https://www.discogs.com/artist/32198
+	//discogs-work    https://www.discogs.com/master/1282847
+	//discogs-release https://www.discogs.com/release/895934
+	//discogs-label   https://www.discogs.com/label/6785
 }
 
 // Identifier is an external, known Identifier.

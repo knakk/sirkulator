@@ -201,6 +201,48 @@
             "fuzzy": true
         },
         {
+            "id": "Tittel",
+            "message": "Tittel",
+            "translation": "Tittel",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Subtitle",
+            "message": "Subtitle",
+            "translation": "Subtitle",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Cover-image",
+            "message": "Cover-image",
+            "translation": "Cover-image",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Publication cover-image",
+            "message": "Publication cover-image",
+            "translation": "Publication cover-image",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Contributions",
+            "message": "Contributions",
+            "translation": "Contributions",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Agent",
+            "message": "Agent",
+            "translation": "Agent",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "{Total} hits ({Time})",
             "message": "{Total} hits ({Time})",
             "translation": "{Total} hits ({Time})",

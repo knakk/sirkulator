@@ -5,12 +5,14 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
+	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/go-chi/chi/v5"
 	"github.com/knakk/sirkulator"
@@ -107,6 +109,8 @@ func (s *Server) router(assetsDir string) chi.Router {
 	}
 	FileServer(r, "/assets", fs, assetsDir)
 
+	r.Get("/image/{id}", s.image)
+
 	// Main UI routes
 	r.Route("/", func(r chi.Router) {
 		r.Use(WithLocalizer())
@@ -146,6 +150,42 @@ func (s *Server) Close() error {
 		s.idx.Close() // TODO check err?
 	}
 	return s.srv.Shutdown(ctx)
+}
+
+func (s *Server) image(w http.ResponseWriter, r *http.Request) {
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		// TODO which statuscode/response is appropriate?
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+	var rowID int64
+	var imgType string
+	fn := func(stmt *sqlite.Stmt) error {
+		rowID = stmt.ColumnInt64(0)
+		imgType = stmt.ColumnText(1)
+		return nil
+	}
+	const q = "SELECT rowid, type FROM files.image WHERE id=?"
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if rowID == 0 {
+		http.NotFound(w, r)
+		return
+	}
+	blob, err := conn.OpenBlob("files", "image", "data", rowID, false)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+	defer blob.Close()
+
+	w.Header().Set("Content-Type", "image/"+imgType)
+	io.Copy(w, blob)
 }
 
 func (s *Server) pageHome(w http.ResponseWriter, r *http.Request) {
@@ -243,6 +283,8 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	img, _ := sql.GetImage(conn, id) // img is nil if err != nil TODO log err if err != ErrNotFound?
+
 	tmpl := html.PublicationTemplate{
 		Page: html.Page{
 			Lang: s.Lang,
@@ -250,6 +292,7 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		},
 		Resource:      res,
 		Contributions: contrib,
+		Image:         img,
 	}
 	tmpl.Render(r.Context(), w)
 }

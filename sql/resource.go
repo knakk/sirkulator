@@ -144,4 +144,25 @@ func GetPublcationContributors(conn *sqlite.Conn, id string) ([]sirkulator.Publi
 	return res, nil
 }
 
+func GetImage(conn *sqlite.Conn, id string) (*sirkulator.Image, error) {
+	var img sirkulator.Image
+	const q = "SELECT type, width, height FROM files.image WHERE id=?"
+	fn := func(stmt *sqlite.Stmt) error {
+		img.ID = id
+		img.Type = stmt.ColumnText(0)
+		img.Width = stmt.ColumnInt(1)
+		img.Height = stmt.ColumnInt(2)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return nil, fmt.Errorf("sql.GetImage(%q): %w", id, err)
+	}
+	if img.ID == "" {
+		return nil, sirkulator.ErrNotFound
+	}
+
+	return &img, nil
+}
+
 //func GetOAIRecord(conn *sqlite.Conn, source,id string) (oai.Record, error) {}

@@ -276,11 +276,13 @@ func (yr YearRange) enLabel() string {
 	return s.String()
 }
 
+// AgentContribution is a contribution from the viewpoint of an Agent (Person|Corporation).
 type AgentContribution struct {
 	SimpleResource
 	Roles []marc.Relator
 }
 
+// PublicationContribution is a contribution from the view point of a Publication.
 type PublicationContribution struct {
 	Agent SimpleResource
 	Roles []marc.Relator
@@ -347,16 +349,12 @@ type Relation struct {
 	Data   map[string]interface{} // TODO consider map[string]string or [][2]string
 }
 
-/*
-{
-	Type: TypePublication,
-	ID:   "Rae943afe",
-	Prop: "Publisher",
-	Value: "Aschehough"
-
+type Image struct {
+	ID     string
+	Type   string // OR Mime?
+	Height int
+	Width  int
 }
-
-*/
 
 // GetNewID returns a new string ID which can be used to persist a
 // new Resource to DB.
