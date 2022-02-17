@@ -66,6 +66,7 @@ func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirku
 	return res, nil
 }
 
+// TODO orderBy year|label orderAsc bool
 func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentContribution, error) {
 	var res []sirkulator.AgentContribution
 
@@ -74,6 +75,7 @@ func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentCont
 		r.from_id,
 		resource.type as res_type,
 		resource.label as res_label,
+		json_extract(resource.data, '$.year') AS year,
 		GROUP_CONCAT(json_extract(r.data, '$.role')) as role
 	FROM
 		relation r
@@ -81,14 +83,16 @@ func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentCont
 	WHERE
 		r.type='has_contributor'
 	AND to_id=?
-	GROUP BY r.from_id`
+	GROUP BY r.from_id
+	ORDER BY year DESC`
 
 	fn := func(stmt *sqlite.Stmt) error {
 		c := sirkulator.AgentContribution{}
 		c.ID = stmt.ColumnText(0)
 		c.Type = sirkulator.ParseResourceType(stmt.ColumnText(1))
 		c.Label = stmt.ColumnText(2)
-		for _, role := range strings.Split(stmt.ColumnText(3), ",") {
+		c.Year = stmt.ColumnInt(3)
+		for _, role := range strings.Split(stmt.ColumnText(4), ",") {
 			rel, err := marc.ParseRelator(role)
 			if err == nil {
 				c.Roles = append(c.Roles, rel)

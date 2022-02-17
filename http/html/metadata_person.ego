@@ -110,7 +110,8 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                 <thead>
                     <tr>
                         <th><%= l.Translate("Role") %></th>
-                        <th><%= l.Translate("Publication") %></th>
+                        <th class="clickable"><%= l.Translate("Year") %> ▲▼</th>
+                        <th class="clickable"><%= l.Translate("Publication") %> ▲▼</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,6 +120,7 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                             <td>
                                 <%= printRoles(c.Roles, l) %>
                             </td>
+                            <td><%= notZero(c.Year) %></td>
                             <td>
                                 <a href="<%= resourceLink(c.SimpleResource) %>"><%= c.Label %></a>
                             </td>

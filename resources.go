@@ -279,6 +279,7 @@ func (yr YearRange) enLabel() string {
 // AgentContribution is a contribution from the viewpoint of an Agent (Person|Corporation).
 type AgentContribution struct {
 	SimpleResource
+	Year  int // TODO publication year or first published year?
 	Roles []marc.Relator
 }
 
