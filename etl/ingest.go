@@ -42,7 +42,7 @@ func NewIngestor(db *sqlitex.Pool, idx *search.Index) *Ingestor {
 	return &Ingestor{
 		db:         db,
 		idx:        idx,
-		ImageWidth: 200,                 // default resize width
+		ImageWidth: 300,                 // default resize width
 		idFunc:     sirkulator.GetNewID, // can be overwritten with a deterministic function in tests
 	}
 }
@@ -338,35 +338,42 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 		return // context.Cancelled
 	}
 	defer ig.db.Put(conn)
-	for _, f := range files {
+	for _, f := range files { // TODO consider extract loop body to function, for easier cleanup with defer
 		r, err := client.Open(ctx, f.URL)
 		if err != nil {
 			continue
 		}
+
 		src, _, err := image.Decode(r)
 		if err != nil {
 			r.Close()
 			continue
 		}
 		r.Close()
+
 		ratio := float64(ig.ImageWidth) / float64(src.Bounds().Max.X)
 		height := float64(src.Bounds().Max.Y) * ratio
 		dst := image.NewRGBA(image.Rect(0, 0, ig.ImageWidth, int(height)))
 		draw.CatmullRom.Scale(dst, dst.Bounds(), src, src.Bounds(), draw.Over, nil)
+
 		var b bytes.Buffer
-		if err := jpeg.Encode(&b, dst, nil); err != nil {
+		opt := jpeg.Options{Quality: 50} // TODO find optimal Quality
+
+		if err := jpeg.Encode(&b, dst, &opt); err != nil {
 			continue
 		}
+
 		stmt := conn.Prep(`
 			INSERT INTO files.image (id, type, width, height, size, data, source)
 				VALUES ($id, $type, $width, $height, $size, $data, $source)`)
 		stmt.SetText("$id", f.ResourceID)
 		stmt.SetText("$type", "jpeg")
-		stmt.SetInt64("$width", 200)
+		stmt.SetInt64("$width", int64(ig.ImageWidth))
 		stmt.SetInt64("$height", int64(height))
 		stmt.SetInt64("$size", int64(b.Len()))
 		stmt.SetBytes("$data", b.Bytes())
 		stmt.SetText("$source", f.URL)
+
 		if _, err = stmt.Step(); err != nil {
 			continue
 		}

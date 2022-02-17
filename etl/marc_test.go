@@ -365,6 +365,10 @@ func TestIngestOAIRecord(t *testing.T) {
 				},
 				{
 					ResourceID: "t1",
+					URL:        "https://contents.bibs.aws.unit.no/files/images/original/3/3/9788203365133.jpg",
+				},
+				{
+					ResourceID: "t1",
 					URL:        "https://media.aja.bs.no/4bfe1c40-8ee2-4601-b7eb-2e032a2e59b7/cover/original.jpg",
 				},
 				{
@@ -802,15 +806,15 @@ func TestIngestOAIRecord(t *testing.T) {
 					<subfield code="a">aja.bs.no</subfield>
 					<subfield code="n">Biblioteksentralen, Oslo</subfield>
 					<subfield code="q">image/jpeg</subfield>
-					<subfield code="u">https://aja.bs.no/ad0ca9fa-1460-430b-a306-348a47f26437/cover/original.jpg</subfield>
-					<subfield code="3">Omslagsbilde</subfield>
+					<subfield code="u">https://aja.bs.no/ad0ca9fa-1460-430b-a306-348a47f26437/cover/thumbnail.jpg</subfield>
+					<subfield code="3">Miniatyrbilde</subfield>
 				</datafield>
 				<datafield ind1=" " ind2=" " tag="856">
 					<subfield code="a">aja.bs.no</subfield>
 					<subfield code="n">Biblioteksentralen, Oslo</subfield>
 					<subfield code="q">image/jpeg</subfield>
-					<subfield code="u">https://aja.bs.no/ad0ca9fa-1460-430b-a306-348a47f26437/cover/thumbnail.jpg</subfield>
-					<subfield code="3">Miniatyrbilde</subfield>
+					<subfield code="u">https://aja.bs.no/ad0ca9fa-1460-430b-a306-348a47f26437/cover/original.jpg</subfield>
+					<subfield code="3">Omslagsbilde</subfield>
 				</datafield>
 				<datafield ind1="0" ind2="1" tag="852">
 					<subfield code="a">47BIBSYS_UBO</subfield>
@@ -1077,14 +1081,14 @@ func TestIngestOAIRecord(t *testing.T) {
 				<datafield ind1=" " ind2=" " tag="856">
 					<subfield code="a">aja.bs.no</subfield>
 					<subfield code="q">image/jpeg</subfield>
-					<subfield code="u">https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/original.jpg</subfield>
-					<subfield code="3">Omslagsbilde</subfield>
+					<subfield code="u">https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/thumbnail.jpg</subfield>
+					<subfield code="3">Miniatyrbilde</subfield>
 				</datafield>
 				<datafield ind1=" " ind2=" " tag="856">
 					<subfield code="a">aja.bs.no</subfield>
 					<subfield code="q">image/jpeg</subfield>
-					<subfield code="u">https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/thumbnail.jpg</subfield>
-					<subfield code="3">Miniatyrbilde</subfield>
+					<subfield code="u">https://media.aja.bs.no/cd6935ab-1a2b-4e29-ac07-a3ba5d753d89/cover/original.jpg</subfield>
+					<subfield code="3">Omslagsbilde</subfield>
 				</datafield>
 				<datafield ind1=" " ind2=" " tag="913">
 					<subfield code="a">Norbok</subfield>

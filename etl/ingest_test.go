@@ -417,8 +417,8 @@ func TestIngestISBN(t *testing.T) {
 	if x := img.Bounds().Max.X; x != ing.ImageWidth {
 		t.Errorf("image width=%d; expected %d", x, ing.ImageWidth)
 	}
-	if y := img.Bounds().Max.Y; y != 100 {
-		t.Errorf("image width=%d; expected 100", y)
+	if y := img.Bounds().Max.Y; y != ing.ImageWidth/2 {
+		t.Errorf("image width=%d; expected %d", y, ing.ImageWidth/2)
 	}
 
 	// TODO link to nb deduced from marc record? /nb, nb-free, nb-norway?

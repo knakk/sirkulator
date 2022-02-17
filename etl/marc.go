@@ -312,11 +312,20 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	var covers []FileFetch
 	for _, f := range rec.DataFieldsAt("856") {
 		if url := f.ValueAt("u"); url != "" {
-			if mime := f.ValueAt("q"); strings.HasPrefix(mime, "image") || strings.Contains(url, ".jpg") || strings.Contains(url, ".jpeg") {
+			if mime := f.ValueAt("q"); strings.HasPrefix(mime, "image") || strings.HasSuffix(url, ".jpg") || strings.HasSuffix(url, ".jpeg") {
 				covers = append(covers, FileFetch{
 					ResourceID: pID,
 					URL:        url,
 				})
+
+				// Bibsys records sometimes omit the original version and just gives us the small one,
+				// but we'll also try to get original size image:
+				if strings.HasPrefix(url, "https://contents.bibs.aws.unit.no/files/images/small/") {
+					covers = append(covers, FileFetch{
+						ResourceID: pID,
+						URL:        "https://contents.bibs.aws.unit.no/files/images/original/" + url[53:],
+					})
+				}
 			}
 
 		}
