@@ -12,6 +12,51 @@ import (
 	"github.com/knakk/sirkulator/marc"
 )
 
+// TODO more candidates: https://gist.github.com/boutros/221499f95397a4987a70ce726455319e
+var relatorsFrom700e = map[string]string{
+	"arranger of music":           "arr",
+	"author of introduction, etc": "aui",
+	"author":                      "aut",
+	"autor":                       "aut", // misseplling?
+	"contributor":                 "ctb",
+	"cover designer":              "bjd",
+	"director":                    "drt",
+	"dirigent":                    "cnd",
+	"editor":                      "edt",
+	"elgitar":                     "", // TODO instrument
+	"fiolin":                      "", // TODO instrument
+	"gitar":                       "", // TODO instrument
+	"illustr":                     "ill",
+	"illustrator":                 "ill",
+	"klaver":                      "", // TODO instrument
+	"kurator":                     "cur",
+	"medarb":                      "ctb", // ?
+	"narrator":                    "nrt",
+	"overs":                       "trl",
+	"photographer":                "pht",
+	"producer":                    "pro",
+	"produsent":                   "pro",
+	"red":                         "edt",
+	"sang":                        "sng",
+	"slagverk":                    "", // TODO instrument
+	"sopran":                      "", // TODO intsrument
+	"speaker":                     "", // ?
+	"tekstforf":                   "lyr",
+	"tenor":                       "", // TODO instrument
+	"tenorsaksofon":               "", // TODO instrument
+	"translator":                  "trl",
+	"trompet":                     "",    // TODO instrument
+	"utg":                         "pbl", // ?
+	"utøver":                      "prf",
+	"writer of foreword":          "aui", // TODO foreword != introduction ?
+	"writer of introduction":      "aui",
+	// "ethnographer": "",
+	//"attributed name", "",
+	//"coordinador": ""
+	//"dir": "drt", // eller dirigent?
+	//"traductor": ""
+}
+
 // createAgent creates a Resource of type Person/Corporation from the given MARC datafield.
 // If the returned Resource has an empty ID, it is to be considered invalid.
 func createAgent(f marc.DataField, idFunc func() string) (res sirkulator.Resource) {
@@ -267,20 +312,45 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 
 	// 7xx contributors
 	for _, f := range rec.DataFieldsAt("700", "710") {
+
+		// No role, ignore those entries for now
+		if f.ValueAt("4") == "" && f.ValueAt("e") == "" {
+			continue
+		}
+
 		if agent := matchOrCreate(&agents, f, idFunc); agent.ID != "" {
-			relator, _ := marc.ParseRelator(f.ValueAt("4"))
-			role := relator.Code()
-			if role == "" {
-				// default
-				// TODO different default for mediatypes other than books/monographs
-				role = "aut"
+			for _, rel := range f.ValuesAt("4") {
+				relator, _ := marc.ParseRelator(rel)
+				role := relator.Code()
+				if role != "" { // We only add relation if we know the role TODO assume default role on certain conditions?
+					// TODO check that we don't already have an identical relation, except with main-entry:true
+					relations = append(relations, sirkulator.Relation{
+						FromID: pID,
+						ToID:   agent.ID,
+						Type:   "has_contributor",
+						Data:   map[string]interface{}{"role": role},
+					})
+				}
 			}
-			relations = append(relations, sirkulator.Relation{
-				FromID: pID,
-				ToID:   agent.ID,
-				Type:   "has_contributor",
-				Data:   map[string]interface{}{"role": role},
-			})
+			for _, rel := range f.ValuesAt("e") {
+				rel = strings.ToLower(rel)
+				rel = strings.TrimSuffix(rel, ".")
+				rel = strings.TrimSuffix(rel, ",")
+				if match := relatorsFrom700e[rel]; match != "" {
+					rel = match
+				}
+				relator, _ := marc.ParseRelator(rel)
+				role := relator.Code()
+				if role != "" {
+					// TODO check that we don't already have an identical relation, except with main-entry:true
+					relations = append(relations, sirkulator.Relation{
+						FromID: pID,
+						ToID:   agent.ID,
+						Type:   "has_contributor",
+						Data:   map[string]interface{}{"role": role},
+					})
+				}
+			}
 		}
 	}
 
