@@ -12,6 +12,7 @@ import (
 // which was last updated 2019-03-06
 // The original source of English codes is maintained by Library of Congress:
 // 	https://www.loc.gov/marc/relators/relaterm.html
+// TODO also check https://rdakatalogisering.unit.no/files/2021/12/Liste_over_relasjoner_RDA.pdf
 var relators = map[string][2]string{
 	"act": {"Actor", "skuespiller"},
 	"adp": {"Adapter", "bearbeider"},

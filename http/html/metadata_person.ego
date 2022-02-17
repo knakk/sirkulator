@@ -56,22 +56,37 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                 <h4><%= l.Translate("Properties") %></h4>
                 <p><br/></p>
                 <form>
-                    <label for="person_name"><%= l.Translate("Name") %></label>
-                    <input name="person_name" type="text" disabled value="<%= person.Name %>">
 
+                    <fieldset>
+                        <legend><%= l.Translate("Personalia") %></legend>
+                        <div>
+                            <input id="person_name" name="person_name" type="text" size="50" value="<%= person.Name %>">
+                            <label for="person_name"><%= l.Translate("Name") %></label>
+                        </div>
+                        <div>
+                            <input id="person_description_short" name="person_description_short" type="text" size="50" value="">
+                            <label for="person_description_short"><%= l.Translate("Short description") %></label>
+                        </div>
+                    </fieldset>
 
                     <fieldset>
                         <legend><%= l.Translate("Lifespan") %></legend>
-                        <label for="person_birthyear"><%= l.Translate("Birthyear") %></label>
-                        <input name="person_birthyear" disabled value="<%= notZero(person.YearRange.From) %>">
-                        <br/>
-
-                        <label for="person_deathyear"><%= l.Translate("Deathyear") %></label>
-                        <input name="person_deathyear" disabled value="<%= notZero(person.YearRange.To) %>">
-                        <br/>
-
-                        <label for="person_lifespan_approx"><%= l.Translate("approximate") %></label>
-                            <input name="person_lifespan_approx" type="checkbox" disabled >
+                        <div>
+                            <input id="person_birthyear" name="person_birthyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(person.YearRange.From) %>">
+                            <label for="person_birthyear"><%= l.Translate("Birthyear") %></label>
+                        </div>
+                        <div>
+                            <input id="person_deathyear" name="person_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(person.YearRange.To) %>">
+                            <label for="person_deathyear"><%= l.Translate("Deathyear") %></label>
+                        </div>
+                        <div>
+                            <% if person.YearRange.Approx { %>
+                                <input id="person_lifespan_approx" name="person_lifespan_approx" type="checkbox" checked>
+                            <% } else { %>
+                                <input id="person_lifespan_approx" name="person_lifespan_approx" type="checkbox">
+                            <% } %>
+                            <label for="person_lifespan_approx"><%= l.Translate("approximate") %></label>
+                        </div>
                     </fieldset>
                 </form>
             </div>

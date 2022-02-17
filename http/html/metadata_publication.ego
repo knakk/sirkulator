@@ -3,6 +3,7 @@ package html
 
 import (
     "fmt"
+    "strings"
 
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/internal/localizer"
@@ -33,16 +34,69 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                 <p><br/></p>
                 <form>
                     <fieldset>
-                        <legend>Tittelopplysninger</legend>
-
-                        <label for="publicataion_title"><%= l.Translate("Tittel") %></label>
-                        <input name="publication_title" disabled value="<%= publication.Title %>">
-                        <br/>
-
-                        <label for="publicataion_title"><%= l.Translate("Subtitle") %></label>
-                        <input name="publication_title" disabled value="<%= publication.Subtitle %>">
-                        <br/>
-
+                        <legend><%= l.Translate("Publication") %></legend>
+                        <div>
+                            <input id="publication_title" type="text" size="50" name="publication_title" value="<%= publication.Title %>">
+                            <label for="publicataion_title"><%= l.Translate("Tittel") %></label>
+                        </div>
+                        <div>
+                            <input id="publication_subtitle" type="text" size="50" name="publication_subtitle" value="<%= publication.Subtitle %>">
+                            <label for="publicataion_subtitle"><%= l.Translate("Subtitle") %></label>
+                        </div>
+                        <div>
+                            <input id="publication_publisher" type="text" size="50" name="publication_publisher" value="<%= publication.Publisher %>">
+                            <label for="publicataion_publisher"><%= l.Translate("Publisher") %></label>
+                        </div>
+                        <div>
+                            <input id="publication_year" name="publication_year" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(publication.Year) %>">
+                            <label for="publication_year"><%= l.Translate("Year") %></label>
+                        </div>
+                        <div>
+                            <input id="publication_edition" name="publication_edition" type="text" size="5" maxlength="5" value="">
+                            <label for="publication_edition"><%= l.Translate("Edition") %></label>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend><%= l.Translate("Content") %></legend>
+                        <div>
+                            <input id="publication_language" name="publication_language" type="text" size="5" maxlength="5" value="<%= publication.Language %>">
+                            <label for="publication_language"><%= l.Translate("Main language") %></label>
+                        </div>
+                        <div>
+                            <textarea id="publication_languages_other" name="publication_languages_other" rows="2"><%= strings.Join(publication.LanguagesOther, "\n") %></textarea>
+                            <label for="publication_languages_other"><%= l.Translate("Other languages") %></label>
+                        </div>
+                        <div>
+                            <% if publication.Fiction { %>
+                                <input id="publication_fiction" name="publication_fiction" type="checkbox" checked>
+                            <% } else { %>
+                                <input id="publication_fiction" name="publication_fiction" type="checkbox">
+                            <% } %>
+                            <label for="publication_fiction"><%= l.Translate("Fiction") %></label>
+                        </div>
+                        <div>
+                            <% if publication.Nonfiction { %>
+                                <input id="publication_nonfiction" name="publication_nonfiction" type="checkbox" checked >
+                            <% } else { %>
+                                <input id="publication_nonfiction" name="publication_nonfiction" type="checkbox">
+                            <% } %>
+                            <label for="publication_nonfiction"><%= l.Translate("Nonfiction") %></label>
+                        </div>
+                        <div>
+                            <textarea id="publication_genre_forms" name="publication_genre_forms" rows="2"><%= strings.Join(publication.GenreForms, "\n") %></textarea>
+                            <label for="publication_genre_forms"><%= l.Translate("Genre and forms") %></label>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend><%= l.Translate("Physical characteristics") %></legend>
+                        <div>
+                            <input id="publication_binding" type="text" size="50" name="publication_binding" value="">
+                            <label for="publicataion_binding"><%= l.Translate("Binding") %></label>
+                        </div>
+                        <div>
+                            <input id="publication_numpages" name="publication_numpages" type="text" pattern="\d{1-4}" size="5" maxlength="5" value="<%= notZero(publication.NumPages) %>">
+                            <label for="publication_numpages"><%= l.Translate("Number of pages") %></label>
+                        </div>
                     </fieldset>
                 </form>
             </div>

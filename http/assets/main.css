@@ -27,7 +27,7 @@ a:visited      { color: blue }
 
 a[href^="http"]::after { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23fff' stroke='%2336c' d='M1.5 4.518h5.982V10.5H1.5z'/%3E%3Cpath fill='%2336c' d='M5.765 1H11v5.39L9.427 7.937l-1.31-1.31L5.393 9.35l-2.69-2.688 2.81-2.808L4.2 2.544z'/%3E%3Cpath fill='%23fff' d='m9.995 2.004.022 4.885L8.2 5.07 5.32 7.95 4.09 6.723l2.882-2.88-1.85-1.852z'/%3E%3C/svg%3E%0A"); }
 
-h4 { background: #eee; border-bottom: 2px solid black; margin: 1rem 0; text-transform: uppercase; padding: 0.15rem 0; }
+h4 { background: #eee; border-bottom: 2px solid var(--textcolor); margin: 1rem 0; text-transform: uppercase; padding: 0.15rem 0; }
 
 body   { display: grid; grid-template-rows: auto 1fr auto; height: 100vh;
          font-family: system-ui, sans-serif; color: var(--textcolor)}
@@ -41,6 +41,18 @@ table td { vertical-align: top; }
 table td.right { text-align: right; padding-right: 1em; }
 
 label    { font-weight: bold; }
+
+fieldset       { margin-bottom: 1rem; }
+fieldset div   { display: flex; align-items: center; margin-bottom: 0.5rem; }
+fieldset label { order: 1; text-align: right; width: 10rem; padding-right: 1rem; white-space: nowrap; user-select: none; cursor: pointer; }
+fieldset input,
+fieldset textarea { order: 2; }
+fieldset textarea { flex: 1 1 auto }
+fieldset input[type="checkbox"],
+fieldset input[type="radio"] { order: 1; flex: none; width: auto; margin-left: 10em; }
+fieldset input[type="checkbox"] ~ label, input[type="radio"] ~ label { width: auto; text-align: left; padding-left: 1rem; }
+fieldset input:focus ~ label,
+fieldset textarea:focus ~ label { color: blue  }
 
 details summary     { cursor: pointer;  background: lightsteelblue; padding: .5rem 1rem;}
 details summary > * { display: inline; }
