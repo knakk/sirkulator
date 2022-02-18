@@ -226,14 +226,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 				Data:   map[string]interface{}{"label": p.Publisher},
 			})
 		}
-		if year := f.ValueAt("c"); year != "" {
-			year = strings.TrimPrefix(year, "[")
-			year = strings.TrimSuffix(year, "]")
-			n, err := strconv.Atoi(year)
-			if err == nil {
-				p.Year = n
-				label = fmt.Sprintf("%s (%d)", label, n)
-			}
+		if year := parseYear(f.ValueAt("c")); year != 0 {
+			p.Year = year
+			label = fmt.Sprintf("%s (%d)", label, year)
 		}
 	}
 	// Physical properties
@@ -409,6 +404,17 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	// TODO verify that we have enough data for a valid record, ie with Label != ""
 
 	return ing, nil
+}
+
+var rxpYear = regexp.MustCompile(`\d{4}`)
+
+func parseYear(s string) int {
+	matches := rxpYear.FindAllString(s, -1)
+	if len(matches) == 1 {
+		n, _ := strconv.Atoi(matches[0])
+		return n
+	}
+	return 0
 }
 
 var rxpNumbers = regexp.MustCompile(`[0-9]+`)

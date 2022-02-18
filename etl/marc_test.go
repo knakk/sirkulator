@@ -96,6 +96,39 @@ func TestParsePages(t *testing.T) {
 	}
 }
 
+func TestParseYear(t *testing.T) {
+	tests := []struct {
+		input string
+		want  int
+	}{
+		// good:
+		{"1981", 1981},
+		{"1981 ", 1981},
+		{" 1981", 1981},
+		{"1981.", 1981},
+		{"cop. 1981", 1981},
+		{"c2004", 2004},
+		{"c2012.", 2012},
+		{"[1996]", 1996},
+		{"©2004", 2004},
+		{"[1986?]", 1986}, // ?
+		// no-good:
+		{"[19-?]", 0},
+		{"[198-?]", 0},
+		{"[u.å.]", 0},
+		{"[s.a.]", 0},
+		{"c1993-2010 [2010]", 0},
+		{"20060101", 0},
+		{"2012, c2013.", 0},
+	}
+
+	for _, test := range tests {
+		if got := parseYear(test.input); got != test.want {
+			t.Errorf("parseYear(%q): got %v; want %v", test.input, got, test.want)
+		}
+	}
+}
+
 /*func TestPublicationLabel(t *testing.T) {
 	tests := []struct {
 		pub       sirkulator.Publication
