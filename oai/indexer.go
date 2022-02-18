@@ -73,7 +73,7 @@ func (idx *Indexer) loadRecords(ctx context.Context, num int) ([]DBRecord, error
 
 	res := make([]DBRecord, 0, num)
 	fn := func(stmt *sqlite.Stmt) error {
-		blob, err := conn.OpenBlob("main", "oai_record", "data", stmt.ColumnInt64(2), false)
+		blob, err := conn.OpenBlob("main", "oai.record", "data", stmt.ColumnInt64(2), false)
 		if err != nil {
 			return err
 		}
@@ -97,7 +97,7 @@ func (idx *Indexer) loadRecords(ctx context.Context, num int) ([]DBRecord, error
 	}
 
 	const q = `SELECT source_id, id, rowid
-				FROM oai_record
+				FROM oai.record
 				WHERE archived_at IS NULL AND queued_at IS NOT NULL LIMIT ?`
 	if err := sqlitex.Exec(conn, q, fn, num); err != nil {
 		return nil, fmt.Errorf("loadRecords: %w", err)
@@ -115,14 +115,14 @@ func (idx *Indexer) storeIdentifiers(ctx context.Context, identifiers [][4]strin
 	defer sqlitex.Save(conn)(&err)
 
 	stmt, err := conn.Prepare(`
-		INSERT OR IGNORE INTO oai_record_id (source_id, record_id, type, id)
+		INSERT OR IGNORE INTO oai.link (source_id, record_id, type, id)
 			VALUES ($source_id, $record_id, $type, $id)
 	`)
 	if err != nil {
 		return fmt.Errorf("storeIdentifiers: %w", err)
 	}
 
-	stmt2, err := conn.Prepare(`UPDATE oai_record SET queued_at=NULL WHERE source_id=$source_id AND id=$id`)
+	stmt2, err := conn.Prepare(`UPDATE oai.record SET queued_at=NULL WHERE source_id=$source_id AND id=$id`)
 	if err != nil {
 		return fmt.Errorf("storeIdentifiers: %w", err)
 	}
@@ -150,12 +150,15 @@ func (idx *Indexer) storeIdentifiers(ctx context.Context, identifiers [][4]strin
 	return nil
 }
 
+// TODO isbn package
+var isbnClener = strings.NewReplacer("-", "", ":", "", " ", "", "ISBN", "", "isbn", "", "(", "", ")", "")
+
 func IndexBibsysPublication(res *ProcessedRecord, mrc marc.Record) {
 	for _, isbn := range mrc.ValuesAt("020", "a") {
 		if len(isbn) < 10 { // TODO proper validation?
 			continue
 		}
-		res.Identifiers = append(res.Identifiers, [2]string{"isbn", strings.Replace(isbn, "-", "", -1)})
+		res.Identifiers = append(res.Identifiers, [2]string{"isbn", isbnClener.Replace(isbn)})
 	}
 
 	for _, issn := range mrc.ValuesAt("022", "a") {

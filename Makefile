@@ -9,3 +9,6 @@ generate: http/html/*.ego
 
 run: generate
 	@go run cmd/sirkulatord/sirkulatord.go --assets=$(CURDIR)/http/assets
+
+datarun: generate
+	@go run cmd/sirkulatord/sirkulatord.go --assets=$(CURDIR)/http/assets --db=_data

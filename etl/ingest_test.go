@@ -257,7 +257,7 @@ func TestIngestISBN(t *testing.T) {
 				VALUES ('bibsys/pub','dummy','dummy','dummy');
 			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
 				VALUES ('bibsys/pub', '999608854204702201', x'%x', 0, 0);
-			INSERT INTO oai.record_id (source_id, record_id, type, id)
+			INSERT INTO oai.link (source_id, record_id, type, id)
 				VALUES ('bibsys/pub', '999608854204702201', 'isbn', '8202018560');
 			INSERT INTO resource (id, type, label, data, created_at, updated_at)
 				VALUES ('p0','person', 'Per Arvid Åsen (1949-)', x'%x', 0, 0);

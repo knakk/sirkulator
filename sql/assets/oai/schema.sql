@@ -22,8 +22,7 @@ CREATE TABLE oai.record (
     PRIMARY KEY (source_id, id)
 );
 
--- TODO maybe oai.link?
-CREATE TABLE oai.record_id (
+CREATE TABLE oai.link (
     source_id   TEXT     NOT NULL REFERENCES record(source_id) ON DELETE CASCADE,
     record_id   TEXT     NOT NULL REFERENCES record(id) ON DELETE CASCADE,
     type        TEXT     NOT NULL, -- isbn|issn|isni|viaf|orcid etc
@@ -32,7 +31,7 @@ CREATE TABLE oai.record_id (
     PRIMARY KEY (source_id, record_id, id) -- TODO what about type?
 );
 
-CREATE INDEX oai.idx_id ON record_id (id);
+CREATE INDEX oai.idx_id ON link (id);
 
 -- increment with 1 for each migration
 PRAGMA oai.user_version=1;

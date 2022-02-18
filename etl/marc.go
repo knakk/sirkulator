@@ -17,7 +17,7 @@ var relatorsFrom700e = map[string]string{
 	"arranger of music":           "arr",
 	"author of introduction, etc": "aui",
 	"author":                      "aut",
-	"autor":                       "aut", // misseplling?
+	"autor":                       "aut", // misspelling?
 	"contributor":                 "ctb",
 	"cover designer":              "bjd",
 	"director":                    "drt",
@@ -314,6 +314,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	for _, f := range rec.DataFieldsAt("700", "710") {
 
 		// No role, ignore those entries for now
+		// TODO default to "ctb" contributor
 		if f.ValueAt("4") == "" && f.ValueAt("e") == "" {
 			continue
 		}

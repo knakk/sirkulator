@@ -76,13 +76,13 @@ func main() {
 	conf := parseFlags(os.Args[1:])
 
 	// Create databases and init connection pool
-	db, err := sql.OpenAt("data")
+	db, err := sql.OpenAt(conf.DataDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Setup search index
-	idx, err := search.Open("data/index")
+	idx, err := search.Open(conf.DataDir + "/index")
 	if err != nil {
 		log.Fatal(err)
 	}

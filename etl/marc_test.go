@@ -864,7 +864,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						},
 					},
 				},
-				{
+				/*{
 					Type:  sirkulator.TypePerson,
 					ID:    "t3",
 					Label: "Ove Arbo Høeg (1898–1993)",
@@ -894,7 +894,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t6",
 					Label: "Universitetet i Oslo",
 					Links: [][2]string{{"bibsys", "11071432"}},
-				},
+				},*/
 			},
 			Relations: []sirkulator.Relation{
 				{
@@ -903,7 +903,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
 				},
-				{
+				/*{
 					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
@@ -926,7 +926,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ToID:   "t6",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": string("aut")},
-				},
+				},*/
 			},
 			Reviews: []sirkulator.Relation{
 				{
@@ -1166,7 +1166,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Name: "Liv Sæteren",
 					},
 				},
-				{
+				/*{
 					Type:  sirkulator.TypeCorporation,
 					ID:    "t7",
 					Label: "Lund Hagem arkitekter AS",
@@ -1176,7 +1176,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t8",
 					Label: "Atelier Oslo",
 					Links: [][2]string{{"bibsys", "12073195"}},
-				},
+				},*/
 			},
 			Relations: []sirkulator.Relation{
 				{
@@ -1208,7 +1208,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut"},
 				},
-				{
+				/*{
 					FromID: "t1",
 					ToID:   "t7",
 					Type:   "has_contributor",
@@ -1219,7 +1219,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ToID:   "t8",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": string("aut")},
-				},
+				},*/
 			},
 			Reviews: []sirkulator.Relation{
 				{

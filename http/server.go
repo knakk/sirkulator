@@ -313,6 +313,9 @@ func (s *Server) importResources(w http.ResponseWriter, r *http.Request) {
 	var res []html.ImportResultEntry
 	numOK := 0
 	for _, id := range strings.Split(ids, "\n") {
+		if strings.TrimSpace(id) == "" {
+			continue
+		}
 		// TODO detect type of ID: ISBN/EAN/ISSN
 		entry := html.ImportResultEntry{
 			IDType: "ISBN",

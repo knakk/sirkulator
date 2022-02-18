@@ -25,7 +25,7 @@ type Harvester struct {
 	StartAt  time.Time
 	Token    string
 	Process  ProcessFunc
-	Enqueue  bool // if true, set queued_at timestamp, and store data in new_data column // TODO implement!
+	Enqueue  bool // if true, don't overwrite data column, but set queued_at timestamp, and store data in new_data column
 }
 
 func (h *Harvester) Name() string {
@@ -55,7 +55,7 @@ func (h *Harvester) Run(ctx context.Context, w io.Writer) error {
 				//return fmt.Errorf("Harvester.Run: %w", err)
 			}
 			prec.Source = h.Source
-			fmt.Printf("%s %s %s %s\t%v\n", prec.Source, prec.ID, prec.Type, prec.Label, prec.Identifiers)
+			//fmt.Printf("%s %s %s %s\t%v\n", prec.Source, prec.ID, prec.Type, prec.Label, prec.Identifiers)
 			if prec.ArchivedAt.IsZero() {
 				recordUpserts = append(recordUpserts, prec)
 				for _, id := range prec.Identifiers {
@@ -171,6 +171,7 @@ func (h *Harvester) fetchRecords(ctx context.Context) ([]RemoteRecord, error) {
 			url += "&from=" + h.StartAt.Format("2006-01-02")
 		}
 	}
+	// TODO use http.Open from local package?
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("fetchRecords: NewRequest(%s): %w", url, err)
@@ -213,7 +214,7 @@ func (h *Harvester) storeSource(ctx context.Context) error {
 		return context.Canceled
 	}
 	defer h.DB.Put(conn)
-	const q = "INSERT OR IGNORE INTO oai_source (id, url, dataset, prefix) VALUES (?, ?, ?, ?)"
+	const q = "INSERT OR IGNORE INTO oai.source (id, url, dataset, prefix) VALUES (?, ?, ?, ?)"
 	if err := sqlitex.Exec(conn, q, nil, h.Source, h.Endpoint, h.Set, h.Prefix); err != nil {
 		return fmt.Errorf("storeSource: %w", err)
 	}
@@ -228,19 +229,31 @@ func (h *Harvester) updateSource(ctx context.Context) error {
 	defer h.DB.Put(conn)
 	if h.Token == "" {
 		// TODO we should use a timestamp from remote repository as in_sync_at
-		const q = "UPDATE oai_source SET token=?, in_sync_at=? WHERE id=?"
+		const q = "UPDATE oai.source SET token=?, in_sync_at=? WHERE id=?"
 		if err := sqlitex.Exec(conn, q, nil, h.Token, time.Now().Unix(), h.Source); err != nil {
 			return fmt.Errorf("updateSource: %w", err)
 		}
 		return nil
 	}
-	const q = "UPDATE oai_source SET token=?, in_sync_at=NULL WHERE id=?"
+	const q = "UPDATE oai.source SET token=?, in_sync_at=NULL WHERE id=?"
 	if err := sqlitex.Exec(conn, q, nil, h.Token, h.Source); err != nil {
 		return fmt.Errorf("updateSource: %w", err)
 	}
 
 	return nil
 }
+
+const qInsert = `
+	INSERT INTO oai.record (source_id, id, data, created_at, updated_at, queued_at)
+			VALUES ($source, $id, $data, $created, $updated, $queued)
+		ON CONFLICT(source_id, id) DO UPDATE
+			SET new_data=$data, queued_at=$queued`
+
+const qOverwrite = `
+	INSERT INTO oai.record (source_id, id, data, created_at, updated_at, queued_at)
+			VALUES ($source, $id, $data, $created, $updated, $queued)
+		ON CONFLICT(source_id, id) DO UPDATE
+			SET data=$data, queued_at=$queued`
 
 func (h *Harvester) storeRecords(ctx context.Context, upserts, archived []ProcessedRecord, identifiers [][4]string) (err error) {
 	conn := h.DB.Get(ctx)
@@ -250,22 +263,21 @@ func (h *Harvester) storeRecords(ctx context.Context, upserts, archived []Proces
 	defer h.DB.Put(conn)
 	defer sqlitex.Save(conn)(&err)
 
-	stmt, err := conn.Prepare(`
-		INSERT INTO oai_record (source_id, id, data, created_at, updated_at, queued_at)
-			VALUES ($source, $id, $data, $created, $updated, $queued)
-		ON CONFLICT(source_id, id) DO UPDATE
-			SET new_data=$data, queued_at=$queued
-	`)
-	if err != nil {
-		return fmt.Errorf("storeRecords: %w", err)
+	q := qOverwrite
+	if h.Enqueue {
+		q = qInsert
 	}
+	stmt := conn.Prep(q)
+
 	for _, r := range upserts {
 		stmt.SetText("$source", r.Source)
 		stmt.SetText("$id", r.ID)
 		stmt.SetBytes("$data", r.Data)
 		stmt.SetInt64("$created", r.CreatedAt.Unix())
 		stmt.SetInt64("$updated", r.UpdatedAt.Unix())
-		stmt.SetInt64("$queued", time.Now().Unix())
+		if h.Enqueue {
+			stmt.SetInt64("$queued", time.Now().Unix())
+		}
 
 		if _, err = stmt.Step(); err != nil {
 			return fmt.Errorf("storeRecords: %w", err)
@@ -273,13 +285,10 @@ func (h *Harvester) storeRecords(ctx context.Context, upserts, archived []Proces
 		stmt.Reset()
 	}
 
-	stmt, err = conn.Prepare(`
-		UPDATE OR IGNORE oai_record SET archived_at=$archived, queued_at=$queued
+	stmt = conn.Prep(`
+		UPDATE OR IGNORE oai.record SET archived_at=$archived, queued_at=$queued
 		WHERE source_id=$source AND id=$id
 	`)
-	if err != nil {
-		return fmt.Errorf("storeRecords: %w", err)
-	}
 
 	for _, r := range archived {
 		stmt.SetText("$source", r.Source)
@@ -293,13 +302,11 @@ func (h *Harvester) storeRecords(ctx context.Context, upserts, archived []Proces
 		stmt.Reset()
 	}
 
-	stmt, err = conn.Prepare(`
-		INSERT OR IGNORE INTO oai_record_id (source_id, record_id, type, id)
+	stmt = conn.Prep(`
+		INSERT OR IGNORE INTO oai.link (source_id, record_id, type, id)
 		VALUES ($source_id, $record_id, $type, $id)
 	`)
-	if err != nil {
-		return fmt.Errorf("storeRecords: %w", err)
-	}
+
 	for _, id := range identifiers {
 		stmt.SetText("$source_id", id[0])
 		stmt.SetText("$record_id", id[1])

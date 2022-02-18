@@ -115,14 +115,11 @@ func (ig *Ingestor) PreviewISBN(ctx context.Context, isbn string) (Ingestion, er
 	var data Ingestion
 	rec, err := ig.localRecord(ctx, "isbn", isbn)
 	if err == nil {
-		data, err = ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
-		if err != nil {
-			return data, err
-		}
+		return ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
 	} else if errors.Is(err, sirkulator.ErrNotFound) {
 		data, err = ig.remoteRecord(ctx, "isbn", isbn)
 		return data, err
-	}
+	} // TODO else internal server error?
 	return data, sirkulator.ErrNotFound
 }
 
@@ -160,7 +157,7 @@ func (ig *Ingestor) localRecord(ctx context.Context, idtype, id string) (oai.Rec
 			r.source_id,
 			r.id,
 			r.rowid
-		FROM oai.record_id t
+		FROM oai.link t
 			JOIN oai.record r ON (t.source_id=r.source_id AND t.record_id=r.id)
 		WHERE t.type=? AND t.id=?
 	`
