@@ -1,19 +1,22 @@
 package sirkulator
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/knakk/sirkulator/internal/localizer"
 	"github.com/knakk/sirkulator/marc"
+	"github.com/knakk/sirkulator/vocab"
 	"github.com/teris-io/shortid"
 	"golang.org/x/text/language"
 )
 
-/*type PersistableResource interface {
-	Validate() error
-}*/
+type PersistableResource interface {
+	Valid() bool
+	Label() string
+}
 
 type ResourceType int
 
@@ -89,8 +92,9 @@ type Resource struct {
 	ID    string
 	Label string // Synthesized from Data properties
 	Links [][2]string
-	//Aliases []string    // To function as "synonyms", giving hits when searching, but not for display?
-	Data interface{}
+	// Description string // Short description (max 50 characters)
+	// Aliases []string    // To function as "synonyms", giving hits when searching, but not for display?
+	Data interface{} // TODO PersistableResource?
 
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
@@ -331,8 +335,21 @@ type Publisher struct {
 }
 
 type Person struct {
-	YearRange `json:"year_range"`
-	Name      string `json:"name"`
+	YearRange      YearRange    `json:"year_range"` // TODO pointer *YearRange?
+	Name           string       `json:"name"`
+	Gender         vocab.Gender `json:"gender"`
+	NameVariations []string     `json:"name_variations"`
+	// PlaceAssociations denotes places where the person lived and worked.
+	// It can be a country, region, historical empire, city etc, but it
+	// will most commonly be one or more countries (~ "nationality")
+	PlaceAssociations []string
+}
+
+func (p Person) Label() string {
+	if p.YearRange.From != 0 || p.YearRange.To != 0 {
+		return fmt.Sprintf("%s (%s)", p.Name, p.YearRange)
+	}
+	return p.Name
 }
 
 type Corporation struct {

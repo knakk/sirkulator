@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/marc"
+	"github.com/knakk/sirkulator/vocab"
 )
 
 func TestParseYearRange(t *testing.T) {
@@ -1283,4 +1284,99 @@ func TestIngestOAIRecord(t *testing.T) {
 		}
 	})
 
+}
+
+func TestPersonFromAuthority(t *testing.T) {
+	const autrec = `
+	<marc:record format="MARC21" type="Authority" id="90067942" xmlns:marc="info:lc/xmlns/marcxchange-v1">
+		<marc:leader>99999nz  a2299999n  4500</marc:leader>
+		<marc:controlfield tag="001">90067942</marc:controlfield>
+		<marc:controlfield tag="003">NO-TrBIB</marc:controlfield>
+		<marc:controlfield tag="005">20220118132609.0</marc:controlfield>
+		<marc:controlfield tag="008">120319n| adz|naabn|         |a|ana|     </marc:controlfield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">x90067942</marc:subfield>
+			<marc:subfield code="2">NO-TrBIB</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">http://hdl.handle.net/11250/470737</marc:subfield>
+			<marc:subfield code="2">hdl</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">0000000109115902</marc:subfield>
+			<marc:subfield code="2">isni</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">http://viaf.org/viaf/59247880</marc:subfield>
+			<marc:subfield code="2">viaf</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">https://id.bs.no/bibbi/37524</marc:subfield>
+			<marc:subfield code="2">bibbi</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="040" ind1=" " ind2=" ">
+			<marc:subfield code="a">NO-TrBIB</marc:subfield>
+			<marc:subfield code="b">nob</marc:subfield>
+			<marc:subfield code="c">NO-TrBIB</marc:subfield>
+			<marc:subfield code="f">noraf</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="043" ind1=" " ind2=" ">
+			<marc:subfield code="c">fi</marc:subfield>
+			<marc:subfield code="c">no</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="100" ind1="1" ind2=" ">
+			<marc:subfield code="a">Valkeapää, Nils-Aslak</marc:subfield>
+			<marc:subfield code="d">1943-2001</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="370" ind1=" " ind2=" ">
+			<marc:subfield code="a">Palojoensuu, Enontekis, Lappland, Finland</marc:subfield>
+			<marc:subfield code="b">Espo, Finland</marc:subfield>
+			<marc:subfield code="c">Skibotn, Storfjord, Troms, Norge</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="375" ind1=" " ind2=" ">
+			<marc:subfield code="a">m</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="386" ind1=" " ind2=" ">
+			<marc:subfield code="a">n.-sam.</marc:subfield>
+			<marc:subfield code="m">Nasjonalitet/regional gruppe</marc:subfield>
+			<marc:subfield code="2">bs-nasj</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="400" ind1="0" ind2=" ">
+			<marc:subfield code="a">Áillohaš</marc:subfield>
+			<marc:subfield code="d">1943-2001</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="400" ind1="0" ind2=" ">
+			<marc:subfield code="a">Áilu</marc:subfield>
+			<marc:subfield code="d">1943-2001</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="901" ind1=" " ind2=" ">
+			<marc:subfield code="a">kat3</marc:subfield>
+		</marc:datafield>
+	</marc:record>
+	`
+
+	want := sirkulator.Resource{
+		Type:  sirkulator.TypePerson,
+		Label: "Nils-Aslak Valkeapää (1943–2001)",
+		Data: sirkulator.Person{
+			Name:           "Nils-Aslak Valkeapää",
+			NameVariations: []string{"Áillohaš", "Áilu"},
+			YearRange: sirkulator.YearRange{
+				From: 1943,
+				To:   2001,
+			},
+			Gender:            vocab.GenderMale,
+			PlaceAssociations: []string{"marc/fi", "marc/no", "bs/n.", "bs/sam."},
+		},
+		Links: [][2]string{{"bibsys", "90067942"}, {"isni", "0000000109115902"}, {"viaf", "59247880"}, {"bibbi", "37524"}},
+	}
+
+	got, err := PersonFromAuthority(marc.MustParseString(autrec))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("PersonFromAuthority() mismatch (-want +got):\n%s", diff)
+	}
 }

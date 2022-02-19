@@ -12,3 +12,8 @@ run: generate
 
 datarun: generate
 	@go run cmd/sirkulatord/sirkulatord.go --assets=$(CURDIR)/http/assets --db=_data
+
+datareset:
+	@rm _data/main.db
+	@rm _data/files.db
+	@rm -rf _data/index

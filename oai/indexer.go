@@ -25,7 +25,7 @@ type Indexer struct {
 }
 
 func (idx *Indexer) Name() string {
-	return fmt.Sprintf("oai_indexer:%s", idx.Source)
+	return fmt.Sprintf("oai.indexer:%s", idx.Source)
 }
 
 func (idx *Indexer) Run(ctx context.Context, w io.Writer) error {
@@ -266,10 +266,14 @@ func IndexBibsysAuthority(res *ProcessedRecord, mrc marc.Record) {
 			res.Identifiers = append(res.Identifiers, [2]string{"isni", val})
 		case "bibbi":
 			res.Identifiers = append(res.Identifiers, [2]string{"bibbi", val})
+		case "orcid":
+			res.Identifiers = append(res.Identifiers, [2]string{"orcid", val})
 		case "no-trbib", "dma", "hdl":
 			// ignore
 		default:
 			fmt.Printf("unhandled 024 identifier: %s\t%s\n", code, val)
+			// unhandled 024 identifier: lccn  https://lccn.loc.gov/nb2007019240
+
 		}
 	}
 }

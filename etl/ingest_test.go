@@ -19,6 +19,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/sql"
+	"github.com/knakk/sirkulator/vocab"
 )
 
 func mustGzip(s string) []byte {
@@ -420,12 +421,133 @@ func TestIngestISBN(t *testing.T) {
 	if y := img.Bounds().Max.Y; y != ing.ImageWidth/2 {
 		t.Errorf("image width=%d; expected %d", y, ing.ImageWidth/2)
 	}
+}
 
-	// TODO link to nb deduced from marc record? /nb, nb-free, nb-norway?
-	// TODO check for link [2]string{"nb-fulltext","2014021108035"}
-	// https://api.nb.no/catalog/v1/items?q=oaiid%3A%22oai%3Anb.bibsys.no%3A998110670684702202%22&filter=mediatype%3Aaviser%20OR%20mediatype%3Abilder%20OR%20mediatype%3Ab%C3%B8ker%20OR%20mediatype%3Akart%20OR%20mediatype%3Amusikk%20OR%20mediatype%3Amusikkmanuskripter%20OR%20mediatype%3Anoter%20OR%20mediatype%3Aplakater%20OR%20mediatype%3Aprivatarkivmateriale%20OR%20mediatype%3Atidsskrift&aggs=mediatype&size=1&profile=nbdigital
-	// https://urn.nb.no/URN:NBN:no-nb_digibok_2014021108035
-	// https://www.nb.no/items/4b5337744e197a56fa0aeb2df01feb60?page=0
+const bibsys90294124 = `
+<marc:record format="MARC21" type="Authority" id="90294124" xmlns:marc="info:lc/xmlns/marcxchange-v1">
+    <marc:leader>99999nz  a2299999n  4500</marc:leader>
+    <marc:controlfield tag="001">90294124</marc:controlfield>
+    <marc:controlfield tag="003">NO-TrBIB</marc:controlfield>
+    <marc:controlfield tag="005">20220118133303.0</marc:controlfield>
+    <marc:controlfield tag="008">110315n| adz|naabn|         |a|ana|     </marc:controlfield>
+    <marc:datafield tag="024" ind1="7" ind2=" ">
+        <marc:subfield code="a">x90294124</marc:subfield>
+        <marc:subfield code="2">NO-TrBIB</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="024" ind1="7" ind2=" ">
+        <marc:subfield code="a">http://hdl.handle.net/11250/872392</marc:subfield>
+        <marc:subfield code="2">hdl</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="024" ind1="7" ind2=" ">
+        <marc:subfield code="a">0000000383686038</marc:subfield>
+        <marc:subfield code="2">isni</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="024" ind1="7" ind2=" ">
+        <marc:subfield code="a">http://viaf.org/viaf/270825492</marc:subfield>
+        <marc:subfield code="2">viaf</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="024" ind1="7" ind2=" ">
+        <marc:subfield code="a">https://id.bs.no/bibbi/40502</marc:subfield>
+        <marc:subfield code="2">bibbi</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="040" ind1=" " ind2=" ">
+        <marc:subfield code="a">NO-TrBIB</marc:subfield>
+        <marc:subfield code="b">nob</marc:subfield>
+        <marc:subfield code="c">NO-TrBIB</marc:subfield>
+        <marc:subfield code="f">noraf</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="043" ind1=" " ind2=" ">
+        <marc:subfield code="c">no</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="100" ind1="1" ind2=" ">
+        <marc:subfield code="a">Åsen, Per Arvid</marc:subfield>
+        <marc:subfield code="d">1949-</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="375" ind1=" " ind2=" ">
+        <marc:subfield code="a">m</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="386" ind1=" " ind2=" ">
+        <marc:subfield code="a">n.</marc:subfield>
+        <marc:subfield code="m">Nasjonalitet/regional gruppe</marc:subfield>
+        <marc:subfield code="2">bs-nasj</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="901" ind1=" " ind2=" ">
+        <marc:subfield code="a">kat3</marc:subfield>
+    </marc:datafield>
+</marc:record>`
+
+func TestIngestPersonFromLocalOAI(t *testing.T) {
+	pubrecord := mustGzip(isbn8202018560)
+	autrecord := mustGzip(bibsys90294124)
+
+	// Setup and populate DB
+	db, err := sql.OpenMem()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	conn := db.Get(nil)
+	defer db.Put(conn)
+
+	q := fmt.Sprintf(`
+			INSERT INTO oai.source (id, url, dataset, prefix)
+				VALUES ('bibsys/aut','dummy','dummy','dummy');
+			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
+				VALUES ('bibsys/aut', '90294124', x'%x', 0, 0);
+			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
+				VALUES ('bibsys/pub', '999608854204702201', x'%x', 0, 0);
+			INSERT INTO oai.link (source_id, record_id, type, id)
+				VALUES ('bibsys/pub', '999608854204702201', 'isbn', '8202018560');
+		`, autrecord, pubrecord)
+
+	if err := sqlitex.ExecScript(conn, q); err != nil {
+		t.Fatal(err)
+	}
+
+	// Ingest by ISBN number
+	ing := NewIngestor(db, nil)
+	ing.idFunc = testID()
+	if err := ing.IngestISBN(context.Background(), "8202018560"); err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify that resource was stored from local authority oai record
+	perWant := sirkulator.Resource{
+		Type:  sirkulator.TypePerson,
+		Label: "Per Arvid Åsen (1949–)",
+		ID:    "t2",
+		Links: [][2]string{
+			{"bibbi", "40502"},
+			{"bibsys", "90294124"},
+			{"isni", "0000000383686038"},
+			{"viaf", "270825492"},
+		},
+		Data: &sirkulator.Person{
+			Name: "Per Arvid Åsen",
+			YearRange: sirkulator.YearRange{
+				From: 1949,
+			},
+			Gender:            vocab.GenderMale,
+			PlaceAssociations: []string{"marc/no", "bs/n."},
+		},
+	}
+	perGot, err := sql.GetResource(conn, sirkulator.TypePerson, "t2")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// reset timestamps we don't want to compare
+	perGot.CreatedAt = time.Time{}
+	perGot.UpdatedAt = time.Time{}
+
+	if diff := cmp.Diff(perWant, perGot); diff != "" {
+		t.Errorf("person mismatch (-want +got):\n%s", diff)
+	}
+
 }
 
 func TestIngestRemote(t *testing.T) {

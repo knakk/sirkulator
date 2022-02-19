@@ -399,6 +399,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 			// TODO make this (whole Ingest method) transactional?
 			continue
 		}
+		newResource := true
 		stmt := conn.Prep("SELECT resource_id FROM link WHERE type=$type AND id=$id")
 		for _, link := range res.Links {
 			stmt.SetText("$type", link[0])
@@ -407,10 +408,12 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 			if err != nil && !errors.Is(err, sqlitex.ErrNoResults) {
 				return err // TODO annotate
 			}
+
 			if id == "" {
 				continue
 			}
 			// Resource is already in our DB and sholdn't be imported
+			newResource = false
 			data.Resources = append(data.Resources[:i], data.Resources[i+1:]...)
 			for j, rel := range data.Relations {
 				// swap id with exisiting resource id in relations:
@@ -422,6 +425,54 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 				}
 			}
 			stmt.Reset()
+		}
+
+		if newResource {
+			// check if an authority record is present in local oai db, and use that instead
+			for _, link := range res.Links {
+				if link[0] != "bibsys" {
+					continue
+				}
+				var rec oai.Record
+				fn := func(stmt *sqlite.Stmt) error {
+					rec.Source = "bibsys/aut"
+					rec.ID = link[1]
+					blob, err := conn.OpenBlob("oai", "record", "data", stmt.ColumnInt64(0), false)
+					if err != nil {
+						return err
+					}
+					defer blob.Close()
+					gz, err := gzip.NewReader(blob)
+					if err != nil {
+						return err
+					}
+					dec := marc.NewDecoder(gz)
+					mrc, err := dec.Decode()
+					if err != nil {
+						return err
+					}
+					rec.Data = mrc
+					return nil
+				}
+				q := "SELECT rowid FROM oai.record WHERE source_id='bibsys/aut' AND id=?"
+				if err := sqlitex.Exec(conn, q, fn, link[1]); err != nil {
+					return err // TODO annotate
+				}
+				if rec.ID == "" {
+					continue
+				}
+				switch res.Type {
+				case sirkulator.TypePerson:
+					p, err := PersonFromAuthority(rec.Data)
+					if err == nil {
+						// Swap resource with fuller resource,
+						// making sure to copy the ID from the discarded resource.
+						data.Resources[i] = p
+						data.Resources[i].ID = res.ID
+					} // TODO else log error?
+				case sirkulator.TypeCorporation:
+				}
+			}
 		}
 	}
 

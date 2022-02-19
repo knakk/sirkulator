@@ -10,6 +10,7 @@ import (
 
 	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/marc"
+	"github.com/knakk/sirkulator/vocab"
 )
 
 // TODO more candidates: https://gist.github.com/boutros/221499f95397a4987a70ce726455319e
@@ -526,4 +527,62 @@ func invertName(s string) string {
 		return s[i+2:] + " " + s[:i]
 	}
 	return s
+}
+
+func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
+	var (
+		res    sirkulator.Resource
+		person sirkulator.Person
+	)
+
+	res.Type = sirkulator.TypePerson
+
+	if name, _ := rec.ValueAt("100", "a"); name != "" {
+		person.Name = invertName(name)
+	} // TODO else authority without name should be an error
+
+	if lifespan, _ := rec.ValueAt("100", "d"); lifespan != "" {
+		person.YearRange = parseYearRange(lifespan)
+	}
+
+	for _, name := range rec.ValuesAt("400", "a") {
+		person.NameVariations = append(person.NameVariations, invertName(name))
+	}
+
+	for _, d := range rec.DataFieldsAt("024") {
+		code := d.ValueAt("2")
+		val := d.ValueAt("a")
+		if val == "" {
+			continue
+		}
+		switch strings.ToLower(code) {
+		case "viaf":
+			res.Links = append(res.Links, [2]string{"viaf", strings.TrimPrefix(val, "http://viaf.org/viaf/")})
+		case "isni":
+			res.Links = append(res.Links, [2]string{"isni", val})
+		case "bibbi":
+			res.Links = append(res.Links, [2]string{"bibbi", strings.TrimPrefix(val, "https://id.bs.no/bibbi/")})
+		case "orcid":
+			res.Links = append(res.Links, [2]string{"orcid", val})
+		case "no-trbib":
+			res.Links = append(res.Links, [2]string{"bibsys", strings.TrimPrefix(val, "x")})
+		}
+	}
+
+	for _, country := range rec.ValuesAt("043", "c") {
+		person.PlaceAssociations = append(person.PlaceAssociations, "marc/"+country)
+	}
+	if f, ok := rec.DataFieldAt("386"); ok && f.ValueAt("2") == "bs-nasj" {
+		for _, nationality := range strings.Split(f.ValueAt("a"), "-") {
+			person.PlaceAssociations = append(person.PlaceAssociations, "bs/"+nationality)
+		}
+	}
+
+	gender, _ := rec.ValueAt("375", "a")
+	person.Gender = vocab.ParseGender(gender)
+
+	res.Data = person
+	res.Label = person.Label()
+
+	return res, nil
 }
