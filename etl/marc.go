@@ -537,11 +537,11 @@ func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 
 	res.Type = sirkulator.TypePerson
 
-	if name, _ := rec.ValueAt("100", "a"); name != "" {
+	if name := rec.ValueAt("100", "a"); name != "" {
 		person.Name = invertName(name)
 	} // TODO else authority without name should be an error
 
-	if lifespan, _ := rec.ValueAt("100", "d"); lifespan != "" {
+	if lifespan := rec.ValueAt("100", "d"); lifespan != "" {
 		person.YearRange = parseYearRange(lifespan)
 	}
 
@@ -578,11 +578,63 @@ func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 		}
 	}
 
-	gender, _ := rec.ValueAt("375", "a")
-	person.Gender = vocab.ParseGender(gender)
+	person.Gender = vocab.ParseGender(rec.ValueAt("375", "a"))
 
 	res.Data = person
 	res.Label = person.Label()
+
+	return res, nil
+}
+
+func CorporationFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
+	var (
+		res  sirkulator.Resource
+		corp sirkulator.Corporation
+	)
+
+	res.Type = sirkulator.TypeCorporation
+
+	if name := rec.ValueAt("110", "b"); name != "" {
+		// subdivision often is a more descriptinve name than parent corporation name (field a)
+		corp.Name = strings.TrimSpace(name)
+		// if b is found, a should also be present
+		corp.ParentName = strings.TrimSpace(rec.ValueAt("110", "a"))
+	} else if name := rec.ValueAt("110", "a"); name != "" {
+		corp.Name = strings.TrimSpace(name)
+	} // TODO else authority without name should be an error
+
+	for _, d := range rec.DataFieldsAt("024") {
+		// TODO code same as in PersonFromAuthority, extract to fn?
+		code := d.ValueAt("2")
+		val := d.ValueAt("a")
+		if val == "" {
+			continue
+		}
+		switch strings.ToLower(code) {
+		case "viaf":
+			res.Links = append(res.Links, [2]string{"viaf", strings.TrimPrefix(val, "http://viaf.org/viaf/")})
+		case "isni":
+			res.Links = append(res.Links, [2]string{"isni", val})
+		case "bibbi":
+			res.Links = append(res.Links, [2]string{"bibbi", strings.TrimPrefix(val, "https://id.bs.no/bibbi/")})
+		case "orcid":
+			res.Links = append(res.Links, [2]string{"orcid", val})
+		case "no-trbib":
+			res.Links = append(res.Links, [2]string{"bibsys", strings.TrimPrefix(val, "x")})
+		}
+	}
+
+	for _, f := range rec.DataFieldsAt("410") {
+		if subdivision := f.ValueAt("b"); subdivision != "" {
+			corp.NameVariations = append(corp.NameVariations,
+				fmt.Sprintf("%s / %s", strings.TrimSpace(subdivision), strings.TrimSpace(f.ValueAt("a"))))
+		} else if name := f.ValueAt("a"); name != corp.ParentName && name != corp.Name {
+			corp.NameVariations = append(corp.NameVariations, strings.TrimSpace(name))
+		}
+	}
+
+	res.Data = corp
+	res.Label = corp.Label()
 
 	return res, nil
 }

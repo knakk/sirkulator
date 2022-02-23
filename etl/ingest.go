@@ -465,12 +465,27 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 				case sirkulator.TypePerson:
 					p, err := PersonFromAuthority(rec.Data)
 					if err == nil {
-						// Swap resource with fuller resource,
+						// Swap resource with the oai resource,
 						// making sure to copy the ID from the discarded resource.
 						data.Resources[i] = p
 						data.Resources[i].ID = res.ID
 					} // TODO else log error?
 				case sirkulator.TypeCorporation:
+					c, err := CorporationFromAuthority(rec.Data)
+					if err == nil {
+						// Swap resource with the oai resource,
+						// making sure to copy the ID from the discarded resource.
+						data.Resources[i] = c
+						data.Resources[i].ID = res.ID
+					} // TODO else log error?
+					if parent := c.Data.(sirkulator.Corporation).ParentName; parent != "" {
+						// Add review to establish link to parent corporation
+						data.Reviews = append(data.Reviews, sirkulator.Relation{
+							FromID: res.ID,
+							Type:   "has_parent",
+							Data:   map[string]interface{}{"name": parent},
+						})
+					}
 				}
 			}
 		}

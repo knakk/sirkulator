@@ -183,17 +183,17 @@ func IndexBibsysPublication(res *ProcessedRecord, mrc marc.Record) {
 		res.Identifiers = append(res.Identifiers, [2]string{"gtin", strings.Replace(gtin, "-", "", -1)})
 	}
 
-	if author, ok := mrc.ValueAt("100", "a"); ok {
+	if author := mrc.ValueAt("100", "a"); author != "" {
 		res.Label += invertName(author) + ": "
 	} // TODO 100$c
 
-	if title, ok := mrc.ValueAt("245", "a"); ok {
+	if title := mrc.ValueAt("245", "a"); title != "" {
 		res.Label += strings.TrimSuffix(strings.TrimSpace(title), ":")
 	}
-	if subtitle, ok := mrc.ValueAt("245", "b"); ok {
+	if subtitle := mrc.ValueAt("245", "b"); subtitle != "" {
 		res.Label += ": " + strings.TrimSpace(subtitle)
 	}
-	if year, ok := mrc.ValueAt("260", "c"); ok {
+	if year := mrc.ValueAt("260", "c"); year != "" {
 		res.Label += " (" + cleanYear(year) + ")"
 	}
 	// TODO 028$a serial number/catalogue number for music records/sheet music

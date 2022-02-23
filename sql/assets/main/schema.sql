@@ -9,6 +9,7 @@ CREATE TABLE resource (
     indexed_at  INTEGER, -- imte.Now().Unix()
     archived_at INTEGER  -- time.Now().Unix()
 );
+-- TODO index on expression json_extract(data, '$.year')?
 
 CREATE TABLE resource_edit_log (
     at          INTEGER NOT NULL, -- time.Now().Unix()

@@ -299,7 +299,7 @@ type Publication struct {
 	// Title and publishing info
 	Title     string `json:"title"`
 	Subtitle  string `json:"subtitle,omitempty"`
-	Publisher string `json:"publisher"`
+	Publisher string `json:"publisher,omitempty"`
 	// Note, Year|YearFirst=0 means we cannot have a publication published in year 0,
 	// assumed this to be not a practical problem, not a lot of known classics published that year (TODO any?)
 	// https://en.wikipedia.org/wiki/Ancient_literature
@@ -313,7 +313,7 @@ type Publication struct {
 	LanguageOriginal string `json:"language_original,omitempty"`
 
 	// Content info
-	Language       string   `json:"language"`
+	Language       string   `json:"language,omitempty"`
 	LanguagesOther []string `json:"languages_other"`
 	GenreForms     []string `json:"genre_forms"`
 	Fiction        bool     `json:"fiction"`
@@ -335,7 +335,7 @@ type Publisher struct {
 }
 
 type Person struct {
-	YearRange      YearRange    `json:"year_range"` // TODO pointer *YearRange?
+	YearRange      YearRange    `json:"year_range,omitempty"` // TODO pointer *YearRange?
 	Name           string       `json:"name"`
 	Gender         vocab.Gender `json:"gender"`
 	NameVariations []string     `json:"name_variations"`
@@ -352,8 +352,27 @@ func (p Person) Label() string {
 	return p.Name
 }
 
+// Corporation TODO rename Organization?
 type Corporation struct {
-	YearRange
+	YearRange      YearRange `json:"year_range,omitempty"`
+	Name           string    `json:"name"`
+	ParentName     string    `json:"parent_name,omitempty"`
+	NameVariations []string  `json:"name_variations"`
+	//Type           vocab.CorporationType `json:"type"` // University, Municipality, Music gorup, Record label etc
+}
+
+func (c Corporation) Label() string {
+	if c.ParentName != "" {
+		return fmt.Sprintf("%s / %s", c.Name, c.ParentName)
+	}
+	return c.Name
+}
+
+// Character is a fictional or mythical person/character.
+// Examples: Ulysses, Donald Duck, Harry Hole
+type Character struct {
+	Name           string   `json:"name"`
+	NameVariations []string `json:"name_variations"`
 }
 
 // 3) Circulation: Item, User, Staff etc

@@ -349,7 +349,6 @@ func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {
 
 	ing := etl.NewPreviewIngestor(s.db)
 	ing.ImageDownload = false
-	ing.ImageAsync = true
 	var res []html.ImportPreviewEntry
 
 	for _, id := range strings.Split(ids, "\n") {

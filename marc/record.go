@@ -65,20 +65,20 @@ func (r Record) IsEmpty() bool {
 	return r.Leader == "" && len(r.ControlFields) == 0 && len(r.DataFields) == 0
 }
 
-// ValueAt returns the first occurrence of code in the requested DataField, along
-// with a boolean denoting if a value was found or not.
-func (r Record) ValueAt(tag, code string) (string, bool) {
+// ValueAt returns the first occurrence of code in the requested DataField. An empty
+// string means no match.
+func (r Record) ValueAt(tag, code string) string {
 	for _, f := range r.DataFields {
 		if f.Tag == tag {
 			for _, sf := range f.SubFields {
 				if sf.Code == code {
-					return sf.Value, true
+					return sf.Value
 				}
 			}
 		}
 	}
 
-	return "", false
+	return ""
 }
 
 // ValuesAt returns a string slice of all occurrences of code in

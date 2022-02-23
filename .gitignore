@@ -1,6 +1,6 @@
 notes.txt
 data
-.data
+_data
 tmp
 scratch
 *.ego.go

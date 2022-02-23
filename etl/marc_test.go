@@ -1380,3 +1380,66 @@ func TestPersonFromAuthority(t *testing.T) {
 		t.Errorf("PersonFromAuthority() mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestCorporationFromAuthority(t *testing.T) {
+	const autrec = `
+	<marc:record format="MARC21" type="Authority" id="11008994" xmlns:marc="info:lc/xmlns/marcxchange-v1">
+		<marc:leader>99999nz  a2299999n  4500</marc:leader>
+		<marc:controlfield tag="001">11008994</marc:controlfield>
+		<marc:controlfield tag="003">NO-TrBIB</marc:controlfield>
+		<marc:controlfield tag="005">20180525124711.0</marc:controlfield>
+		<marc:controlfield tag="008">110113n| adz|naabn|         |a|ana|     </marc:controlfield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">x11008994</marc:subfield>
+			<marc:subfield code="2">NO-TrBIB</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="024" ind1="7" ind2=" ">
+			<marc:subfield code="a">http://hdl.handle.net/11250/834336</marc:subfield>
+			<marc:subfield code="2">hdl</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="040" ind1=" " ind2=" ">
+			<marc:subfield code="a">NO-TrBIB</marc:subfield>
+			<marc:subfield code="b">nob</marc:subfield>
+			<marc:subfield code="c">NO-TrBIB</marc:subfield>
+			<marc:subfield code="f">noraf</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="110" ind1="2" ind2=" ">
+			<marc:subfield code="a">United Nations </marc:subfield>
+			<marc:subfield code="b">Working Group on Indigenous Populations </marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="410" ind1="2" ind2=" ">
+			<marc:subfield code="a">Forente nasjoner </marc:subfield>
+			<marc:subfield code="b">Arbeidsgruppen for urfolksspørsmål</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="410" ind1="2" ind2=" ">
+			<marc:subfield code="a">Arbeidsgruppen for urfolksspørsmål</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="410" ind1="2" ind2=" ">
+			<marc:subfield code="a">Working Group on Indigenous Populations</marc:subfield>
+		</marc:datafield>
+		<marc:datafield tag="901" ind1=" " ind2=" ">
+			<marc:subfield code="a">kat3</marc:subfield>
+		</marc:datafield>
+	</marc:record>
+	`
+
+	want := sirkulator.Resource{
+		Type:  sirkulator.TypeCorporation,
+		Label: "Working Group on Indigenous Populations / United Nations",
+		Data: sirkulator.Corporation{
+			Name:           "Working Group on Indigenous Populations",
+			ParentName:     "United Nations",
+			NameVariations: []string{"Arbeidsgruppen for urfolksspørsmål / Forente nasjoner", "Arbeidsgruppen for urfolksspørsmål"},
+		},
+		Links: [][2]string{{"bibsys", "11008994"}},
+	}
+
+	got, err := CorporationFromAuthority(marc.MustParseString(autrec))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("CorporationFromAuthority() mismatch (-want +got):\n%s", diff)
+	}
+}
