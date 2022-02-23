@@ -14,6 +14,7 @@ type PublicationTemplate struct {
     Page
     Resource sirkulator.Resource
     Contributions []sirkulator.PublicationContribution
+    Reviews []sirkulator.Relation
     Image *sirkulator.Image
 }
 
@@ -37,11 +38,11 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                         <legend><%= l.Translate("Publication") %></legend>
                         <div>
                             <input id="publication_title" type="text" size="50" name="publication_title" value="<%= publication.Title %>">
-                            <label for="publicataion_title"><%= l.Translate("Tittel") %></label>
+                            <label for="publication_title"><%= l.Translate("Tittel") %></label>
                         </div>
                         <div>
                             <input id="publication_subtitle" type="text" size="50" name="publication_subtitle" value="<%= publication.Subtitle %>">
-                            <label for="publicataion_subtitle"><%= l.Translate("Subtitle") %></label>
+                            <label for="publication_subtitle"><%= l.Translate("Subtitle") %></label>
                         </div>
                         <div>
                             <input id="publication_publisher" type="text" size="50" name="publication_publisher" value="<%= publication.Publisher %>">
@@ -145,6 +146,7 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                     <tr>
                         <th><%= l.Translate("Role") %></th>
                         <th><%= l.Translate("Agent") %></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,8 +155,21 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                             <td>
                                 <%= printRoles(c.Roles, l) %>
                             </td>
-                            <td>
+                            <td colspan="2">
                                 <a href="<%= resourceLink(c.Agent) %>"><%= c.Agent.Label %></a>
+                            </td>
+                        </tr>
+                    <% } %>
+                    <% for _, r := range tmpl.Reviews { %>
+                        <tr class="review">
+                            <td>
+                                <%= vocab.ParseRelationType(r.Type).Label(l.Lang) %>
+                            </td>
+                            <td>
+                                <%= r.Data["label"] %>
+                            </td>
+                            <td>
+                                <button><%= l.Translate("Søk og koble til ressurs") %></button>
                             </td>
                         </tr>
                     <% } %>

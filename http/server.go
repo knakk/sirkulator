@@ -282,6 +282,11 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		ServerError(w, err)
 		return
 	}
+	reviews, err := sql.GetPublcationReviews(conn, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
 
 	img, _ := sql.GetImage(conn, id) // img is nil if err != nil TODO log err if err != ErrNotFound?
 
@@ -292,6 +297,7 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		},
 		Resource:      res,
 		Contributions: contrib,
+		Reviews:       reviews,
 		Image:         img,
 	}
 	tmpl.Render(r.Context(), w)

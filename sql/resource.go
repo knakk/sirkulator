@@ -2,6 +2,7 @@ package sql
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -143,6 +144,43 @@ func GetPublcationContributors(conn *sqlite.Conn, id string) ([]sirkulator.Publi
 
 	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
 		return res, fmt.Errorf("sql.GetPublicationContributions(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetPublcationReviews(conn *sqlite.Conn, id string) ([]sirkulator.Relation, error) {
+	var res []sirkulator.Relation
+
+	const q = `
+	SELECT
+		type,
+		data
+	FROM
+		review
+	WHERE
+		from_id=?
+	ORDER BY queued_at`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		rel := sirkulator.Relation{
+			FromID: id,
+			Type:   stmt.ColumnText(0),
+		}
+		var data map[string]interface{}
+		if err := json.Unmarshal([]byte(stmt.ColumnText(1)), &data); err != nil {
+			return err // TODO annotate
+		}
+		rel.Data = data
+		if data == nil {
+			return errors.New("review has no data")
+		}
+		res = append(res, rel)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetPublicationReviews(%q): %w", id, err)
 	}
 
 	return res, nil
