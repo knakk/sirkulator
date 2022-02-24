@@ -103,9 +103,8 @@ type Resource struct {
 
 type SimpleResource struct {
 	Type  ResourceType
-	ID    string // If ID == "", considered an "unmapped resource"; use Links to map to existing or create a new resource.
+	ID    string
 	Label string
-	Links [][2]string // [2]string{"wikidata", "q213"} [2]string{"viaf", "234234"} etc
 }
 
 // YearRange represents a span of years, with a from and to year,

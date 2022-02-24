@@ -57,42 +57,6 @@ func NewPreviewIngestor(db *sqlitex.Pool) *Ingestor {
 
 var isbnCleaner = strings.NewReplacer("-", "", " ", "") // TODO move to isbn package
 
-func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string) error {
-	isbn = isbnCleaner.Replace(isbn)
-
-	// First, check if publication is allready in DB
-	found, err := ig.existsISBN(ctx, isbn)
-	if err != nil {
-		return fmt.Errorf("Ingestor.IngestISBN(%s): %w", isbn, err)
-	}
-	if found {
-		return sirkulator.ErrConflict
-	}
-
-	//
-	// TODO future idea: maybe if in local DB, go look on the internet and see if
-	//      we can gain something new info diffing existing record,
-	//      but then, we have to consider the changes we have made (in resource_edit_log?)
-
-	// The preferred source is local oai DB
-	var data Ingestion
-	rec, err := ig.localRecord(ctx, "isbn", isbn)
-	if err == nil {
-		data, err = ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
-		if err != nil {
-			return err
-		}
-	} else if errors.Is(err, sirkulator.ErrNotFound) {
-		// Record not in local DB - search external sources
-		data, err = ig.remoteRecord(ctx, "isbn", isbn)
-		if err != nil {
-			return err
-		}
-	}
-	// We got data, either from local or remote source, now try to persist it:
-	return ig.Ingest(ctx, data)
-}
-
 func (ig *Ingestor) existsISBN(ctx context.Context, isbn string) (bool, error) {
 	conn := ig.db.Get(ctx)
 	if conn == nil {
@@ -110,17 +74,114 @@ func (ig *Ingestor) existsISBN(ctx context.Context, isbn string) (bool, error) {
 	return true, nil
 }
 
-func (ig *Ingestor) PreviewISBN(ctx context.Context, isbn string) (Ingestion, error) {
+type ImportEntry struct {
+	Source    string // bibsys, openlibrary, discogs etc
+	Exists    bool   // allready in local DB
+	Error     string // not found, unable to map to local metadata, insuficcient data etc
+	Resources []sirkulator.SimpleResource
+}
+
+// IngestISBN will try to ingest a publication and related resources given an ISBN-number,
+// optionally persisting it to DB.
+// TODO refactor to remove duplication
+func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string, persist bool) ImportEntry {
 	isbn = isbnCleaner.Replace(isbn)
-	var data Ingestion
+
+	var entry ImportEntry
+
+	// 1. First check if we allready have it:
+	if res, err := ig.existingPublication(ctx, "isbn", isbn); err == nil {
+		// ISBN is present on existing publication, so we can return with
+		// reference to that
+		entry.Source = "local"
+		entry.Exists = true
+		entry.Resources = append(entry.Resources, res)
+		return entry
+	} else if !errors.Is(err, sirkulator.ErrNotFound) {
+		// i/o error or other internal problem
+		log.Printf("Ingestor.IngestISBN: %v", err)
+		entry.Error = sirkulator.ErrInternal.Code
+		return entry
+	}
+
+	// 2. Next, look for it in local oai DB:
 	rec, err := ig.localRecord(ctx, "isbn", isbn)
 	if err == nil {
-		return ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
-	} else if errors.Is(err, sirkulator.ErrNotFound) {
-		data, err = ig.remoteRecord(ctx, "isbn", isbn)
-		return data, err
-	} // TODO else internal server error?
-	return data, sirkulator.ErrNotFound
+		entry.Source = rec.Source
+		data, err := ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
+		if errors.Is(err, sirkulator.ErrNotFound) {
+			entry.Error = err.Error()
+			return entry
+		} else if err != nil {
+			log.Printf("Ingestor.IngestISBN: %v", err)
+			entry.Error = sirkulator.ErrInternal.Code
+			return entry
+		}
+		res, err := ig.Ingest(ctx, data, persist)
+		if err != nil {
+			log.Printf("Ingestor.IngestISBN: %v", err)
+			entry.Error = sirkulator.ErrInternal.Code
+			return entry
+		}
+		entry.Resources = res
+		return entry
+	} else if !errors.Is(err, sirkulator.ErrNotFound) {
+		// i/o error or other internal problem
+		log.Printf("Ingestor.IngestISBN: %v", err)
+		entry.Error = sirkulator.ErrInternal.Code
+		return entry
+	}
+
+	// 3. Finally, search external sources:
+	data, err := ig.remoteRecord(ctx, "isbn", isbn)
+	if errors.Is(err, sirkulator.ErrNotFound) {
+		entry.Error = sirkulator.ErrNotFound.Code
+		return entry
+	} else if err != nil {
+		log.Printf("Ingestor.IngestISBN: %v", err)
+		entry.Error = sirkulator.ErrInternal.Code
+		return entry
+	}
+	res, err := ig.Ingest(ctx, data, persist)
+	if err != nil {
+		log.Printf("Ingestor.IngestISBN: %v", err)
+		entry.Error = sirkulator.ErrInternal.Code
+		return entry
+	}
+	entry.Resources = res
+
+	return entry
+}
+
+func (ig *Ingestor) existingPublication(ctx context.Context, idtype, id string) (sirkulator.SimpleResource, error) {
+	var res sirkulator.SimpleResource
+	conn := ig.db.Get(ctx)
+	if conn == nil {
+		return res, context.Canceled
+	}
+	defer ig.db.Put(conn)
+
+	fn := func(stmt *sqlite.Stmt) error {
+		res.ID = stmt.ColumnText(0)
+		res.Label = stmt.ColumnText(1)
+		return nil
+	}
+	q := `
+		SELECT
+			r.id,
+			r.label
+		FROM resource r
+			JOIN link l ON (l.resource_id=r.id AND l.type=? AND l.id=?)
+	`
+	if err := sqlitex.Exec(conn, q, fn, idtype, id); err != nil {
+		return res, err
+	}
+	if res.ID == "" {
+		return res, sirkulator.ErrNotFound
+	}
+
+	res.Type = sirkulator.TypePublication
+	return res, nil
 }
 
 // TODO move to sql package?
@@ -279,7 +340,12 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 			`)
 			stmt.SetText("$resource_id", res.ID)
 			stmt.SetText("$type", link[0])
-			stmt.SetText("$id", link[1])
+			if link[0] == "isbn" {
+				// TODO move out this to a fn enforcing correct format of all IDs
+				stmt.SetText("$id", isbnCleaner.Replace(link[1]))
+			} else {
+				stmt.SetText("$id", link[1])
+			}
 			if _, err := stmt.Step(); err != nil {
 				return err // TODO annotate
 			}
@@ -379,10 +445,14 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 	}
 }
 
-func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
+// Ingest will merge the ingestion with locally matching resources before storing the data to db
+// and trigger indexing of documents.
+// if persist=false, nothing is persisted, and the returnet results represents a preview of which resources
+// would have been stored if persist=true.
+func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([]sirkulator.SimpleResource, error) {
 	conn := ig.db.Get(ctx)
 	if conn == nil {
-		return context.Canceled
+		return nil, context.Canceled
 	}
 	defer ig.db.Put(conn)
 
@@ -406,7 +476,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 			stmt.SetText("$id", link[1])
 			id, err := sqlitex.ResultText(stmt)
 			if err != nil && !errors.Is(err, sqlitex.ErrNoResults) {
-				return err // TODO annotate
+				return nil, err // TODO annotate
 			}
 
 			if id == "" {
@@ -456,7 +526,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 				}
 				q := "SELECT rowid FROM oai.record WHERE source_id='bibsys/aut' AND id=?"
 				if err := sqlitex.Exec(conn, q, fn, link[1]); err != nil {
-					return err // TODO annotate
+					return nil, err // TODO annotate
 				}
 				if rec.ID == "" {
 					continue
@@ -491,9 +561,23 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 		}
 	}
 
+	results := make([]sirkulator.SimpleResource, 0, len(data.Resources))
+	for _, r := range data.Resources {
+		results = append(results, sirkulator.SimpleResource{
+			Type:  r.Type,
+			ID:    r.ID,
+			Label: r.Label,
+		})
+	}
+
+	// We're only interested in a preview, so return now before persiting anything.
+	if !persist {
+		return results, nil
+	}
+
 	// Store all resources and relations in a transaction:
 	if err := persistIngestion(conn, data); err != nil {
-		return err // TODO annotate
+		return nil, err // TODO annotate
 	}
 
 	if ig.ImageDownload {
@@ -507,7 +591,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion) error {
 	// Index documents asynchronously
 	go ig.indexResources(data.Resources)
 
-	return nil
+	return results, nil
 }
 
 func (ig *Ingestor) indexResources(res []sirkulator.Resource) {

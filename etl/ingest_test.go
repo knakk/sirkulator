@@ -274,8 +274,8 @@ func TestIngestISBN(t *testing.T) {
 	ing := NewIngestor(db, nil)
 	ing.idFunc = testID()
 	ing.ImageDownload = true
-	if err := ing.IngestISBN(context.Background(), "8202018560"); err != nil {
-		t.Fatal(err)
+	if entry := ing.IngestISBN(context.Background(), "8202018560", true); entry.Error != "" {
+		t.Fatal(entry.Error)
 	}
 
 	// Verify that the existing person resource is still there unchanged
@@ -511,8 +511,8 @@ func TestIngestPersonFromLocalOAI(t *testing.T) {
 	// Ingest by ISBN number
 	ing := NewIngestor(db, nil)
 	ing.idFunc = testID()
-	if err := ing.IngestISBN(context.Background(), "8202018560"); err != nil {
-		t.Fatal(err)
+	if entry := ing.IngestISBN(context.Background(), "8202018560", true); entry.Error != "" {
+		t.Fatal(entry.Error)
 	}
 
 	// Verify that resource was stored from local authority oai record
@@ -564,8 +564,8 @@ func TestIngestRemote(t *testing.T) {
 	ing := NewIngestor(db, nil)
 	ing.idFunc = testID()
 	ing.UseRemote = true
-	if err := ing.IngestISBN(context.Background(), "9788253043203"); err != nil {
-		t.Fatal(err)
+	if entry := ing.IngestISBN(context.Background(), "9788253043203", true); entry.Error != "" {
+		t.Fatal(entry.Error)
 	}
 	conn := db.Get(nil)
 	defer db.Put(conn)

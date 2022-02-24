@@ -133,6 +133,8 @@ func matchOrCreate(agents *[]sirkulator.Resource, f marc.DataField, idFunc func(
 	return agent
 }
 
+// TODO it currently never returns an error: when should it fail? For example not enough data
+// to construct a valid resource? No label?
 func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ingestion, error) {
 	// TODO switch on source => one fn per source
 

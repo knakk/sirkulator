@@ -317,25 +317,20 @@ func (s *Server) importResources(w http.ResponseWriter, r *http.Request) {
 	ing.ImageDownload = true
 	ing.ImageAsync = true
 	var res []html.ImportResultEntry
-	numOK := 0
 	for _, id := range strings.Split(ids, "\n") {
-		if strings.TrimSpace(id) == "" {
+		if len(strings.TrimSpace(id)) < 10 {
+			// TODO proper validation and detection of type of ID: ISBN/GTIN/ISSN
 			continue
 		}
-		// TODO detect type of ID: ISBN/EAN/ISSN
+
 		entry := html.ImportResultEntry{
 			IDType: "ISBN",
 			ID:     id,
+			Data:   ing.IngestISBN(r.Context(), id, true),
 		}
-		err := ing.IngestISBN(r.Context(), id)
-		if err != nil {
-			entry.Err = err.Error()
-		} else {
-			numOK++
-		}
+		res = append(res, entry)
 	}
 	tmpl := html.ImportResultsTmpl{
-		NumOK:   numOK, // TODO remove
 		Entries: res,
 	}
 	tmpl.Render(r.Context(), w)
@@ -355,25 +350,25 @@ func (s *Server) importPreview(w http.ResponseWriter, r *http.Request) {
 
 	ing := etl.NewPreviewIngestor(s.db)
 	ing.ImageDownload = false
-	var res []html.ImportPreviewEntry
+	var res []html.ImportResultEntry
 
 	for _, id := range strings.Split(ids, "\n") {
-		// TODO detect type of ID: ISBN/EAN/ISSN
-		p := html.ImportPreviewEntry{
+		if len(strings.TrimSpace(id)) < 10 {
+			// TODO proper validation and detection of type of ID: ISBN/GTIN/ISSN
+			continue
+		}
+
+		p := html.ImportResultEntry{
 			IDType: "ISBN",
 			ID:     id,
 		}
-		data, err := ing.PreviewISBN(r.Context(), id)
-		if err == nil {
-			p.Data = data
-		} else {
-			p.Err = err.Error()
-		}
+		entry := ing.IngestISBN(r.Context(), id, false)
+		p.Data = entry
 		res = append(res, p)
 
 	}
 
-	tmpl := html.ImportPreviewTmpl{
+	tmpl := html.ImportResultsTmpl{
 		Entries: res,
 	}
 

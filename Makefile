@@ -7,6 +7,10 @@ translate: generate
 generate: http/html/*.ego
 	@go run github.com/benbjohnson/ego/cmd/ego ./http/html
 
+cleanrun: generate
+	@rm -rf ./data
+	@go run cmd/sirkulatord/sirkulatord.go --assets=$(CURDIR)/http/assets
+
 run: generate
 	@go run cmd/sirkulatord/sirkulatord.go --assets=$(CURDIR)/http/assets
 

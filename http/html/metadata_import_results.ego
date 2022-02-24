@@ -9,12 +9,10 @@ import (
 type ImportResultEntry struct {
 	IDType string // isbn/ean/issn
 	ID     string
-	Err    string
-	Data   etl.Ingestion
+	Data   etl.ImportEntry
 }
 
 type ImportResultsTmpl struct {
-    NumOK int // TODO remove
     Entries []ImportResultEntry
 }
 
@@ -23,6 +21,38 @@ func (ir *ImportResultsTmpl) Render(ctx context.Context, w io.Writer) {
 
 %>
 <div>
-    <%= l.Translate("%d imported OK!", ir.NumOK) %>
+    <div class="row">
+        <table>
+            <tbody>
+                <% for _, e := range ir.Entries { %>
+                    <tr>
+                        <td><strong><%= e.IDType %>: <%= e.ID %></strong></td>
+                        <% if e.Data.Error != "" { %>
+                            <td></td>
+                            <td><mark>error: <%= e.Data.Error %></mark></td>
+                        <% } else { %>
+                            <% for i, r := range e.Data.Resources { %>
+                                <% if i > 0 { %><tr><td></td><% } %>
+                                <td><%= r.Type.Label(l.Lang) %></td>
+                                <td>
+                                    <% if r.ID == "" { %>
+                                        <%= r.Label %>
+                                    <% } else { %>
+                                        <a href="<%= fmt.Sprintf("/metadata/%s/%s", r.Type.String(), r.ID) %>">
+                                            <%= r.Label %>
+                                        </a>
+                                    <% } %>
+                                    <% if e.Data.Exists { %>
+                                        <br/><strong><%= l.Translate("Already in catalogue") %></strong>
+                                    <% } %>
+                                </td>
+                                <% if i > 0 { %></tr><% } %>
+                            <% } %>
+                        <% } %>
+                    </tr>
+                <% } %>
+            <tbody>
+        </table>
+    </div>
 </div>
 <% } %>
