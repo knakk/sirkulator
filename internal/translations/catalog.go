@@ -39,88 +39,118 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d hits (%v)":                   33,
-	"%d imported OK!":                15,
+	"%d hits (%v)":                   48,
 	"1 per line":                     12,
-	"Agent":                          32,
-	"Birthyear":                      19,
+	"Agent":                          46,
+	"Already in catalogue":           15,
+	"Binding":                        41,
+	"Birthyear":                      21,
 	"Circulation":                    1,
 	"Configuration":                  5,
-	"Contributions":                  31,
-	"Cover-image":                    29,
-	"Deathyear":                      20,
+	"Content":                        34,
+	"Contributions":                  45,
+	"Cover-image":                    43,
+	"Deathyear":                      22,
+	"Edition":                        33,
+	"Fiction":                        37,
+	"Genre and forms":                39,
 	"Holdings":                       4,
 	"Home":                           0,
 	"ISBN, ISSN or EAN":              11,
-	"Identificators and links":       22,
+	"Identificators and links":       24,
 	"Identifiers":                    10,
 	"Import":                         9,
-	"Lifespan":                       18,
+	"Lifespan":                       20,
+	"Main language":                  35,
 	"Metadata":                       3,
-	"Name":                           17,
+	"Name":                           18,
+	"Nonfiction":                     38,
+	"Number of pages":                42,
 	"Orders":                         2,
-	"Other relations":                26,
+	"Other languages":                36,
+	"Other relations":                29,
+	"Personalia":                     17,
+	"Physical characteristics":       40,
 	"Preview":                        13,
 	"Properties":                     16,
-	"Publication":                    25,
-	"Publication cover-image":        30,
-	"Publications and contributions": 23,
-	"Role":                           24,
+	"Publication":                    28,
+	"Publication cover-image":        44,
+	"Publications and contributions": 25,
+	"Publisher":                      32,
+	"Role":                           26,
+	"Search and connect to resource": 47,
 	"Search/browse catalogue":        8,
+	"Short description":              19,
 	"Show metadata for review":       7,
 	"Show recent transactions":       6,
-	"Subtitle":                       28,
-	"Tittel":                         27,
-	"approximate":                    21,
+	"Subtitle":                       31,
+	"Tittel":                         30,
+	"Year":                           27,
+	"approximate":                    23,
 	"wait...":                        14,
 }
 
-var enIndex = []uint32{ // 35 elements
+var enIndex = []uint32{ // 50 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000051,
 	0x0000006a, 0x00000082, 0x00000089, 0x00000095,
 	0x000000a7, 0x000000b2, 0x000000ba, 0x000000c2,
-	0x000000d5, 0x000000e0, 0x000000e5, 0x000000ee,
-	0x000000f8, 0x00000102, 0x0000010e, 0x00000127,
-	0x00000146, 0x0000014b, 0x00000157, 0x00000167,
-	0x0000016e, 0x00000177, 0x00000183, 0x0000019b,
+	0x000000d7, 0x000000e2, 0x000000ed, 0x000000f2,
+	0x00000104, 0x0000010d, 0x00000117, 0x00000121,
+	0x0000012d, 0x00000146, 0x00000165, 0x0000016a,
+	0x0000016f, 0x0000017b, 0x0000018b, 0x00000192,
 	// Entry 20 - 3F
-	0x000001a9, 0x000001af, 0x000001c2,
-} // Size: 164 bytes
+	0x0000019b, 0x000001a5, 0x000001ad, 0x000001b5,
+	0x000001c3, 0x000001d3, 0x000001db, 0x000001e6,
+	0x000001f6, 0x0000020f, 0x00000217, 0x00000227,
+	0x00000233, 0x0000024b, 0x00000259, 0x0000025f,
+	0x0000027e, 0x00000291,
+} // Size: 224 bytes
 
-const enData string = "" + // Size: 450 bytes
+const enData string = "" + // Size: 657 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Show recent transactions\x02Show metadata for review\x02Search/bro" +
 	"wse catalogue\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
-	"e\x02Preview\x02wait...\x02%[1]d imported OK!\x02Properties\x02Name\x02L" +
-	"ifespan\x02Birthyear\x02Deathyear\x02approximate\x02Identificators and l" +
-	"inks\x02Publications and contributions\x02Role\x02Publication\x02Other r" +
-	"elations\x02Tittel\x02Subtitle\x02Cover-image\x02Publication cover-image" +
-	"\x02Contributions\x02Agent\x02%[1]d hits (%[2]v)"
+	"e\x02Preview\x02wait...\x02Already in catalogue\x02Properties\x02Persona" +
+	"lia\x02Name\x02Short description\x02Lifespan\x02Birthyear\x02Deathyear" +
+	"\x02approximate\x02Identificators and links\x02Publications and contribu" +
+	"tions\x02Role\x02Year\x02Publication\x02Other relations\x02Tittel\x02Sub" +
+	"title\x02Publisher\x02Edition\x02Content\x02Main language\x02Other langu" +
+	"ages\x02Fiction\x02Nonfiction\x02Genre and forms\x02Physical characteris" +
+	"tics\x02Binding\x02Number of pages\x02Cover-image\x02Publication cover-i" +
+	"mage\x02Contributions\x02Agent\x02Search and connect to resource\x02%[1]" +
+	"d hits (%[2]v)"
 
-var noIndex = []uint32{ // 35 elements
+var noIndex = []uint32{ // 50 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000055,
 	0x00000075, 0x0000008a, 0x00000093, 0x000000a3,
 	0x000000b8, 0x000000c4, 0x000000d1, 0x000000d9,
-	0x000000ed, 0x000000f8, 0x000000fd, 0x00000105,
-	0x00000111, 0x0000011a, 0x00000126, 0x00000140,
-	0x00000155, 0x0000015b, 0x00000165, 0x00000176,
-	0x0000017d, 0x00000189, 0x00000196, 0x000001af,
+	0x000000ee, 0x000000f9, 0x00000104, 0x00000109,
+	0x0000011a, 0x00000122, 0x0000012e, 0x00000137,
+	0x00000143, 0x0000015d, 0x00000172, 0x00000178,
+	0x0000017c, 0x00000186, 0x00000197, 0x0000019e,
 	// Entry 20 - 3F
-	0x000001b6, 0x000001bd, 0x000001d1,
-} // Size: 164 bytes
+	0x000001aa, 0x000001b2, 0x000001b9, 0x000001c1,
+	0x000001d1, 0x000001de, 0x000001e6, 0x000001ea,
+	0x000001fa, 0x0000020d, 0x00000219, 0x00000222,
+	0x0000022f, 0x00000248, 0x0000024f, 0x00000256,
+	0x00000270, 0x00000284,
+} // Size: 224 bytes
 
-const noData string = "" + // Size: 465 bytes
+const noData string = "" + // Size: 644 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vis siste transaksjoner\x02Vis opplysninger til gjennomsyn" +
 	"\x02Søk/bla i katalogen\x02Importer\x02Identifikatorer\x02ISBN, ISSN ell" +
-	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02%[1]d importert OK!" +
-	"\x02Egenskaper\x02Navn\x02Levetid\x02Fødselsår\x02Dødsår\x02omtrentelig" +
-	"\x02Identifikatorer og lenker\x02Utgivelser og bidrag\x02Rolle\x02Utgive" +
-	"lse\x02Andre relasjoner\x02Tittel\x02Undertittel\x02Forsidebilde\x02Utgi" +
-	"velsens forsidebilde\x02Bidrag\x02Aktør\x02%[1]d treff (%[2]v)"
+	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02Allerede i katalogen" +
+	"\x02Egenskaper\x02Personalia\x02Navn\x02Kort beskrivelse\x02Levetid\x02F" +
+	"ødselsår\x02Dødsår\x02omtrentelig\x02Identifikatorer og lenker\x02Utgiv" +
+	"elser og bidrag\x02Rolle\x02År\x02Utgivelse\x02Andre relasjoner\x02Titte" +
+	"l\x02Undertittel\x02Utgiver\x02Utgave\x02Innhold\x02Språk (hoved-)\x02An" +
+	"dre språk\x02Fiksjon\x02Fag\x02Sjanger og form\x02Fysiske egenskaper\x02" +
+	"Innbdinding\x02Sidetall\x02Forsidebilde\x02Utgivelsens forsidebilde\x02B" +
+	"idrag\x02Aktør\x02Søk og koble til ressurs\x02%[1]d treff (%[2]v)"
 
-	// Total table size 1243 bytes (1KiB); checksum: 67E4AF58
+	// Total table size 1749 bytes (1KiB); checksum: C7EFABC8

@@ -107,20 +107,10 @@
             "fuzzy": true
         },
         {
-            "id": "{NumOK} imported OK!",
-            "message": "{NumOK} imported OK!",
-            "translation": "{NumOK} imported OK!",
+            "id": "Already in catalogue",
+            "message": "Already in catalogue",
+            "translation": "Already in catalogue",
             "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "NumOK",
-                    "string": "%[1]d",
-                    "type": "int",
-                    "underlyingType": "int",
-                    "argNum": 1,
-                    "expr": "ir.NumOK"
-                }
-            ],
             "fuzzy": true
         },
         {
@@ -131,9 +121,23 @@
             "fuzzy": true
         },
         {
+            "id": "Personalia",
+            "message": "Personalia",
+            "translation": "Personalia",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Name",
             "message": "Name",
             "translation": "Name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Short description",
+            "message": "Short description",
+            "translation": "Short description",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -187,6 +191,13 @@
             "fuzzy": true
         },
         {
+            "id": "Year",
+            "message": "Year",
+            "translation": "Year",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Publication",
             "message": "Publication",
             "translation": "Publication",
@@ -215,6 +226,83 @@
             "fuzzy": true
         },
         {
+            "id": "Publisher",
+            "message": "Publisher",
+            "translation": "Publisher",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Edition",
+            "message": "Edition",
+            "translation": "Edition",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Content",
+            "message": "Content",
+            "translation": "Content",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Main language",
+            "message": "Main language",
+            "translation": "Main language",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Other languages",
+            "message": "Other languages",
+            "translation": "Other languages",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Fiction",
+            "message": "Fiction",
+            "translation": "Fiction",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Nonfiction",
+            "message": "Nonfiction",
+            "translation": "Nonfiction",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Genre and forms",
+            "message": "Genre and forms",
+            "translation": "Genre and forms",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Physical characteristics",
+            "message": "Physical characteristics",
+            "translation": "Physical characteristics",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Binding",
+            "message": "Binding",
+            "translation": "Binding",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Number of pages",
+            "message": "Number of pages",
+            "translation": "Number of pages",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Cover-image",
             "message": "Cover-image",
             "translation": "Cover-image",
@@ -239,6 +327,13 @@
             "id": "Agent",
             "message": "Agent",
             "translation": "Agent",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Search and connect to resource",
+            "message": "Search and connect to resource",
+            "translation": "Search and connect to resource",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

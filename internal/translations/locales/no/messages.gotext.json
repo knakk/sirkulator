@@ -77,19 +77,9 @@
             "translation": "vent..."
         },
         {
-            "id": "{NumOK} imported OK!",
-            "message": "{NumOK} imported OK!",
-            "translation": "{NumOK} importert OK!",
-            "placeholders": [
-                {
-                    "id": "NumOK",
-                    "string": "%[1]d",
-                    "type": "int",
-                    "underlyingType": "int",
-                    "argNum": 1,
-                    "expr": "ir.NumOK"
-                }
-            ]
+            "id": "Already in catalogue",
+            "message": "Already in catalogue",
+            "translation": "Allerede i katalogen"
         },
         {
             "id": "Properties",
@@ -97,9 +87,19 @@
             "translation": "Egenskaper"
         },
         {
+            "id": "Personalia",
+            "message": "Personalia",
+            "translation": "Personalia"
+        },
+        {
             "id": "Name",
             "message": "Name",
             "translation": "Navn"
+        },
+        {
+            "id": "Short description",
+            "message": "Short description",
+            "translation": "Kort beskrivelse"
         },
         {
             "id": "Lifespan",
@@ -137,6 +137,11 @@
             "translation": "Rolle"
         },
         {
+            "id": "Year",
+            "message": "Year",
+            "translation": "År"
+        },
+        {
             "id": "Publication",
             "message": "Publication",
             "translation": "Utgivelse"
@@ -157,6 +162,61 @@
             "translation": "Undertittel"
         },
         {
+            "id": "Publisher",
+            "message": "Publisher",
+            "translation": "Utgiver"
+        },
+        {
+            "id": "Edition",
+            "message": "Edition",
+            "translation": "Utgave"
+        },
+        {
+            "id": "Content",
+            "message": "Content",
+            "translation": "Innhold"
+        },
+        {
+            "id": "Main language",
+            "message": "Main language",
+            "translation": "Språk (hoved-)"
+        },
+        {
+            "id": "Other languages",
+            "message": "Other languages",
+            "translation": "Andre språk"
+        },
+        {
+            "id": "Fiction",
+            "message": "Fiction",
+            "translation": "Fiksjon"
+        },
+        {
+            "id": "Nonfiction",
+            "message": "Nonfiction",
+            "translation": "Fag"
+        },
+        {
+            "id": "Genre and forms",
+            "message": "Genre and forms",
+            "translation": "Sjanger og form"
+        },
+        {
+            "id": "Physical characteristics",
+            "message": "Physical characteristics",
+            "translation": "Fysiske egenskaper"
+        },
+        {
+            "id": "Binding",
+            "message": "Binding",
+            "translation": "Innbdinding"
+        },
+        {
+            "id": "Number of pages",
+            "message": "Number of pages",
+            "translation": "Sidetall"
+        },
+        {
             "id": "Cover-image",
             "message": "Cover-image",
             "translation": "Forsidebilde"
@@ -175,6 +235,11 @@
             "id": "Agent",
             "message": "Agent",
             "translation": "Aktør"
+        },
+        {
+            "id": "Search and connect to resource",
+            "message": "Search and connect to resource",
+            "translation": "Søk og koble til ressurs"
         },
         {
             "id": "{Total} hits ({Time})",

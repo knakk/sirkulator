@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"image"
 	"image/jpeg"
 	"log"
@@ -38,6 +37,18 @@ type Ingestor struct {
 	//ImageWebp  bool // convert to webp before storing
 }
 
+type Ingestion struct {
+	Resources []sirkulator.Resource
+	Relations []sirkulator.Relation
+	Reviews   []sirkulator.Relation
+	Covers    []FileFetch
+}
+
+type FileFetch struct {
+	ResourceID string
+	URL        string
+}
+
 func NewIngestor(db *sqlitex.Pool, idx *search.Index) *Ingestor {
 	return &Ingestor{
 		db:         db,
@@ -56,23 +67,6 @@ func NewPreviewIngestor(db *sqlitex.Pool) *Ingestor {
 }
 
 var isbnCleaner = strings.NewReplacer("-", "", " ", "") // TODO move to isbn package
-
-func (ig *Ingestor) existsISBN(ctx context.Context, isbn string) (bool, error) {
-	conn := ig.db.Get(ctx)
-	if conn == nil {
-		return false, context.Canceled
-	}
-	defer ig.db.Put(conn)
-	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn' AND id=$id")
-	stmt.SetText("$id", isbn)
-	if _, err := sqlitex.ResultText(stmt); err != nil {
-		if errors.Is(err, sqlitex.ErrNoResults) {
-			return false, nil
-		}
-		return false, fmt.Errorf("Ingestor.existsISBN(%s): %w ", isbn, err)
-	}
-	return true, nil
-}
 
 type ImportEntry struct {
 	Source    string // bibsys, openlibrary, discogs etc
@@ -414,6 +408,12 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 		}
 		r.Close()
 
+		// TODO enforce minimum image size/quality?
+		// const minWidth = 300
+		// if src.Bounds().Max.X < minWidth {
+		// 	continue
+		// }
+
 		ratio := float64(ig.ImageWidth) / float64(src.Bounds().Max.X)
 		height := float64(src.Bounds().Max.Y) * ratio
 		dst := image.NewRGBA(image.Rect(0, 0, ig.ImageWidth, int(height)))
@@ -614,17 +614,4 @@ func (ig *Ingestor) indexResources(res []sirkulator.Resource) {
 		log.Println(err) // TODO or not
 	}
 	// TODO update indexed_at column in main.resource SQL db
-}
-
-type Ingestion struct {
-	Resources []sirkulator.Resource
-	Relations []sirkulator.Relation
-	Reviews   []sirkulator.Relation
-	Covers    []FileFetch
-	//Documents []search.Document
-}
-
-type FileFetch struct {
-	ResourceID string
-	URL        string
 }

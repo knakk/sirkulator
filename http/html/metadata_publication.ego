@@ -163,13 +163,13 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                     <% for _, r := range tmpl.Reviews { %>
                         <tr class="review">
                             <td>
-                                <%= vocab.ParseRelationType(r.Type).Label(l.Lang) %>
+                                <%= vocab.ParseRelation(r.Type).Label(l.Lang) %>
                             </td>
                             <td>
                                 <%= r.Data["label"] %>
                             </td>
                             <td>
-                                <button><%= l.Translate("Søk og koble til ressurs") %></button>
+                                <button><%= l.Translate("Search and connect to resource") %></button>
                             </td>
                         </tr>
                     <% } %>
