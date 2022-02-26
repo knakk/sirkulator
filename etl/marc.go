@@ -218,11 +218,10 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	if !ok {
 		f, ok = rec.DataFieldAt("264")
 	}
-	// Todo handle multiple 260/264 fields
+	// TODO handle multiple 260/264 fields
 	if ok {
 		if publisher := f.ValueAt("b"); publisher != "" {
 			p.Publisher = publisher
-			// TODO add published_by Review
 			ing.Reviews = append(ing.Reviews, sirkulator.Relation{
 				FromID: pID,
 				Type:   "published_by",
@@ -233,6 +232,28 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			p.Year = year
 			label = fmt.Sprintf("%s (%d)", label, year)
 		}
+	}
+	// Publisher series
+	for _, f := range rec.DataFieldsAt("490") {
+		if series := f.ValueAt("a"); series != "" {
+			p.Series = append(p.Series, series)
+			data := map[string]interface{}{"label": series}
+			if num := f.ValueAt("v"); num != "" {
+				n, err := strconv.Atoi(num)
+				if err == nil {
+					data["number"] = n
+				}
+			}
+			if p.Publisher != "" {
+				data["publisher"] = p.Publisher
+			}
+			ing.Reviews = append(ing.Reviews, sirkulator.Relation{
+				FromID: pID,
+				Type:   "in_series",
+				Data:   data,
+			})
+		}
+
 	}
 	// Physical properties
 	if f, ok := rec.DataFieldAt("300"); ok {

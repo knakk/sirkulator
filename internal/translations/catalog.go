@@ -39,16 +39,16 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d hits (%v)":                   48,
+	"%d hits (%v)":                   49,
 	"1 per line":                     12,
-	"Agent":                          46,
+	"Agent":                          47,
 	"Already in catalogue":           15,
 	"Binding":                        41,
 	"Birthyear":                      21,
 	"Circulation":                    1,
 	"Configuration":                  5,
 	"Content":                        34,
-	"Contributions":                  45,
+	"Contributions and relations":    45,
 	"Cover-image":                    43,
 	"Deathyear":                      22,
 	"Edition":                        33,
@@ -78,7 +78,8 @@ var messageKeyToIndex = map[string]int{
 	"Publications and contributions": 25,
 	"Publisher":                      32,
 	"Role":                           26,
-	"Search and connect to resource": 47,
+	"Role/relation":                  46,
+	"Search and connect to resource": 48,
 	"Search/browse catalogue":        8,
 	"Short description":              19,
 	"Show metadata for review":       7,
@@ -90,7 +91,7 @@ var messageKeyToIndex = map[string]int{
 	"wait...":                        14,
 }
 
-var enIndex = []uint32{ // 50 elements
+var enIndex = []uint32{ // 51 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000051,
@@ -104,11 +105,11 @@ var enIndex = []uint32{ // 50 elements
 	0x0000019b, 0x000001a5, 0x000001ad, 0x000001b5,
 	0x000001c3, 0x000001d3, 0x000001db, 0x000001e6,
 	0x000001f6, 0x0000020f, 0x00000217, 0x00000227,
-	0x00000233, 0x0000024b, 0x00000259, 0x0000025f,
-	0x0000027e, 0x00000291,
-} // Size: 224 bytes
+	0x00000233, 0x0000024b, 0x00000267, 0x00000275,
+	0x0000027b, 0x0000029a, 0x000002ad,
+} // Size: 228 bytes
 
-const enData string = "" + // Size: 657 bytes
+const enData string = "" + // Size: 685 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Show recent transactions\x02Show metadata for review\x02Search/bro" +
 	"wse catalogue\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
@@ -119,10 +120,10 @@ const enData string = "" + // Size: 657 bytes
 	"title\x02Publisher\x02Edition\x02Content\x02Main language\x02Other langu" +
 	"ages\x02Fiction\x02Nonfiction\x02Genre and forms\x02Physical characteris" +
 	"tics\x02Binding\x02Number of pages\x02Cover-image\x02Publication cover-i" +
-	"mage\x02Contributions\x02Agent\x02Search and connect to resource\x02%[1]" +
-	"d hits (%[2]v)"
+	"mage\x02Contributions and relations\x02Role/relation\x02Agent\x02Search " +
+	"and connect to resource\x02%[1]d hits (%[2]v)"
 
-var noIndex = []uint32{ // 50 elements
+var noIndex = []uint32{ // 51 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000055,
@@ -136,11 +137,11 @@ var noIndex = []uint32{ // 50 elements
 	0x000001aa, 0x000001b2, 0x000001b9, 0x000001c1,
 	0x000001d1, 0x000001de, 0x000001e6, 0x000001ea,
 	0x000001fa, 0x0000020d, 0x00000219, 0x00000222,
-	0x0000022f, 0x00000248, 0x0000024f, 0x00000256,
-	0x00000270, 0x00000284,
-} // Size: 224 bytes
+	0x0000022f, 0x00000248, 0x0000025d, 0x0000026c,
+	0x00000273, 0x0000028d, 0x000002a1,
+} // Size: 228 bytes
 
-const noData string = "" + // Size: 644 bytes
+const noData string = "" + // Size: 673 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vis siste transaksjoner\x02Vis opplysninger til gjennomsyn" +
 	"\x02Søk/bla i katalogen\x02Importer\x02Identifikatorer\x02ISBN, ISSN ell" +
@@ -151,6 +152,7 @@ const noData string = "" + // Size: 644 bytes
 	"l\x02Undertittel\x02Utgiver\x02Utgave\x02Innhold\x02Språk (hoved-)\x02An" +
 	"dre språk\x02Fiksjon\x02Fag\x02Sjanger og form\x02Fysiske egenskaper\x02" +
 	"Innbdinding\x02Sidetall\x02Forsidebilde\x02Utgivelsens forsidebilde\x02B" +
-	"idrag\x02Aktør\x02Søk og koble til ressurs\x02%[1]d treff (%[2]v)"
+	"idrag og relasjoner\x02Rolle/relasjon\x02Aktør\x02Søk og koble til ressu" +
+	"rs\x02%[1]d treff (%[2]v)"
 
-	// Total table size 1749 bytes (1KiB); checksum: C7EFABC8
+	// Total table size 1814 bytes (1KiB); checksum: 6809D483

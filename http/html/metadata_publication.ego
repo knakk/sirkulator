@@ -138,13 +138,13 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
 
     <details open>
         <summary>
-            <h3><%= l.Translate("Contributions") %></h3>
+            <h3><%= l.Translate("Contributions and relations") %></h3>
         </summary>
         <div class="border pad">
             <table>
                 <thead>
                     <tr>
-                        <th><%= l.Translate("Role") %></th>
+                        <th><%= l.Translate("Role/relation") %></th>
                         <th><%= l.Translate("Agent") %></th>
                         <th></th>
                     </tr>
@@ -179,15 +179,5 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
         </div>
     </details>
 
-    <br/>
-
-    <details open>
-        <summary>
-            <h3><%= l.Translate("Other relations") %></h3>
-        </summary>
-        <div class="border pad">
-
-        </div>
-    </details>
 </ego:App>
 <% } %>

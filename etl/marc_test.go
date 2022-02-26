@@ -1284,6 +1284,258 @@ func TestIngestOAIRecord(t *testing.T) {
 		}
 	})
 
+	t.Run("book in a publisher series", func(t *testing.T) {
+		const isbn9788205560130 = `
+			<record xmlns="http://www.loc.gov/MARC21/slim">
+				<leader>02682nam  2200481 c 4500</leader>
+				<controlfield tag="001">999921603445902201</controlfield>
+				<controlfield tag="005">20220223113839.0</controlfield>
+				<controlfield tag="007">ta</controlfield>
+				<controlfield tag="008">211029s2022    no     j ||||||0| 1 nob|^</controlfield>
+				<datafield ind1=" " ind2=" " tag="020">
+					<subfield code="a">9788205560130</subfield>
+					<subfield code="c">Nkr 279.00</subfield>
+					<subfield code="q">innbundet</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="035">
+					<subfield code="a">(NO-OsBA)0638924</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="035">
+					<subfield code="a">oai:bibbi.bs.no:0638924</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="040">
+					<subfield code="a">NO-OsBA</subfield>
+					<subfield code="b">nob</subfield>
+					<subfield code="e">rda</subfield>
+					<subfield code="d">NO-OsNB</subfield>
+				</datafield>
+				<datafield ind1="0" ind2="4" tag="082">
+					<subfield code="a">839.8238</subfield>
+					<subfield code="q">NO-OsBA</subfield>
+					<subfield code="2">23/nor</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="100">
+					<subfield code="a">Ingvaldsen, Bjørn</subfield>
+					<subfield code="d">1962-</subfield>
+					<subfield code="0">(NO-TrBIB)90829580</subfield>
+					<subfield code="4">aut</subfield>
+				</datafield>
+				<datafield ind1="1" ind2="0" tag="240">
+					<subfield code="a">Når noen klikker i vinkel</subfield>
+				</datafield>
+				<datafield ind1="1" ind2="0" tag="245">
+					<subfield code="a">Når noen klikker i vinkel</subfield>
+					<subfield code="c">Bjørn Ingvaldsen</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="1" tag="264">
+					<subfield code="a">Oslo</subfield>
+					<subfield code="b">Gyldendal</subfield>
+					<subfield code="c">2022</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="300">
+					<subfield code="a">122 sider</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="336">
+					<subfield code="a">tekst</subfield>
+					<subfield code="0">http://rdaregistry.info/termList/RDAContentType/1020</subfield>
+					<subfield code="2">rdaco</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="337">
+					<subfield code="a">uformidlet</subfield>
+					<subfield code="0">http://rdaregistry.info/termList/RDAMediaType/1007</subfield>
+					<subfield code="2">rdamt</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="338">
+					<subfield code="a">bind</subfield>
+					<subfield code="0">http://rdaregistry.info/termList/RDACarrierType/1049</subfield>
+					<subfield code="2">rdact</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="385">
+					<subfield code="a">9-10 år</subfield>
+					<subfield code="m">Aldersgruppe</subfield>
+					<subfield code="0">https://schema.nb.no/Bibliographic/Values/TG1003</subfield>
+					<subfield code="2">nortarget</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="385">
+					<subfield code="a">11-12 år</subfield>
+					<subfield code="m">Aldersgruppe</subfield>
+					<subfield code="0">https://schema.nb.no/Bibliographic/Values/TG1004</subfield>
+					<subfield code="2">nortarget</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="385">
+					<subfield code="a">Leselig skrift</subfield>
+					<subfield code="m">Gruppe med spesielle behov</subfield>
+					<subfield code="0">https://schema.nb.no/Bibliographic/Values/TG1009</subfield>
+					<subfield code="2">nortarget</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="490">
+					<subfield code="a">Søstrene Proxy blogger om verden</subfield>
+					<subfield code="v">1</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="520">
+					<subfield code="a">Søstrene Mercedes på 13 og Lada på nesten 12 tester ut livet som bloggere og influensere. I den alderen vil man jo gjerne fremstå som eldre enn man er, og mamma er litt bekymret når døtrene setter i gang med kamera og gode planer. Og jentene lærer at det fort kan bli litt pinlig og ganske morsomt. Humor for mellomtrinnet. Omtalen er utarbeidet av BS.</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="521">
+					<subfield code="a">Alder: 9-13 år</subfield>
+				</datafield>
+				<datafield ind1="3" ind2=" " tag="521">
+					<subfield code="a">God, leselig skrift</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="7" tag="655">
+					<subfield code="a">Romaner</subfield>
+					<subfield code="0">https://id.nb.no/vocabulary/ntsf/258</subfield>
+					<subfield code="2">ntsf</subfield>
+					<subfield code="9">nob</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="7" tag="655">
+					<subfield code="a">Romanar</subfield>
+					<subfield code="0">https://id.nb.no/vocabulary/ntsf/258</subfield>
+					<subfield code="2">ntsf</subfield>
+					<subfield code="9">nno</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="7" tag="655">
+					<subfield code="a">Humor</subfield>
+					<subfield code="0">https://id.nb.no/vocabulary/ntsf/127</subfield>
+					<subfield code="2">ntsf</subfield>
+					<subfield code="9">nob</subfield>
+				</datafield>
+				<datafield ind1=" " ind2="7" tag="655">
+					<subfield code="a">Humor</subfield>
+					<subfield code="0">https://id.nb.no/vocabulary/ntsf/127</subfield>
+					<subfield code="2">ntsf</subfield>
+					<subfield code="9">nno</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="650">
+					<subfield code="a">Blogging</subfield>
+					<subfield code="0">(NO-OsBA)1140916</subfield>
+					<subfield code="2">bibbi</subfield>
+					<subfield code="9">nob</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="650">
+					<subfield code="a">Blogging</subfield>
+					<subfield code="0">(NO-OsBA)1140916</subfield>
+					<subfield code="2">bibbi</subfield>
+					<subfield code="9">nno</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="650">
+					<subfield code="a">Søstre</subfield>
+					<subfield code="0">(NO-OsBA)1128323</subfield>
+					<subfield code="2">bibbi</subfield>
+					<subfield code="9">nob</subfield>
+				</datafield>
+				<datafield ind1="2" ind2="7" tag="650">
+					<subfield code="a">Systrer</subfield>
+					<subfield code="0">(NO-OsBA)1128323</subfield>
+					<subfield code="2">bibbi</subfield>
+					<subfield code="9">nno</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="700">
+					<subfield code="a">Bergesen, Anders</subfield>
+					<subfield code="d">1976-</subfield>
+					<subfield code="4">bjd</subfield>
+					<subfield code="0">(NO-TrBIB)10007330</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="700">
+					<subfield code="a">Ingvaldsen, Bjørn</subfield>
+					<subfield code="d">1962-</subfield>
+					<subfield code="t">Når noen klikker i vinkel</subfield>
+					<subfield code="0">(NO-TrBIB)90829580</subfield>
+				</datafield>
+				<datafield ind1="1" ind2=" " tag="800">
+					<subfield code="a">Ingvaldsen, Bjørn</subfield>
+					<subfield code="d">1962-</subfield>
+					<subfield code="t">Søstrene Proxy blogger om verden</subfield>
+					<subfield code="l">Norsk</subfield>
+					<subfield code="v">1</subfield>
+					<subfield code="0">(NO-TrBIB)90829580</subfield>
+				</datafield>
+				<datafield ind1=" " ind2=" " tag="913">
+					<subfield code="a">Norbok</subfield>
+					<subfield code="b">NB</subfield>
+				</datafield>
+			</record>
+			`
+		want := Ingestion{
+			Resources: []sirkulator.Resource{
+				{
+					ID:    "t1",
+					Label: "Bjørn Ingvaldsen - Når noen klikker i vinkel (2022)",
+					Type:  sirkulator.TypePublication,
+					Links: [][2]string{{"isbn", "9788205560130"}},
+					Data: sirkulator.Publication{
+						Title:      "Når noen klikker i vinkel",
+						Publisher:  "Gyldendal",
+						Series:     []string{"Søstrene Proxy blogger om verden"},
+						Year:       2022,
+						Language:   "nob",
+						GenreForms: []string{"Romaner", "Humor"},
+						Fiction:    true,
+						NumPages:   122,
+					},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t2",
+					Label: "Bjørn Ingvaldsen (1962–)",
+					Data: sirkulator.Person{
+						YearRange: sirkulator.YearRange{From: 1962},
+						Name:      "Bjørn Ingvaldsen"},
+					Links: [][2]string{{"bibsys", "90829580"}},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t3",
+					Label: "Anders Bergesen (1976–)",
+					Links: [][2]string{{"bibsys", "10007330"}},
+					Data: sirkulator.Person{
+						Name:      "Anders Bergesen",
+						YearRange: sirkulator.YearRange{From: 1976},
+					},
+				},
+			},
+			Relations: []sirkulator.Relation{
+				{
+					FromID: "t1",
+					ToID:   "t2",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t3",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "bjd"},
+				},
+			},
+			Reviews: []sirkulator.Relation{
+				{
+					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Gyldendal"},
+				},
+				{
+					FromID: "t1",
+					Type:   "in_series",
+					Data: map[string]interface{}{
+						"label":     "Søstrene Proxy blogger om verden",
+						"number":    1,
+						"publisher": "Gyldendal",
+						//	"author": "Bjørn Ingvaldsen",
+					},
+				},
+			},
+		}
+
+		got, err := ingestMarcRecord("bibsys/pub", marc.MustParseString(isbn9788205560130), testID())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if diff := cmp.Diff(want, got); diff != "" {
+			t.Errorf("ingestMarcRecord() mismatch (-want +got):\n%s", diff)
+		}
+	})
+
 }
 
 func TestPersonFromAuthority(t *testing.T) {

@@ -317,9 +317,16 @@
             "fuzzy": true
         },
         {
-            "id": "Contributions",
-            "message": "Contributions",
-            "translation": "Contributions",
+            "id": "Contributions and relations",
+            "message": "Contributions and relations",
+            "translation": "Contributions and relations",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Role/relation",
+            "message": "Role/relation",
+            "translation": "Role/relation",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

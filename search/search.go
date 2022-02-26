@@ -122,7 +122,7 @@ func (idx Index) batchStore(docs []Document) error {
 	return nil
 }
 
-// TODO too many params method: take query struct insted
+// TODO too many arguments to method: take query struct instead?
 func (idx *Index) Search(ctx context.Context, q, resType, sortBy, sortDir string, limit int) (Results, error) {
 	res := Results{}
 	var query bluge.Query

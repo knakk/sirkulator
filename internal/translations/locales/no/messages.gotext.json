@@ -227,9 +227,14 @@
             "translation": "Utgivelsens forsidebilde"
         },
         {
-            "id": "Contributions",
-            "message": "Contributions",
-            "translation": "Bidrag"
+            "id": "Contributions and relations",
+            "message": "Contributions and relations",
+            "translation": "Bidrag og relasjoner"
+        },
+        {
+            "id": "Role/relation",
+            "message": "Role/relation",
+            "translation": "Rolle/relasjon"
         },
         {
             "id": "Agent",

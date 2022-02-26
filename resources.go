@@ -92,15 +92,20 @@ type Resource struct {
 	ID    string
 	Label string // Synthesized from Data properties
 	Links [][2]string
-	// Description string // Short description (max 50 characters)
-	// Aliases []string    // To function as "synonyms", giving hits when searching, but not for display?
-	Data interface{} // TODO PersistableResource?
+	Data  interface{} // TODO PersistableResource?
+	// TODO candidates/thinking:
+	// Description string   // Short description (max 50 characters)
+	// Aliases     []string // To function as "synonyms", giving hits when searching, but not for display?
+	// Tags        []string // anything that's interesting for discovery/categorization: subject, suptype, genre, etc
 
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	ArchivedAt time.Time
 }
 
+// SimpleResource is a minimal representation of a Resource that can be
+// displayed and referenced to (i.e generate a URL/link from type+ID).
+// If ID is empty it is not persisted or intended for persistence.
 type SimpleResource struct {
 	Type  ResourceType
 	ID    string
@@ -296,9 +301,10 @@ type PublicationContribution struct {
 
 type Publication struct {
 	// Title and publishing info
-	Title     string `json:"title"`
-	Subtitle  string `json:"subtitle,omitempty"`
-	Publisher string `json:"publisher,omitempty"`
+	Title     string   `json:"title"`
+	Subtitle  string   `json:"subtitle,omitempty"`
+	Publisher string   `json:"publisher,omitempty"`
+	Series    []string `json:"series"`
 	// Note, Year|YearFirst=0 means we cannot have a publication published in year 0,
 	// assumed this to be not a practical problem, not a lot of known classics published that year (TODO any?)
 	// https://en.wikipedia.org/wiki/Ancient_literature
@@ -387,7 +393,7 @@ type Relation struct {
 
 type Image struct {
 	ID     string
-	Type   string // OR Mime?
+	Type   string // MIME type, but stored without "image/" prefix
 	Height int
 	Width  int
 }
