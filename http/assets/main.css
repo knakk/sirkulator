@@ -103,6 +103,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 /* metadata page */
 table.metadata-search-results td { min-width: 250px; }
 
-table tr.review { background: #eee }
+th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
+tr.review { background: #eee }
 
 /* person page */

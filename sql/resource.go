@@ -36,6 +36,9 @@ func readData(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt *sq
 	case sirkulator.TypePublication:
 		res.Data = &sirkulator.Publication{}
 		return readResource(res, t)
+	case sirkulator.TypeCorporation:
+		res.Data = &sirkulator.Corporation{}
+		return readResource(res, t)
 	default:
 		panic("sql.GetResource: readData: TODO")
 	}

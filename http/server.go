@@ -122,6 +122,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Post("/import", s.importResources) // s.tmplImportResponse ?
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
+			r.Get("/corporation/{id}", s.pageCorporation)
 			r.Get("/person/{id}", s.pagePerson)
 			r.Get("/publication/{id}", s.pagePublication)
 		})
@@ -299,6 +300,41 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		Contributions: contrib,
 		Reviews:       reviews,
 		Image:         img,
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) pageCorporation(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		// TODO which statuscode/response is appropriate?
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+	res, err := sql.GetResource(conn, sirkulator.TypeCorporation, id)
+	if errors.Is(err, sirkulator.ErrNotFound) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	contrib, err := sql.GetAgentContributions(conn, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	tmpl := html.CorporationTemplate{
+		Page: html.Page{
+			Lang: s.Lang,
+			Path: r.URL.Path,
+		},
+		Resource:      res,
+		Contributions: contrib,
 	}
 	tmpl.Render(r.Context(), w)
 }

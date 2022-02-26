@@ -3,49 +3,21 @@ package html
 
 import (
     "fmt"
-    "strconv"
-    "strings"
 
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/internal/localizer"
-    "github.com/knakk/sirkulator/marc"
     "github.com/knakk/sirkulator/vocab"
 )
 
-type PersonTemplate struct {
+type CorporationTemplate struct {
     Page
     Resource sirkulator.Resource
     Contributions []sirkulator.AgentContribution
 }
 
-// TODO move util functions out to html.go ?
-func resourceLink(r sirkulator.SimpleResource) string {
-    return fmt.Sprintf("/metadata/%s/%s", r.Type, r.ID)
-}
-
-// TODO move util functions out to html.go ?
-func printRoles(roles []marc.Relator, l localizer.Localizer) string {
-    var sb strings.Builder
-    for i, role := range roles {
-        if i > 0 {
-            sb.WriteString(", ")
-        }
-        sb.WriteString(role.Label(l.Lang))
-    }
-    return sb.String()
-}
-
-// TODO move util functions out to html.go ?
-func notZero(n int) string {
-    if n != 0 {
-        return strconv.Itoa(n)
-    }
-    return ""
-}
-
-func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
+func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
-    person := tmpl.Resource.Data.(*sirkulator.Person)
+    corp := tmpl.Resource.Data.(*sirkulator.Corporation)
 %><ego:App Page=tmpl.Page>
     <details open>
         <summary>
@@ -58,34 +30,38 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                 <form>
 
                     <fieldset>
-                        <legend><%= l.Translate("Personalia") %></legend>
+                        <legend><%= l.Translate("Basic information") %></legend>
                         <div>
-                            <input id="person_name" name="person_name" type="text" size="50" value="<%= person.Name %>">
-                            <label for="person_name"><%= l.Translate("Name") %></label>
+                            <input id="corp_name" name="corp_name" type="text" size="50" value="<%= corp.Name %>">
+                            <label for="corp_name"><%= l.Translate("Name") %></label>
                         </div>
                         <div>
-                            <input id="person_description_short" name="person_description_short" type="text" size="50" value="">
-                            <label for="person_description_short"><%= l.Translate("Short description") %></label>
+                            <input id="corp_description_short" name="corp_description_short" type="text" size="50" value="">
+                            <label for="corp_description_short"><%= l.Translate("Short description") %></label>
+                        </div>
+                         <div>
+                            <input id="corp_parentName" name="corp_parentName" type="text" size="50" value="<%= corp.ParentName %>">
+                            <label for="corp_parentName"><%= l.Translate("Parent name") %></label>
                         </div>
                     </fieldset>
 
                     <fieldset>
                         <legend><%= l.Translate("Lifespan") %></legend>
                         <div>
-                            <input id="person_birthyear" name="person_birthyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(person.YearRange.From) %>">
-                            <label for="person_birthyear"><%= l.Translate("Birthyear") %></label>
+                            <input id="corp_foundationyear" name="corp_foundationyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(corp.YearRange.From) %>">
+                            <label for="corp_foundationyear"><%= l.Translate("Foundation year") %></label>
                         </div>
                         <div>
-                            <input id="person_deathyear" name="person_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(person.YearRange.To) %>">
-                            <label for="person_deathyear"><%= l.Translate("Deathyear") %></label>
+                            <input id="corp_deathyear" name="corp_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(corp.YearRange.To) %>">
+                            <label for="corp_deathyear"><%= l.Translate("Disestablishment year") %></label>
                         </div>
                         <div>
-                            <% if person.YearRange.Approx { %>
-                                <input id="person_lifespan_approx" name="person_lifespan_approx" type="checkbox" checked>
+                            <% if corp.YearRange.Approx { %>
+                                <input id="corp_lifespan_approx" name="corp_lifespan_approx" type="checkbox" checked>
                             <% } else { %>
-                                <input id="person_lifespan_approx" name="person_lifespan_approx" type="checkbox">
+                                <input id="corp_lifespan_approx" name="corp_lifespan_approx" type="checkbox">
                             <% } %>
-                            <label for="person_lifespan_approx"><%= l.Translate("approximate") %></label>
+                            <label for="corp_lifespan_approx"><%= l.Translate("uncertain") %></label>
                         </div>
                     </fieldset>
                 </form>
