@@ -318,11 +318,12 @@ type Publication struct {
 	LanguageOriginal string `json:"language_original,omitempty"`
 
 	// Content info
-	Language       string   `json:"language,omitempty"`
-	LanguagesOther []string `json:"languages_other"`
-	GenreForms     []string `json:"genre_forms"`
-	Fiction        bool     `json:"fiction"`
-	Nonfiction     bool     `json:"nonfiction"`
+	Language       string           `json:"language,omitempty"`
+	LanguagesOther []string         `json:"languages_other"`
+	GenreForms     []string         `json:"genre_forms"`
+	Audiences      []vocab.Audience `json:"audiences"`
+	Fiction        bool             `json:"fiction"`
+	Nonfiction     bool             `json:"nonfiction"`
 	Subjects       []string
 
 	// Physical info

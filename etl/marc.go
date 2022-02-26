@@ -294,6 +294,13 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		}
 	}
 
+	// Audience
+	for _, f := range rec.DataFieldsAt("385") {
+		if audience, err := vocab.ParseAudienceURL(f.ValueAt("0")); err == nil {
+			p.Audiences = append(p.Audiences, audience)
+		}
+	}
+
 	// Subjects
 	// https://rdakatalogisering.unit.no/6xx-emneinnforsler/
 	// 600 Subject of person

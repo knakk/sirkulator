@@ -1469,6 +1469,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Year:       2022,
 						Language:   "nob",
 						GenreForms: []string{"Romaner", "Humor"},
+						Audiences:  []vocab.Audience{vocab.TG1003, vocab.TG1004, vocab.TG1009},
 						Fiction:    true,
 						NumPages:   122,
 					},

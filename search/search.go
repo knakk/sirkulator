@@ -23,6 +23,8 @@ type Document struct {
 
 	// Other fields ([0] = key, [1] = value)
 	Fields [][2]string
+	// TODO or maybe just:
+	// Tags []string
 }
 
 func (d Document) GetField(key string) (string, bool) {
