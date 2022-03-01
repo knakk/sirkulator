@@ -10,6 +10,7 @@ import (
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/isbn"
 	"github.com/knakk/sirkulator/marc"
 )
 
@@ -46,7 +47,12 @@ func readData(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt *sq
 
 func readLinks(res *sirkulator.Resource) func(stmt *sqlite.Stmt) error {
 	return func(stmt *sqlite.Stmt) error {
-		res.Links = append(res.Links, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		k := stmt.ColumnText(0)
+		v := stmt.ColumnText(1)
+		if k == "isbn" {
+			v = isbn.Prettify(v)
+		}
+		res.Links = append(res.Links, [2]string{k, v})
 		return nil
 	}
 }
