@@ -1,0 +1,38 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ViewContributions struct {
+    Contributions []sirkulator.AgentContribution
+    SortBy string
+    SortAsc bool
+}
+
+func (tmpl *ViewContributions) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%>
+<tbody id="agent_contributions">
+    <% for _, c := range tmpl.Contributions { %>
+        <tr>
+            <td>
+                <%= printRoles(c.Roles, l) %>
+            </td>
+            <td><%= notZero(c.Year) %></td>
+            <td>
+                <a href="<%= resourceLink(c.SimpleResource) %>"><%= c.Label %></a>
+            </td>
+        </tr>
+    <% } %>
+    <tr>
+        <td colspan="3">
+            <input type="hidden" name="sort_by" value="<%= tmpl.SortBy %>">
+            <input type="hidden" name="sort_asc" value="<%= tmpl.SortAsc %>">
+        </td>
+    </tr>
+</tbody>
+
+<% } %>

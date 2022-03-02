@@ -1537,6 +1537,242 @@ func TestIngestOAIRecord(t *testing.T) {
 		}
 	})
 
+	t.Run("book with audience codes", func(t *testing.T) {
+		const isbn9788202527921 = `<record xmlns="http://www.loc.gov/MARC21/slim">
+		<leader>03117nam a2200529 c 4500</leader>
+		<controlfield tag="001">999920253627802201</controlfield>
+		<controlfield tag="005">20211104172936.0</controlfield>
+		<controlfield tag="007">ta</controlfield>
+		<controlfield tag="008">170118s2017    no a   j |||||00| j nob|^</controlfield>
+		<datafield ind1=" " ind2=" " tag="020">
+		  <subfield code="a">978-82-02-52792-1</subfield>
+		  <subfield code="q">ib.</subfield>
+		  <subfield code="c">Nkr 169.00</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="035">
+		  <subfield code="a">(NO-OsBAS)150262149</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="040">
+		  <subfield code="a">NO-OsBAS</subfield>
+		  <subfield code="b">nob</subfield>
+		  <subfield code="d">NO-OsNB</subfield>
+		  <subfield code="e">katreg</subfield>
+		</datafield>
+		<datafield ind1="0" ind2="4" tag="082">
+		  <subfield code="a">839.823</subfield>
+		  <subfield code="q">NO-OsBAS</subfield>
+		  <subfield code="2">23/nor</subfield>
+		</datafield>
+		<datafield ind1="1" ind2=" " tag="100">
+		  <subfield code="a">Bringsværd, Tor Åge</subfield>
+		  <subfield code="d">1939-</subfield>
+		  <subfield code="0">(NO-TrBIB)90058926</subfield>
+		  <subfield code="4">aut</subfield>
+		</datafield>
+		<datafield ind1="1" ind2="4" tag="245">
+		  <subfield code="a">Den glemte byen</subfield>
+		  <subfield code="c">Tor Åge Bringsværd ; illustrert av Haakon Lie</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="260">
+		  <subfield code="a">[Oslo]</subfield>
+		  <subfield code="b">Cappelen Damm</subfield>
+		  <subfield code="c">2017</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="300">
+		  <subfield code="a">53 s.</subfield>
+		  <subfield code="b">kol. ill.</subfield>
+		  <subfield code="c">24 cm</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="336">
+		  <subfield code="a">text</subfield>
+		  <subfield code="b">txt</subfield>
+		  <subfield code="2">rdacontent</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="337">
+		  <subfield code="a">unmediated</subfield>
+		  <subfield code="b">n</subfield>
+		  <subfield code="2">rdamedia</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="338">
+		  <subfield code="a">volume</subfield>
+		  <subfield code="b">nc</subfield>
+		  <subfield code="2">rdacarrier</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="385">
+		  <subfield code="b">b</subfield>
+		  <subfield code="m">Age group</subfield>
+		  <subfield code="2">nortarget</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="385">
+		  <subfield code="b">ta</subfield>
+		  <subfield code="m">Specialized group</subfield>
+		  <subfield code="2">nortarget</subfield>
+		</datafield>
+		<datafield ind1="1" ind2=" " tag="490">
+		  <subfield code="a">Ulvegutten Tal</subfield>
+		  <subfield code="v">8</subfield>
+		</datafield>
+		<datafield ind1="1" ind2=" " tag="490">
+		  <subfield code="a">Min første leseløve</subfield>
+		</datafield>
+		<datafield ind1=" " ind2=" " tag="520">
+		  <subfield code="a">Den åttende boka i serien om Tal, Nea og Shita er minst like spennende som de foregående! Nea er murr-stammens nye Tigerdronningen - selv om hun bare er ni år! I det siste har de hørt grusomme lyder fra Den glemte byen, og Nea bestemmer at de må finne ut hva som skjer. Tal og Nea blir med de modige jegerne inn i jungelen. Når de nærmer seg Den glemte byen, blir hylene høyere og mer skremmende - og plutselig ser de en stor, skummel skygge som nærmer seg...Tor Åge Bringsværd og Haakon Lie går ikke tomme for spennende og farlige eventyr for ulvegutten Tal og mammut-jenta Nea.</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="648">
+		  <subfield code="a">Steinalderen</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nob</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="648">
+		  <subfield code="a">Steinalderen</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nno</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Romaner</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nob</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Romanar</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nno</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Lettlest</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nob</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Lettlest</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nno</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Spenning</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nob</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Spenning</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nno</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Historisk litteratur</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nob</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="7" tag="655">
+		  <subfield code="a">Historisk litteratur</subfield>
+		  <subfield code="2">bokbas</subfield>
+		  <subfield code="9">nno</subfield>
+		</datafield>
+		<datafield ind1="1" ind2=" " tag="700">
+		  <subfield code="a">Lie, Haakon</subfield>
+		  <subfield code="d">1991-</subfield>
+		  <subfield code="0">(NO-TrBIB)13037663</subfield>
+		  <subfield code="4">ill</subfield>
+		</datafield>
+		<datafield ind1="1" ind2=" " tag="800">
+		  <subfield code="a">Bringsværd, Tor Åge</subfield>
+		  <subfield code="t">Ulvegutten Tal</subfield>
+		  <subfield code="v">8</subfield>
+		</datafield>
+		<datafield ind1=" " ind2="0" tag="830">
+		  <subfield code="a">Min første leseløve</subfield>
+		</datafield>
+	  </record>`
+
+		want := Ingestion{
+			Resources: []sirkulator.Resource{
+				{
+					ID:    "t1",
+					Label: "Tor Åge Bringsværd - Den glemte byen (2017)",
+					Type:  sirkulator.TypePublication,
+					Links: [][2]string{{"isbn", "9788202527921"}},
+					Data: sirkulator.Publication{
+						Title:      "Den glemte byen",
+						Publisher:  "Cappelen Damm",
+						Series:     []string{"Ulvegutten Tal", "Min første leseløve"},
+						Year:       2017,
+						Language:   "nob",
+						GenreForms: []string{"Romaner", "Lettlest", "Spenning", "Historisk litteratur"},
+						Audiences:  []vocab.Audience{vocab.TG1002, vocab.TG1006},
+						Fiction:    true,
+						NumPages:   53,
+					},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t2",
+					Label: "Tor Åge Bringsværd (1939–)",
+					Data: sirkulator.Person{
+						YearRange: sirkulator.YearRange{From: 1939},
+						Name:      "Tor Åge Bringsværd"},
+					Links: [][2]string{{"bibsys", "90058926"}},
+				},
+				{
+					Type:  sirkulator.TypePerson,
+					ID:    "t3",
+					Label: "Haakon Lie (1991–)",
+					Links: [][2]string{{"bibsys", "13037663"}},
+					Data: sirkulator.Person{
+						Name:      "Haakon Lie",
+						YearRange: sirkulator.YearRange{From: 1991},
+					},
+				},
+			},
+			Relations: []sirkulator.Relation{
+				{
+					FromID: "t1",
+					ToID:   "t2",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t3",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "ill"},
+				},
+			},
+			Reviews: []sirkulator.Relation{
+				{
+					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Cappelen Damm"},
+				},
+				{
+					FromID: "t1",
+					Type:   "in_series",
+					Data: map[string]interface{}{
+						"label":     "Ulvegutten Tal",
+						"number":    8,
+						"publisher": "Cappelen Damm",
+					},
+				},
+				{
+					FromID: "t1",
+					Type:   "in_series",
+					Data: map[string]interface{}{
+						"label":     "Min første leseløve",
+						"publisher": "Cappelen Damm",
+					},
+				},
+			},
+		}
+
+		got, err := ingestMarcRecord("bibsys/pub", marc.MustParseString(isbn9788202527921), testID())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if diff := cmp.Diff(want, got); diff != "" {
+			t.Errorf("ingestMarcRecord() mismatch (-want +got):\n%s", diff)
+		}
+	})
+
 }
 
 func TestPersonFromAuthority(t *testing.T) {

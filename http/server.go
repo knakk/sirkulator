@@ -124,6 +124,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Post("/search", s.searchResources)
 			r.Get("/corporation/{id}", s.pageCorporation)
 			r.Get("/person/{id}", s.pagePerson)
+			r.Post("/person/{id}/contributions", s.viewContributions)
 			r.Get("/publication/{id}", s.pagePublication)
 		})
 	})
@@ -243,7 +244,7 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	contrib, err := sql.GetAgentContributions(conn, id)
+	contrib, err := sql.GetAgentContributions(conn, id, "year", false)
 	if err != nil {
 		ServerError(w, err)
 		return
@@ -256,6 +257,40 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 		},
 		Resource:      res,
 		Contributions: contrib,
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) viewContributions(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	id := chi.URLParam(r, "id")
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		// TODO which statuscode/response is appropriate?
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+
+	sortBy := r.PostForm.Get("sort_by")
+	sortAsc := false
+	if r.PostForm.Get("sort_asc") == "false" {
+		sortAsc = true // toggle
+	}
+
+	contrib, err := sql.GetAgentContributions(conn, id, sortBy, sortAsc)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	tmpl := html.ViewContributions{
+		Contributions: contrib,
+		SortBy:        sortBy,
+		SortAsc:       sortAsc,
 	}
 	tmpl.Render(r.Context(), w)
 }
@@ -322,7 +357,7 @@ func (s *Server) pageCorporation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	contrib, err := sql.GetAgentContributions(conn, id)
+	contrib, err := sql.GetAgentContributions(conn, id, "year", false)
 	if err != nil {
 		ServerError(w, err)
 		return

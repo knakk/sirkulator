@@ -125,11 +125,25 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                 <thead>
                     <tr>
                         <th><%= l.Translate("Role") %></th>
-                        <th class="clickable sortable"><%= l.Translate("Year") %></th>
-                        <th class="clickable sortable"><%= l.Translate("Publication") %></th>
+                        <th class="clickable sortable"
+                            hx-post="/metadata/person/<%= tmpl.Resource.ID %>/contributions"
+                            hx-include="[name='sort_asc']"
+                            hx-vals='{"sort_by": "year"}'
+                            hx-target="#agent_contributions"
+                            hx-swap="outerHTML">
+                            <%= l.Translate("Year") %>
+                        </th>
+                        <th class="clickable sortable"
+                            hx-post="/metadata/person/<%= tmpl.Resource.ID %>/contributions"
+                            hx-include="[name='sort_asc']"
+                            hx-vals='{"sort_by": "label"}'
+                            hx-target="#agent_contributions"
+                            hx-swap="outerHTML">
+                            <%= l.Translate("Publication") %>
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="agent_contributions">
                     <% for _, c := range tmpl.Contributions { %>
                         <tr>
                             <td>
@@ -141,6 +155,12 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                             </td>
                         </tr>
                     <% } %>
+                    <tr>
+                        <td colspan="3">
+                            <input type="hidden" name="sort_by" value="year">
+                            <input type="hidden" name="sort_asc" value="false">
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 

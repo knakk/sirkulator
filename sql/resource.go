@@ -77,10 +77,23 @@ func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirku
 }
 
 // TODO orderBy year|label orderAsc bool
-func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentContribution, error) {
+func GetAgentContributions(conn *sqlite.Conn, id string, sortBy string, sortAsc bool) ([]sirkulator.AgentContribution, error) {
 	var res []sirkulator.AgentContribution
 
-	const q = `
+	sortDir := "DESC"
+	if sortAsc {
+		sortDir = "ASC"
+	}
+	switch sortBy {
+	case "year":
+	// OK
+	case "label":
+		sortBy = "res_label"
+	default:
+		sortBy = "year"
+	}
+
+	q := fmt.Sprintf(`
 	SELECT
 		r.from_id,
 		resource.type as res_type,
@@ -94,7 +107,7 @@ func GetAgentContributions(conn *sqlite.Conn, id string) ([]sirkulator.AgentCont
 		r.type='has_contributor'
 	AND to_id=?
 	GROUP BY r.from_id
-	ORDER BY year DESC`
+	ORDER BY %s %s`, sortBy, sortDir)
 
 	fn := func(stmt *sqlite.Stmt) error {
 		c := sirkulator.AgentContribution{}
