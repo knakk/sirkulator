@@ -147,17 +147,19 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	var ing Ingestion
 	if len(rec.Leader) > 33 {
 		switch rec.Leader[33] {
-		case '0':
+		case '0', 'e':
 			p.Nonfiction = true
-		case '1':
+		case '1', 'd', 'f', 'j':
 			p.Fiction = true
 		default:
+
 			// TODO:
 			/*
 				33 - Literary form (006/16)
 
 					0 - Not fiction (not further specified)
 					1 - Fiction (not further specified)
+					c - Comic strips
 					d - Dramas
 					e - Essays
 					f - Novels
@@ -176,10 +178,11 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		// Fiction/Nonfiction
 		if len(f.Value) > 33 {
 			switch f.Value[33] {
-			case '0':
+			case '0', 'e':
 				p.Nonfiction = true
-			case '1':
+			case '1', 'd', 'f', 'j':
 				p.Fiction = true
+
 			}
 		}
 		// Language
