@@ -150,3 +150,9 @@ func Prettify(s string) string {
 	}
 	return s
 }
+
+var isbnCleaner = strings.NewReplacer("ISBN", "", "isbn", "", "-", "", " ", "")
+
+func Clean(s string) string {
+	return isbnCleaner.Replace(s)
+}

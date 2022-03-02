@@ -313,7 +313,7 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePublication,
 		Label: "Per Arvid Åsen - Illustrert algeflora (1980)",
 		ID:    "t1",
-		Links: [][2]string{{"isbn", "8202018560"}},
+		Links: [][2]string{{"isbn", "82-02-01856-0"}},
 		Data:  &pubData,
 	}
 	pubGot, err := sql.GetResource(conn, sirkulator.TypePublication, "t1")

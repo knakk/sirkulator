@@ -50,6 +50,7 @@ func readLinks(res *sirkulator.Resource) func(stmt *sqlite.Stmt) error {
 		k := stmt.ColumnText(0)
 		v := stmt.ColumnText(1)
 		if k == "isbn" {
+			// TODO move this out closer to presentation layer
 			v = isbn.Prettify(v)
 		}
 		res.Links = append(res.Links, [2]string{k, v})

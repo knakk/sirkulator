@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/isbn"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/vocab"
 )
@@ -389,9 +390,8 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	}
 
 	// Publication identifiers: ISBN, ISSN, GTIN (EAN)
-	for _, isbn := range rec.ValuesAt("020", "a") {
-		// TODO clean ISBN number
-		res.Links = append(res.Links, [2]string{"isbn", isbn})
+	for _, id := range rec.ValuesAt("020", "a") {
+		res.Links = append(res.Links, [2]string{"isbn", isbn.Clean(id)})
 	}
 	for _, issn := range rec.ValuesAt("022", "a") {
 		// TODO clean ISSN number

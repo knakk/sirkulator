@@ -11,13 +11,13 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
-	"strings"
 	"time"
 
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/http/client"
+	"github.com/knakk/sirkulator/isbn"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/oai"
 	"github.com/knakk/sirkulator/search"
@@ -66,8 +66,6 @@ func NewPreviewIngestor(db *sqlitex.Pool) *Ingestor {
 	}
 }
 
-var isbnCleaner = strings.NewReplacer("-", "", " ", "") // TODO move to isbn package
-
 type ImportEntry struct {
 	Source    string // bibsys, openlibrary, discogs etc
 	Exists    bool   // allready in local DB
@@ -78,13 +76,13 @@ type ImportEntry struct {
 // IngestISBN will try to ingest a publication and related resources given an ISBN-number,
 // optionally persisting it to DB.
 // TODO refactor to remove duplication
-func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string, persist bool) ImportEntry {
-	isbn = isbnCleaner.Replace(isbn)
+func (ig *Ingestor) IngestISBN(ctx context.Context, id string, persist bool) ImportEntry {
+	id = isbn.Clean(id)
 
 	var entry ImportEntry
 
 	// 1. First check if we allready have it:
-	if res, err := ig.existingPublication(ctx, "isbn", isbn); err == nil {
+	if res, err := ig.existingPublication(ctx, "isbn", id); err == nil {
 		// ISBN is present on existing publication, so we can return with
 		// reference to that
 		entry.Source = "local"
@@ -99,7 +97,7 @@ func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string, persist bool) I
 	}
 
 	// 2. Next, look for it in local oai DB:
-	rec, err := ig.localRecord(ctx, "isbn", isbn)
+	rec, err := ig.localRecord(ctx, "isbn", id)
 	if err == nil {
 		entry.Source = rec.Source
 		data, err := ingestMarcRecord(rec.Source, rec.Data, ig.idFunc)
@@ -127,7 +125,7 @@ func (ig *Ingestor) IngestISBN(ctx context.Context, isbn string, persist bool) I
 	}
 
 	// 3. Finally, search external sources:
-	data, err := ig.remoteRecord(ctx, "isbn", isbn)
+	data, err := ig.remoteRecord(ctx, "isbn", id)
 	if errors.Is(err, sirkulator.ErrNotFound) {
 		entry.Error = sirkulator.ErrNotFound.Code
 		return entry
@@ -336,7 +334,7 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 			stmt.SetText("$type", link[0])
 			if link[0] == "isbn" {
 				// TODO move out this to a fn enforcing correct format of all IDs
-				stmt.SetText("$id", isbnCleaner.Replace(link[1]))
+				stmt.SetText("$id", isbn.Clean(link[1]))
 			} else {
 				stmt.SetText("$id", link[1])
 			}
