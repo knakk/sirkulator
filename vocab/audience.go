@@ -67,6 +67,27 @@ var audienceAliasesEn = map[Audience][]string{
 	TG1006: {"Easy-to-read text"},
 }
 
+var audienceCodes = map[string]Audience{
+	"aa": TG1000,
+	"a":  TG1001,
+	"b":  TG1002,
+	"bu": TG1003,
+	"u":  TG1004,
+	"mu": TG1005,
+	"vu": TG1015,
+	"v":  TG1016,
+	"te": TG1010,
+	"th": TG1013,
+	"tb": TG1007,
+	"td": TG1009,
+	"ta": TG1006,
+	"tj": TG1014,
+	"tc": TG1008,
+	"tg": TG1012,
+	"tf": TG1011,
+	"tk": TG1017,
+}
+
 func (a Audience) Code() string {
 	return string(a)
 }
@@ -104,6 +125,13 @@ func ParseAudience(s string) (Audience, error) {
 
 func ParseAudienceURL(s string) (Audience, error) {
 	return ParseAudience(strings.TrimPrefix(s, "https://schema.nb.no/Bibliographic/Values/"))
+}
+
+func ParseAudienceCode(s string) (Audience, error) {
+	if a, ok := audienceCodes[s]; ok {
+		return a, nil
+	}
+	return "", ErrUnknown
 }
 
 func (a Audience) MarshalJSON() ([]byte, error) {
