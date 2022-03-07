@@ -47,6 +47,17 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
     person := tmpl.Resource.Data.(*sirkulator.Person)
 %><ego:App Page=tmpl.Page>
+    <div class="sticky-top-left">
+        <button
+            class="save-resource"
+            hx-post="/metadata/person/<%= tmpl.Resource.ID %>"
+            hx-target="#person-form"
+            hx-include="#person-form">
+            Lagre
+        </button>
+        <p class="error" id="save-error-message"></p>
+        <p id="save-message"></p>
+    </div>
     <details open>
         <summary>
             <h3><%= tmpl.Resource.Label %></h3>
@@ -55,40 +66,10 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
             <div class="column column-wide pad">
                 <h4><%= l.Translate("Properties") %></h4>
                 <p><br/></p>
-                <form>
-
-                    <fieldset>
-                        <legend><%= l.Translate("Personalia") %></legend>
-                        <div>
-                            <input id="person_name" name="person_name" type="text" size="50" value="<%= person.Name %>">
-                            <label for="person_name"><%= l.Translate("Name") %></label>
-                        </div>
-                        <div>
-                            <input id="person_description_short" name="person_description_short" type="text" size="50" value="">
-                            <label for="person_description_short"><%= l.Translate("Short description") %></label>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend><%= l.Translate("Lifespan") %></legend>
-                        <div>
-                            <input id="person_birthyear" name="person_birthyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(person.YearRange.From) %>">
-                            <label for="person_birthyear"><%= l.Translate("Birthyear") %></label>
-                        </div>
-                        <div>
-                            <input id="person_deathyear" name="person_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(person.YearRange.To) %>">
-                            <label for="person_deathyear"><%= l.Translate("Deathyear") %></label>
-                        </div>
-                        <div>
-                            <% if person.YearRange.Approx { %>
-                                <input id="person_lifespan_approx" name="person_lifespan_approx" type="checkbox" checked>
-                            <% } else { %>
-                                <input id="person_lifespan_approx" name="person_lifespan_approx" type="checkbox">
-                            <% } %>
-                            <label for="person_lifespan_approx"><%= l.Translate("approximate") %></label>
-                        </div>
-                    </fieldset>
-                </form>
+                <ego:PersonForm
+                    Person=person
+                    Localizer=l
+                    UpdatedAt=tmpl.Resource.UpdatedAt.Unix() />
             </div>
             <div class="column pad">
                 <h4><%= l.Translate("Identificators and links") %></h4>
@@ -177,5 +158,58 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
 
         </div>
     </details>
+    <script>
+        document.body.addEventListener("htmx:beforeSwap", function(evt) {
+            if (evt.target.id !== "person-form") {
+                // not a save resource request
+                return;
+            }
+            if (evt.detail.xhr.status === 404){
+                document.getElementById("save-error-message")
+                    .innerHTML = "<%= l.Translate("Resource not found.") %>";
+            } else if (evt.detail.xhr.status === 409) {
+                document.getElementById("save-message")
+                    .innerHTML = "";
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false; // avoid error logging in console
+                evt.detail.target = htmx.find("#save-error-message");
+            } else if (evt.detail.xhr.status === 400) {
+                document.getElementById("save-error-message")
+                    .innerHTML = "<%= l.Translate("Validation failed. Check input fields.") %>";
+                evt.detail.shouldSwap = true;
+                // form is populated again, error messages displayed by CSS rules
+            } else if (evt.detail.xhr.status === 200) {
+                document.getElementById("save-error-message")
+                    .innerHTML = "";
+                document.getElementById("save-message")
+                    .innerHTML = "<%= l.Translate("OK, saved.") %>";
+            } else if (evt.detail.xhr.status === 204) {
+                 document.getElementById("save-error-message")
+                    .innerHTML = "";
+                 document.getElementById("save-message")
+                    .innerHTML = "<%= l.Translate("No changes.") %>";
+            }
+        });
+
+        document.body.addEventListener('htmx:sendError', function(evt) {
+             if (evt.target.id !== "person-form") {
+                return;
+            }
+            document.getElementById("save-message")
+                    .innerHTML = "";
+            document.getElementById("save-error-message")
+                .innerHTML = "<%= l.Translate("Network error. Server unreachable. Check your connection") %>";
+        });
+
+
+        function removeTerm(e) {
+            e.target.closest("li").remove();
+        };
+
+         // TODO create "selected-term" web component and bundle removal js code with it
+        document.querySelectorAll(".unselect-term").forEach(
+            e => e.addEventListener("click", (e) => removeTerm(e)));
+
+    </script>
 </ego:App>
 <% } %>

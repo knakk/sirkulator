@@ -1,6 +1,7 @@
 package etl
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"github.com/knakk/sirkulator/isbn"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/vocab"
+	"github.com/knakk/sirkulator/vocab/iso3166"
 )
 
 // TODO more candidates: https://gist.github.com/boutros/221499f95397a4987a70ce726455319e
@@ -151,6 +153,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			p.Nonfiction = true
 		case '1', 'd', 'f', 'j':
 			p.Fiction = true
+			// TODO also map to GenreForms?
 		default:
 
 			// TODO:
@@ -182,7 +185,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 				p.Nonfiction = true
 			case '1', 'd', 'f', 'j':
 				p.Fiction = true
-
+				// TODO also map to GenreForms?
 			}
 		}
 		// Language
@@ -193,6 +196,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 				p.Language = lang
 			}
 		}
+		// TODO audience pos 22: a=adult, j=juvenile
 	}
 
 	if f, ok := rec.DataFieldAt("041"); ok {
@@ -496,6 +500,8 @@ func parseYearRange(s string) sirkulator.YearRange {
 		n, _ := strconv.Atoi(s[start:pos]) // ignoring err since we know we got all digits
 		return n
 	}
+	to, from := 0, 0
+scanning:
 	for pos <= len(s) {
 		r, w = utf8.DecodeRuneInString(s[pos:])
 		pos += w
@@ -503,14 +509,14 @@ func parseYearRange(s string) sirkulator.YearRange {
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			start = pos - w
 			if parsingTo {
-				res.To = consumeYear()
+				to = consumeYear()
 			} else {
-				res.From = consumeYear()
+				from = consumeYear()
 			}
 		case '-':
 			if peekHas("-tallet") {
 				res.Approx = true
-				res.To = res.From + 100
+				to = from + 100
 			} else {
 				parsingTo = true
 			}
@@ -524,30 +530,36 @@ func parseYearRange(s string) sirkulator.YearRange {
 			}
 		case 'f':
 			if peekHas("f.kr.") {
-				res.From *= -1
-				res.To *= -1
+				from *= -1
+				to *= -1
 			}
 		case 't':
 			if peekHas("th cent") {
-				res.From = (res.From - 1) * 100
-				res.To = res.From + 100
+				from = (from - 1) * 100
+				to = from + 100
 				res.Approx = true
 			}
 		case 'å':
 			if peekHas("årh. f.kr") {
-				res.From *= -100
-				res.To = res.From + 100
+				from *= -100
+				to = from + 100
 				res.Approx = true
 			} else if peekHas("årh.") {
-				res.From = (res.From - 1) * 100
-				res.To = res.From + 100
+				from = (from - 1) * 100
+				to = from + 100
 				res.Approx = true
 			}
 		default:
 			if r == utf8.RuneError { // eof
-				return res
+				break scanning
 			}
 		}
+	}
+	if from != 0 {
+		res.From = json.Number(strconv.Itoa(from))
+	}
+	if to != 0 {
+		res.To = json.Number(strconv.Itoa(to))
 	}
 	return res
 }
@@ -605,12 +617,17 @@ func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 		}
 	}
 
+	// Associated countries
 	for _, country := range rec.ValuesAt("043", "c") {
-		person.PlaceAssociations = append(person.PlaceAssociations, "marc/"+country)
+		if alpha2, err := iso3166.ParseAlpha2(country); err == nil {
+			person.Countries = append(person.Countries, alpha2.URI())
+		}
 	}
+
+	// Associated nationalities
 	if f, ok := rec.DataFieldAt("386"); ok && f.ValueAt("2") == "bs-nasj" {
 		for _, nationality := range strings.Split(f.ValueAt("a"), "-") {
-			person.PlaceAssociations = append(person.PlaceAssociations, "bs/"+nationality)
+			person.Nationalities = append(person.Nationalities, "bs/"+nationality)
 		}
 	}
 

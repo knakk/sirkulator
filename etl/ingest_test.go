@@ -248,7 +248,7 @@ func TestIngestISBN(t *testing.T) {
 	personWant := sirkulator.Person{
 		Name: "Per Arvid Åsen",
 		YearRange: sirkulator.YearRange{
-			From: 1949,
+			From: "1949",
 		},
 	}
 	b := mustJson(personWant)
@@ -529,10 +529,11 @@ func TestIngestPersonFromLocalOAI(t *testing.T) {
 		Data: &sirkulator.Person{
 			Name: "Per Arvid Åsen",
 			YearRange: sirkulator.YearRange{
-				From: 1949,
+				From: "1949",
 			},
-			Gender:            vocab.GenderMale,
-			PlaceAssociations: []string{"marc/no", "bs/n."},
+			Gender:        vocab.GenderMale,
+			Countries:     []string{"iso3361/no"},
+			Nationalities: []string{"bs/n."},
 		},
 	}
 	perGot, err := sql.GetResource(conn, sirkulator.TypePerson, "t2")

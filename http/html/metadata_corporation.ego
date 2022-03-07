@@ -48,11 +48,11 @@ func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
                     <fieldset>
                         <legend><%= l.Translate("Lifespan") %></legend>
                         <div>
-                            <input id="corp_foundationyear" name="corp_foundationyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(corp.YearRange.From) %>">
+                            <input id="corp_foundationyear" name="corp_foundationyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= corp.YearRange.From %>">
                             <label for="corp_foundationyear"><%= l.Translate("Foundation year") %></label>
                         </div>
                         <div>
-                            <input id="corp_deathyear" name="corp_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= notZero(corp.YearRange.To) %>">
+                            <input id="corp_deathyear" name="corp_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= corp.YearRange.To %>">
                             <label for="corp_deathyear"><%= l.Translate("Disestablishment year") %></label>
                         </div>
                         <div>

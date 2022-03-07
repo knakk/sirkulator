@@ -230,4 +230,24 @@ func GetImage(conn *sqlite.Conn, id string) (*sirkulator.Image, error) {
 	return &img, nil
 }
 
+func UpdateResource(conn *sqlite.Conn, res sirkulator.Resource) (err error) {
+	defer sqlitex.Save(conn)(&err)
+	stmt := conn.Prep(`
+			UPDATE resource SET data=$data, updated_at=$updated_at
+			WHERE id=$id
+		`)
+
+	stmt.SetText("$id", res.ID)
+	stmt.SetInt64("$updated_at", time.Now().Unix())
+	b, err := json.Marshal(res.Data)
+	if err != nil {
+		return err // TODO annotate
+	}
+	stmt.SetBytes("$data", b)
+	if _, err := stmt.Step(); err != nil {
+		return err // TODO annotate
+	}
+	return nil
+}
+
 //func GetOAIRecord(conn *sqlite.Conn, source,id string) (oai.Record, error) {}

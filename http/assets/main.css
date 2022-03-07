@@ -6,12 +6,14 @@ body                             { line-height: 1.5; -webkit-font-smoothing: ant
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
 input, button, textarea, select  { font: inherit; }
 p, h1, h2, h3, h4, h5, h6        { overflow-wrap: break-word; }
+ul                               { list-style-type: none; margin: 0; padding: 0}
 
 /* Variables */
 * {
     --textcolor: #121212;
     --bgcolor: #fff;
     --gray-bg: #f5f5f5;
+    --gray-bg-em: #d4d4d4;
     --green-bg: #ccffd8;
     --green-bg-em: #abf2bc;
     --red-bg: #ffebe9;
@@ -42,17 +44,38 @@ table td.right { text-align: right; padding-right: 1em; }
 
 label    { font-weight: bold; }
 
+input:invalid  { background-color: var(--red-bg); }
+fieldset p.validation { visibility: hidden; color: red }
+input:not(:focus):invalid ~ p.validation { visibility: visible; }
+
+input:focus,
+textarea:focus        { outline: 0; box-shadow: 0 0 0 4px lightskyblue; }
+
 fieldset       { margin-bottom: 1rem; }
-fieldset div   { display: flex; align-items: center; margin-bottom: 0.5rem; }
-fieldset label { order: 1; text-align: right; width: 10rem; padding-right: 1rem; white-space: nowrap; user-select: none; cursor: pointer; }
-fieldset input,
-fieldset textarea { order: 2; }
-fieldset textarea { flex: 1 1 auto }
+fieldset .field { clear: both; }
+.field p, .field ul { clear: both;float:right; width: 75%; }
+.field ul li { display: inline-block; margin-right: 1rem }
+
+.field label { float: left; text-align: right; margin-right:2rem; width: 20%; vertical-align: top; user-select: none; cursor: pointer; }
+fieldset input[type="text"],
+fieldset textarea { float:right; width: 75% }
 fieldset input[type="checkbox"],
-fieldset input[type="radio"] { order: 1; flex: none; width: auto; margin-left: 10em; }
-fieldset input[type="checkbox"] ~ label, input[type="radio"] ~ label { width: auto; text-align: left; padding-left: 1rem; }
-fieldset input:focus ~ label,
+fieldset .field input[type="radio"] { margin-right: 33rem; width: auto}
+fieldset input[type="text"]:focus ~ label,
+fieldset input[type="search"]:focus ~ label,
+fieldset input[type="checkbox"]:focus ~ label,
 fieldset textarea:focus ~ label { color: blue  }
+.field .selected-term, button.unselect-term { color: var(--textcolor); padding: 0.2rem 0.5rem;  border: 1px solid var(--textcolor);
+                                  appearance: none; background-color: #ddd; opacity: 0.8;  }
+.field .selected-term { border-radius: 0 0 0 0.5rem; border-right:0 }
+button.unselect-term { border-radius: 0 0.5rem 0 0; cursor: pointer; border-left:0 }
+button.unselect-term span { background-color: #bbb;}
+.radiofield { clear: both; padding-top: 1rem; }
+.radiofield .label { float: left; width: 20%; margin-right:2rem; text-align: right; font-weight:bold }
+.radiofield .radioptions { float: right; width: 75% }
+.radiofield input { width: 2rem;}
+.radiofield label { display: inline-block; cursor: pointer }
+.radiofield input[type="radio"]:focus + label { color: blue}
 
 details summary     { cursor: pointer;  background: lightsteelblue; padding: .5rem 1rem;}
 details summary > * { display: inline; }
@@ -70,6 +93,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 .row     { display: flex; flex-wrap: wrap; width: 100%; }
 .column  { display: flex; flex-direction: column; flex: 1; }
 .column-wide { flex: 2 }
+.column-xwide { flex: 3 }
 
 .pad      { padding: 1rem; }
 .pad-left { padding-left: 1rem; }
@@ -107,3 +131,7 @@ th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
 tr.review { background: #eee }
 
 /* person page */
+
+.sticky-top-left { position: sticky; top: 1rem; float: left; margin-left: -11rem; text-align: right; width: 10rem }
+.sticky-top-left p { margin-top: 1rem; }
+.error { background-color: var(--red-bg);}

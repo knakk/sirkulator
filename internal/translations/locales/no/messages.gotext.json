@@ -77,19 +77,14 @@
             "translation": "vent..."
         },
         {
-            "id": "Already in catalogue",
-            "message": "Already in catalogue",
-            "translation": "Allerede i katalogen"
-        },
-        {
             "id": "Properties",
             "message": "Properties",
             "translation": "Egenskaper"
         },
         {
-            "id": "Personalia",
-            "message": "Personalia",
-            "translation": "Personalia"
+            "id": "Basic information",
+            "message": "Basic information",
+            "translation": "Grunnleggende informasjon"
         },
         {
             "id": "Name",
@@ -102,24 +97,29 @@
             "translation": "Kort beskrivelse"
         },
         {
+            "id": "Parent name",
+            "message": "Parent name",
+            "translation": ""
+        },
+        {
             "id": "Lifespan",
             "message": "Lifespan",
             "translation": "Levetid"
         },
         {
-            "id": "Birthyear",
-            "message": "Birthyear",
-            "translation": "Fødselsår"
+            "id": "Foundation year",
+            "message": "Foundation year",
+            "translation": ""
         },
         {
-            "id": "Deathyear",
-            "message": "Deathyear",
-            "translation": "Dødsår"
+            "id": "Disestablishment year",
+            "message": "Disestablishment year",
+            "translation": ""
         },
         {
-            "id": "approximate",
-            "message": "approximate",
-            "translation": "omtrentelig"
+            "id": "uncertain",
+            "message": "uncertain",
+            "translation": ""
         },
         {
             "id": "Identificators and links",
@@ -150,6 +150,36 @@
             "id": "Other relations",
             "message": "Other relations",
             "translation": "Andre relasjoner"
+        },
+        {
+            "id": "Already in catalogue",
+            "message": "Already in catalogue",
+            "translation": "Allerede i katalogen"
+        },
+        {
+            "id": "Resource not found.",
+            "message": "Resource not found.",
+            "translation": "Ressurs ikke funnet"
+        },
+        {
+            "id": "Validation failed. Check input fields.",
+            "message": "Validation failed. Check input fields.",
+            "translation": "Validering feilet. Sjekk inputfeltene."
+        },
+        {
+            "id": "OK, saved.",
+            "message": "OK, saved.",
+            "translation": "OK, lagret."
+        },
+        {
+            "id": "No changes.",
+            "message": "No changes.",
+            "translation": "Ingen endringer"
+        },
+        {
+            "id": "Network error. Server unreachable. Check your connection",
+            "message": "Network error. Server unreachable. Check your connection",
+            "translation": "Nettverksfeil. Kan ikke nå tjener. Sjekk forbindelsen."
         },
         {
             "id": "Tittel",
@@ -268,6 +298,66 @@
                     "expr": "sr.Results.Time"
                 }
             ]
+        },
+        {
+            "id": "Personalia",
+            "message": "Personalia",
+            "translation": "Personalia"
+        },
+        {
+            "id": "Required field",
+            "message": "Required field",
+            "translation": "Påkrevd felt"
+        },
+        {
+            "id": "Description (short)",
+            "message": "Description (short)",
+            "translation": "Kort beskrivelse"
+        },
+        {
+            "id": "Name variations",
+            "message": "Name variations",
+            "translation": "Navnevarianter"
+        },
+        {
+            "id": "One entry per line",
+            "message": "One entry per line",
+            "translation": "En innførsel per linje"
+        },
+        {
+            "id": "Gender",
+            "message": "Gender",
+            "translation": "Kjønn"
+        },
+        {
+            "id": "Associated country/area",
+            "message": "Associated country/area",
+            "translation": "Assosiert land/område"
+        },
+        {
+            "id": "Associated nationality",
+            "message": "Associated nationality",
+            "translation": "Assosiert nasjonalitet"
+        },
+        {
+            "id": "Birthyear",
+            "message": "Birthyear",
+            "translation": "Fødselsår"
+        },
+        {
+            "id": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "message": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "translation": "År må være et 1-4 sifret heltall. Negative tall betyr BCE."
+        },
+        {
+            "id": "Deathyear",
+            "message": "Deathyear",
+            "translation": "Dødsår"
+        },
+        {
+            "id": "Uncertain",
+            "message": "Uncertain",
+            "translation": "Usikkert"
         }
     ]
 }

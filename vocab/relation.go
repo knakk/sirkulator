@@ -5,7 +5,6 @@ import (
 	"golang.org/x/text/language"
 )
 
-// TODO rename to just Relation
 type Relation string
 
 const (

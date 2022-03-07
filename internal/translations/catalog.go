@@ -39,120 +39,161 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d hits (%v)":                   49,
-	"1 per line":                     12,
-	"Agent":                          47,
-	"Already in catalogue":           15,
-	"Binding":                        41,
-	"Birthyear":                      21,
-	"Circulation":                    1,
-	"Configuration":                  5,
-	"Content":                        34,
-	"Contributions and relations":    45,
-	"Cover-image":                    43,
-	"Deathyear":                      22,
-	"Edition":                        33,
-	"Fiction":                        37,
-	"Genre and forms":                39,
-	"Holdings":                       4,
-	"Home":                           0,
-	"ISBN, ISSN or EAN":              11,
-	"Identificators and links":       24,
-	"Identifiers":                    10,
-	"Import":                         9,
-	"Lifespan":                       20,
-	"Main language":                  35,
-	"Metadata":                       3,
-	"Name":                           18,
-	"Nonfiction":                     38,
-	"Number of pages":                42,
-	"Orders":                         2,
-	"Other languages":                36,
-	"Other relations":                29,
-	"Personalia":                     17,
-	"Physical characteristics":       40,
-	"Preview":                        13,
-	"Properties":                     16,
-	"Publication":                    28,
-	"Publication cover-image":        44,
-	"Publications and contributions": 25,
-	"Publisher":                      32,
-	"Role":                           26,
-	"Role/relation":                  46,
-	"Search and connect to resource": 48,
-	"Search/browse catalogue":        8,
-	"Short description":              19,
-	"Show metadata for review":       7,
-	"Show recent transactions":       6,
-	"Subtitle":                       31,
-	"Tittel":                         30,
-	"Year":                           27,
-	"approximate":                    23,
-	"wait...":                        14,
+	"%d hits (%v)":                55,
+	"1 per line":                  12,
+	"Agent":                       53,
+	"Already in catalogue":        30,
+	"Associated country/area":     62,
+	"Associated nationality":      63,
+	"Basic information":           16,
+	"Binding":                     47,
+	"Birthyear":                   64,
+	"Circulation":                 1,
+	"Configuration":               5,
+	"Content":                     40,
+	"Contributions and relations": 51,
+	"Cover-image":                 49,
+	"Deathyear":                   66,
+	"Description (short)":         58,
+	"Disestablishment year":       22,
+	"Edition":                     39,
+	"Fiction":                     43,
+	"Foundation year":             21,
+	"Gender":                      61,
+	"Genre and forms":             45,
+	"Holdings":                    4,
+	"Home":                        0,
+	"ISBN, ISSN or EAN":           11,
+	"Identificators and links":    24,
+	"Identifiers":                 10,
+	"Import":                      9,
+	"Lifespan":                    20,
+	"Main language":               41,
+	"Metadata":                    3,
+	"Name":                        17,
+	"Name variations":             59,
+	"Network error. Server unreachable. Check your connection": 35,
+	"No changes.":                            34,
+	"Nonfiction":                             44,
+	"Number of pages":                        48,
+	"OK, saved.":                             33,
+	"One entry per line":                     60,
+	"Orders":                                 2,
+	"Other languages":                        42,
+	"Other relations":                        29,
+	"Parent name":                            19,
+	"Personalia":                             56,
+	"Physical characteristics":               46,
+	"Preview":                                13,
+	"Properties":                             15,
+	"Publication":                            28,
+	"Publication cover-image":                50,
+	"Publications and contributions":         25,
+	"Publisher":                              38,
+	"Required field":                         57,
+	"Resource not found.":                    31,
+	"Role":                                   26,
+	"Role/relation":                          52,
+	"Search and connect to resource":         54,
+	"Search/browse catalogue":                8,
+	"Short description":                      18,
+	"Show metadata for review":               7,
+	"Show recent transactions":               6,
+	"Subtitle":                               37,
+	"Tittel":                                 36,
+	"Uncertain":                              67,
+	"Validation failed. Check input fields.": 32,
+	"Year":                                   27,
+	"Year must be a 1-4 digit number. Negative numbers signify BCE.": 65,
+	"uncertain": 23,
+	"wait...":   14,
 }
 
-var enIndex = []uint32{ // 51 elements
+var enIndex = []uint32{ // 69 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000051,
 	0x0000006a, 0x00000082, 0x00000089, 0x00000095,
 	0x000000a7, 0x000000b2, 0x000000ba, 0x000000c2,
-	0x000000d7, 0x000000e2, 0x000000ed, 0x000000f2,
-	0x00000104, 0x0000010d, 0x00000117, 0x00000121,
-	0x0000012d, 0x00000146, 0x00000165, 0x0000016a,
-	0x0000016f, 0x0000017b, 0x0000018b, 0x00000192,
+	0x000000cd, 0x000000df, 0x000000e4, 0x000000f6,
+	0x00000102, 0x0000010b, 0x0000011b, 0x00000131,
+	0x0000013b, 0x00000154, 0x00000173, 0x00000178,
+	0x0000017d, 0x00000189, 0x00000199, 0x000001ae,
 	// Entry 20 - 3F
-	0x0000019b, 0x000001a5, 0x000001ad, 0x000001b5,
-	0x000001c3, 0x000001d3, 0x000001db, 0x000001e6,
-	0x000001f6, 0x0000020f, 0x00000217, 0x00000227,
-	0x00000233, 0x0000024b, 0x00000267, 0x00000275,
-	0x0000027b, 0x0000029a, 0x000002ad,
-} // Size: 228 bytes
+	0x000001c2, 0x000001e9, 0x000001f4, 0x00000200,
+	0x00000239, 0x00000240, 0x00000249, 0x00000253,
+	0x0000025b, 0x00000263, 0x00000271, 0x00000281,
+	0x00000289, 0x00000294, 0x000002a4, 0x000002bd,
+	0x000002c5, 0x000002d5, 0x000002e1, 0x000002f9,
+	0x00000315, 0x00000323, 0x00000329, 0x00000348,
+	0x0000035b, 0x00000366, 0x00000375, 0x00000389,
+	0x00000399, 0x000003ac, 0x000003b3, 0x000003cb,
+	// Entry 40 - 5F
+	0x000003e2, 0x000003ec, 0x0000042b, 0x00000435,
+	0x0000043f,
+} // Size: 300 bytes
 
-const enData string = "" + // Size: 685 bytes
+const enData string = "" + // Size: 1087 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Show recent transactions\x02Show metadata for review\x02Search/bro" +
 	"wse catalogue\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
-	"e\x02Preview\x02wait...\x02Already in catalogue\x02Properties\x02Persona" +
-	"lia\x02Name\x02Short description\x02Lifespan\x02Birthyear\x02Deathyear" +
-	"\x02approximate\x02Identificators and links\x02Publications and contribu" +
-	"tions\x02Role\x02Year\x02Publication\x02Other relations\x02Tittel\x02Sub" +
-	"title\x02Publisher\x02Edition\x02Content\x02Main language\x02Other langu" +
-	"ages\x02Fiction\x02Nonfiction\x02Genre and forms\x02Physical characteris" +
-	"tics\x02Binding\x02Number of pages\x02Cover-image\x02Publication cover-i" +
-	"mage\x02Contributions and relations\x02Role/relation\x02Agent\x02Search " +
-	"and connect to resource\x02%[1]d hits (%[2]v)"
+	"e\x02Preview\x02wait...\x02Properties\x02Basic information\x02Name\x02Sh" +
+	"ort description\x02Parent name\x02Lifespan\x02Foundation year\x02Disesta" +
+	"blishment year\x02uncertain\x02Identificators and links\x02Publications " +
+	"and contributions\x02Role\x02Year\x02Publication\x02Other relations\x02A" +
+	"lready in catalogue\x02Resource not found.\x02Validation failed. Check i" +
+	"nput fields.\x02OK, saved.\x02No changes.\x02Network error. Server unrea" +
+	"chable. Check your connection\x02Tittel\x02Subtitle\x02Publisher\x02Edit" +
+	"ion\x02Content\x02Main language\x02Other languages\x02Fiction\x02Nonfict" +
+	"ion\x02Genre and forms\x02Physical characteristics\x02Binding\x02Number " +
+	"of pages\x02Cover-image\x02Publication cover-image\x02Contributions and " +
+	"relations\x02Role/relation\x02Agent\x02Search and connect to resource" +
+	"\x02%[1]d hits (%[2]v)\x02Personalia\x02Required field\x02Description (s" +
+	"hort)\x02Name variations\x02One entry per line\x02Gender\x02Associated c" +
+	"ountry/area\x02Associated nationality\x02Birthyear\x02Year must be a 1-4" +
+	" digit number. Negative numbers signify BCE.\x02Deathyear\x02Uncertain"
 
-var noIndex = []uint32{ // 51 elements
+var noIndex = []uint32{ // 69 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000055,
 	0x00000075, 0x0000008a, 0x00000093, 0x000000a3,
 	0x000000b8, 0x000000c4, 0x000000d1, 0x000000d9,
-	0x000000ee, 0x000000f9, 0x00000104, 0x00000109,
-	0x0000011a, 0x00000122, 0x0000012e, 0x00000137,
-	0x00000143, 0x0000015d, 0x00000172, 0x00000178,
-	0x0000017c, 0x00000186, 0x00000197, 0x0000019e,
+	0x000000e4, 0x000000fe, 0x00000103, 0x00000114,
+	0x00000114, 0x0000011c, 0x0000011c, 0x0000011c,
+	0x0000011c, 0x00000136, 0x0000014b, 0x00000151,
+	0x00000155, 0x0000015f, 0x00000170, 0x00000185,
 	// Entry 20 - 3F
-	0x000001aa, 0x000001b2, 0x000001b9, 0x000001c1,
-	0x000001d1, 0x000001de, 0x000001e6, 0x000001ea,
-	0x000001fa, 0x0000020d, 0x00000219, 0x00000222,
-	0x0000022f, 0x00000248, 0x0000025d, 0x0000026c,
-	0x00000273, 0x0000028d, 0x000002a1,
-} // Size: 228 bytes
+	0x00000199, 0x000001c0, 0x000001cc, 0x000001dc,
+	0x00000214, 0x0000021b, 0x00000227, 0x0000022f,
+	0x00000236, 0x0000023e, 0x0000024e, 0x0000025b,
+	0x00000263, 0x00000267, 0x00000277, 0x0000028a,
+	0x00000296, 0x0000029f, 0x000002ac, 0x000002c5,
+	0x000002da, 0x000002e9, 0x000002f0, 0x0000030a,
+	0x0000031e, 0x00000329, 0x00000337, 0x00000348,
+	0x00000357, 0x0000036f, 0x00000376, 0x0000038d,
+	// Entry 40 - 5F
+	0x000003a4, 0x000003b0, 0x000003ee, 0x000003f7,
+	0x00000400,
+} // Size: 300 bytes
 
-const noData string = "" + // Size: 673 bytes
+const noData string = "" + // Size: 1024 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vis siste transaksjoner\x02Vis opplysninger til gjennomsyn" +
 	"\x02Søk/bla i katalogen\x02Importer\x02Identifikatorer\x02ISBN, ISSN ell" +
-	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02Allerede i katalogen" +
-	"\x02Egenskaper\x02Personalia\x02Navn\x02Kort beskrivelse\x02Levetid\x02F" +
-	"ødselsår\x02Dødsår\x02omtrentelig\x02Identifikatorer og lenker\x02Utgiv" +
-	"elser og bidrag\x02Rolle\x02År\x02Utgivelse\x02Andre relasjoner\x02Titte" +
-	"l\x02Undertittel\x02Utgiver\x02Utgave\x02Innhold\x02Språk (hoved-)\x02An" +
-	"dre språk\x02Fiksjon\x02Fag\x02Sjanger og form\x02Fysiske egenskaper\x02" +
-	"Innbdinding\x02Sidetall\x02Forsidebilde\x02Utgivelsens forsidebilde\x02B" +
-	"idrag og relasjoner\x02Rolle/relasjon\x02Aktør\x02Søk og koble til ressu" +
-	"rs\x02%[1]d treff (%[2]v)"
+	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02Egenskaper\x02Grunnle" +
+	"ggende informasjon\x02Navn\x02Kort beskrivelse\x02Levetid\x02Identifikat" +
+	"orer og lenker\x02Utgivelser og bidrag\x02Rolle\x02År\x02Utgivelse\x02An" +
+	"dre relasjoner\x02Allerede i katalogen\x02Ressurs ikke funnet\x02Valider" +
+	"ing feilet. Sjekk inputfeltene.\x02OK, lagret.\x02Ingen endringer\x02Net" +
+	"tverksfeil. Kan ikke nå tjener. Sjekk forbindelsen.\x02Tittel\x02Underti" +
+	"ttel\x02Utgiver\x02Utgave\x02Innhold\x02Språk (hoved-)\x02Andre språk" +
+	"\x02Fiksjon\x02Fag\x02Sjanger og form\x02Fysiske egenskaper\x02Innbdindi" +
+	"ng\x02Sidetall\x02Forsidebilde\x02Utgivelsens forsidebilde\x02Bidrag og " +
+	"relasjoner\x02Rolle/relasjon\x02Aktør\x02Søk og koble til ressurs\x02%[1" +
+	"]d treff (%[2]v)\x02Personalia\x02Påkrevd felt\x02Kort beskrivelse\x02Na" +
+	"vnevarianter\x02En innførsel per linje\x02Kjønn\x02Assosiert land/område" +
+	"\x02Assosiert nasjonalitet\x02Fødselsår\x02År må være et 1-4 sifret helt" +
+	"all. Negative tall betyr BCE.\x02Dødsår\x02Usikkert"
 
-	// Total table size 1814 bytes (1KiB); checksum: 6809D483
+	// Total table size 2711 bytes (2KiB); checksum: B4DFA863

@@ -1,7 +1,9 @@
 package sirkulator
 
 import (
+	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -114,17 +116,12 @@ type SimpleResource struct {
 
 // YearRange represents a span of years, with a from and to year,
 // and a specification if it is accurate (Approx=false) or approximate (Approx=true).
-// The year value 0 is interpreted as unknown/no value, which means that
-// we cannot represent the acutaly year 0.
-// Either From or To can be 0, denoting unknown start or end of span.
-// A zero value of the struct, where both From and To are 0, is not really
-// usefull and is to be interpreted as unknown/no value.
-// TODO consider pointer to int so that we can distinquish between unkown
-// and year 0.
+// Using json.Number instead of int allow us to distinguish between year 0 and no value.
+// It also simplifies form validation.
 type YearRange struct {
-	From   int  `json:"from"`
-	To     int  `json:"to"`
-	Approx bool `json:"approx"` // TODO or "CA"?
+	From   json.Number `json:"from,omitempty"`
+	To     json.Number `json:"to,omitempty"`
+	Approx bool        `json:"approx"`
 	// TODO consider ApproxFrom and ApproxTo instead of Approx
 	// TODO consider Active (=Virksom) bool
 }
@@ -136,28 +133,28 @@ func (yr YearRange) String() string {
 	if yr.Approx {
 		s.WriteString("ca. ")
 	}
-	if yr.From != 0 {
-		if yr.From < 0 {
-			s.WriteString(strconv.Itoa(yr.From * -1))
-			if yr.To > 0 {
+	if yr.From != "" {
+		if strings.HasPrefix(string(yr.From), "-") {
+			s.WriteString(string(yr.From)[1:])
+			if !strings.HasPrefix(string(yr.To), "-") {
 				s.WriteString(" BCE")
 			}
 		} else {
-			s.WriteString(strconv.Itoa(yr.From))
+			s.WriteString(string(yr.From))
 		}
 	} else {
 		s.WriteString("?")
 	}
-	s.WriteString("–") // or -
-	if yr.To != 0 {
-		if yr.To < 0 {
-			s.WriteString(strconv.Itoa(yr.To * -1))
-			if yr.From < 0 {
+	s.WriteString("–")
+	if yr.To != "" {
+		if strings.HasPrefix(string(yr.To), "-") {
+			s.WriteString(string(yr.To)[1:])
+			if strings.HasPrefix(string(yr.From), "-") {
 				s.WriteString(" BCE")
 			}
 		} else {
-			s.WriteString(strconv.Itoa(yr.To))
-			if yr.From < 0 {
+			s.WriteString(string(yr.To))
+			if strings.HasPrefix(string(yr.From), "-") {
 				s.WriteString(" AD")
 			}
 		}
@@ -179,51 +176,60 @@ func (yr YearRange) Label(tag language.Tag) string {
 	}
 }
 
+var rxpYear = regexp.MustCompile(`^-?\d{1,4}$`)
+
+func (yr YearRange) Valid() bool {
+	return (yr.From == "" || rxpYear.MatchString(string(yr.From))) &&
+		(yr.To == "" || rxpYear.MatchString(string(yr.To)))
+}
+
 func (yr YearRange) noLabel() string {
 	var s strings.Builder
 	if yr.Approx {
-		if yr.From%100 == 0 && yr.To%100 == 0 {
-			if yr.To-yr.From > 100 {
-				s.WriteString(strconv.Itoa(yr.From / 100))
+		if strings.HasSuffix(string(yr.From), "00") && strings.HasSuffix(string(yr.To), "00") {
+			from, _ := strconv.Atoi(string(yr.From))
+			to, _ := strconv.Atoi(string(yr.To))
+			if to-from > 100 {
+				s.WriteString(strconv.Itoa(from / 100))
 				s.WriteString("/")
-				s.WriteString(strconv.Itoa(yr.To - 100))
+				s.WriteString(strconv.Itoa(to - 100))
 			} else {
-				if yr.From < 0 {
-					s.WriteString(strconv.Itoa(yr.From * -1))
+				if strings.HasPrefix(string(yr.From), "-") {
+					s.WriteString(string(yr.From)[1:])
 				} else {
-					s.WriteString(strconv.Itoa(yr.From))
+					s.WriteString(string(yr.From))
 				}
 			}
 			s.WriteString("-tallet")
-			if yr.To < 0 {
+			if strings.HasPrefix(string(yr.To), "-") {
 				s.WriteString(" f.Kr")
 			}
 			return s.String()
 		}
 		s.WriteString("ca. ")
 	}
-	if yr.From != 0 {
-		if yr.From < 0 {
-			s.WriteString(strconv.Itoa(yr.From * -1))
-			if yr.To > 0 {
+	if yr.From != "" {
+		if strings.HasPrefix(string(yr.From), "-") {
+			s.WriteString(string(yr.From)[1:])
+			if !strings.HasPrefix(string(yr.To), "-") {
 				s.WriteString(" f.Kr")
 			}
 		} else {
-			s.WriteString(strconv.Itoa(yr.From))
+			s.WriteString(string(yr.From))
 		}
 	} else {
 		s.WriteString("?")
 	}
-	s.WriteString("–") // or -
-	if yr.To != 0 {
-		if yr.To < 0 {
-			s.WriteString(strconv.Itoa(yr.To * -1))
-			if yr.From < 0 {
+	s.WriteString("–")
+	if yr.To != "" {
+		if strings.HasPrefix(string(yr.To), "-") {
+			s.WriteString(string(yr.To)[1:])
+			if strings.HasPrefix(string(yr.From), "-") {
 				s.WriteString(" f.Kr")
 			}
 		} else {
-			s.WriteString(strconv.Itoa(yr.To))
-			if yr.From < 0 {
+			s.WriteString(string(yr.To))
+			if strings.HasPrefix(string(yr.From), "-") {
 				s.WriteString(" e.Kr")
 			}
 		}
@@ -235,48 +241,50 @@ func (yr YearRange) noLabel() string {
 func (yr YearRange) enLabel() string {
 	var s strings.Builder
 	if yr.Approx {
-		if yr.From%100 == 0 && yr.To%100 == 0 {
-			if yr.To-yr.From > 100 {
-				s.WriteString(strconv.Itoa((yr.From / 100) + 1))
+		if strings.HasSuffix(string(yr.From), "00") && strings.HasSuffix(string(yr.To), "00") {
+			from, _ := strconv.Atoi(string(yr.From))
+			to, _ := strconv.Atoi(string(yr.To))
+			if to-from > 100 {
+				s.WriteString(strconv.Itoa((from / 100) + 1))
 				s.WriteString("/")
-				s.WriteString(strconv.Itoa(yr.To / 100))
+				s.WriteString(strconv.Itoa(to / 100))
 			} else {
-				if yr.From < 0 {
-					s.WriteString(strconv.Itoa((yr.From/100)*-1 + 1))
+				if strings.HasPrefix(string(yr.From), "-") {
+					s.WriteString(strconv.Itoa((from/100)*-1 + 1))
 				} else {
-					s.WriteString(strconv.Itoa(yr.To / 100))
+					s.WriteString(strconv.Itoa(to / 100))
 				}
 			}
 			s.WriteString("th century")
-			if yr.To < 0 {
+			if strings.HasPrefix(string(yr.To), "-") {
 				s.WriteString(" BCE")
 			}
 			return s.String()
 		}
 		s.WriteString("ca. ")
 	}
-	if yr.From != 0 {
-		if yr.From < 0 {
-			s.WriteString(strconv.Itoa(yr.From * -1))
-			if yr.To > 0 {
+	if yr.From != "" {
+		if strings.HasPrefix(string(yr.From), "-") {
+			s.WriteString(string(yr.From)[1:])
+			if !strings.HasPrefix(string(yr.To), "-") {
 				s.WriteString(" BCE")
 			}
 		} else {
-			s.WriteString(strconv.Itoa(yr.From))
+			s.WriteString(string(yr.From))
 		}
 	} else {
 		s.WriteString("?")
 	}
-	s.WriteString("–") // or -
-	if yr.To != 0 {
-		if yr.To < 0 {
-			s.WriteString(strconv.Itoa(yr.To * -1))
-			if yr.From < 0 {
+	s.WriteString("–")
+	if yr.To != "" {
+		if strings.HasPrefix(string(yr.To), "-") {
+			s.WriteString(string(yr.To)[1:])
+			if strings.HasPrefix(string(yr.From), "-") {
 				s.WriteString(" BCE")
 			}
 		} else {
-			s.WriteString(strconv.Itoa(yr.To))
-			if yr.From < 0 {
+			s.WriteString(string(yr.To))
+			if strings.HasPrefix(string(yr.From), "-") {
 				s.WriteString(" AD")
 			}
 		}
@@ -336,23 +344,27 @@ type Publication struct {
 	// Ex physical numbers: https://www.akademika.no/liv-koltzow/koltzow-liv/9788203365133
 }
 
+// TODO how to get author into the picture?
+func (p Publication) Label() string {
+	return "TODO"
+}
+
 type Publisher struct {
 	YearRange
 }
 
 type Person struct {
-	YearRange      YearRange    `json:"year_range,omitempty"` // TODO pointer *YearRange?
+	YearRange      YearRange    `json:"year_range"` // TODO pointer *YearRange?
 	Name           string       `json:"name"`
-	Gender         vocab.Gender `json:"gender"`
+	Description    string       `json:"description"`
 	NameVariations []string     `json:"name_variations"`
-	// PlaceAssociations denotes places where the person lived and worked.
-	// It can be a country, region, historical empire, city etc, but it
-	// will most commonly be one or more countries (~ "nationality")
-	PlaceAssociations []string
+	Gender         vocab.Gender `json:"gender"`
+	Countries      []string     `json:"countries"`
+	Nationalities  []string     `json:"nationalities"`
 }
 
 func (p Person) Label() string {
-	if p.YearRange.From != 0 || p.YearRange.To != 0 {
+	if p.YearRange.From != "" || p.YearRange.To != "" {
 		return fmt.Sprintf("%s (%s)", p.Name, p.YearRange)
 	}
 	return p.Name

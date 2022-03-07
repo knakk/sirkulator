@@ -1,0 +1,109 @@
+<%
+package html
+
+import (
+    "strings"
+
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/vocab/iso3166"
+    "github.com/knakk/sirkulator/vocab/bs/nationality"
+)
+
+type PersonForm struct {
+    Person *sirkulator.Person
+    Localizer localizer.Localizer
+    UpdatedAt int64
+}
+
+
+// TODO get from vocab package
+var genderOptions = [][2]string{
+	{"u", "Ukjent"},
+	{"m", "Han"},
+	{"f", "Hun"},
+	{"o", "Annet"},
+}
+
+func (form *PersonForm) Render(ctx context.Context, w io.Writer) {
+    person := form.Person
+    l := form.Localizer
+%>
+
+<form id="person-form">
+    <input id="updated_at" type="hidden" name="updated_at" value="<%= form.UpdatedAt %>" />
+
+    <fieldset>
+        <legend><%= l.Translate("Personalia") %></legend>
+
+        <ego:InputString
+            ID="name"
+            Required=true
+            Value=person.Name
+            Label=l.Translate("Name")
+            ValidationMsg=l.Translate("Required field") />
+
+        <ego:InputString
+            ID="description"
+            Value=person.Description
+            Label=l.Translate("Description (short)") />
+
+        <ego:InputText
+            ID="name_variations"
+            Rows=len(person.NameVariations)
+            Label=l.Translate("Name variations")
+            Value=strings.Join(person.NameVariations, "\n")
+            InfoMsg=l.Translate("One entry per line") />
+
+        <ego:InputRadio
+            ID="gender"
+            Label=l.Translate("Gender")
+            Value=string(person.Gender)
+            Options=genderOptions />
+
+        <ego:SearchSelect
+            ID="countries"
+            Label=l.Translate("Associated country/area")
+            Values=person.Countries
+            URIPrefix="iso3166/"
+            Multiple=true
+            Options=iso3166.Options(l.Lang) />
+
+        <ego:SearchSelect
+            ID="nationalities"
+            Label=l.Translate("Associated nationality")
+            Values=person.Nationalities
+            URIPrefix="bs/"
+            Multiple=true
+            Options=nationality.Options(l.Lang) />
+
+    </fieldset>
+
+    <fieldset>
+        <legend><%= l.Translate("Lifespan") %></legend>
+
+        <ego:InputString
+            ID="year_range.from"
+            Value=string(person.YearRange.From)
+            Label=l.Translate("Birthyear")
+            Validation=`-?\d{1,4}`
+            Size="5"
+            ValidationMsg=l.Translate("Year must be a 1-4 digit number. Negative numbers signify BCE.") />
+
+        <ego:InputString
+            ID="year_range.to"
+            Value=string(person.YearRange.To)
+            Label=l.Translate("Deathyear")
+            Validation=`-?\d{1,4}`
+            Size="5"
+            ValidationMsg=l.Translate("Year must be a 1-4 digit number. Negative numbers signify BCE.") />
+
+        <ego:InputBool
+            ID="year_range.approx"
+            Value=person.YearRange.Approx
+            Label=l.Translate("Uncertain") />
+
+    </fieldset>
+
+</form>
+<% } %>

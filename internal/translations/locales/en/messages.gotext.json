@@ -107,13 +107,6 @@
             "fuzzy": true
         },
         {
-            "id": "Already in catalogue",
-            "message": "Already in catalogue",
-            "translation": "Already in catalogue",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "Properties",
             "message": "Properties",
             "translation": "Properties",
@@ -121,9 +114,9 @@
             "fuzzy": true
         },
         {
-            "id": "Personalia",
-            "message": "Personalia",
-            "translation": "Personalia",
+            "id": "Basic information",
+            "message": "Basic information",
+            "translation": "Basic information",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -142,6 +135,13 @@
             "fuzzy": true
         },
         {
+            "id": "Parent name",
+            "message": "Parent name",
+            "translation": "Parent name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Lifespan",
             "message": "Lifespan",
             "translation": "Lifespan",
@@ -149,23 +149,23 @@
             "fuzzy": true
         },
         {
-            "id": "Birthyear",
-            "message": "Birthyear",
-            "translation": "Birthyear",
+            "id": "Foundation year",
+            "message": "Foundation year",
+            "translation": "Foundation year",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Deathyear",
-            "message": "Deathyear",
-            "translation": "Deathyear",
+            "id": "Disestablishment year",
+            "message": "Disestablishment year",
+            "translation": "Disestablishment year",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "approximate",
-            "message": "approximate",
-            "translation": "approximate",
+            "id": "uncertain",
+            "message": "uncertain",
+            "translation": "uncertain",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -208,6 +208,48 @@
             "id": "Other relations",
             "message": "Other relations",
             "translation": "Other relations",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Already in catalogue",
+            "message": "Already in catalogue",
+            "translation": "Already in catalogue",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Resource not found.",
+            "message": "Resource not found.",
+            "translation": "Resource not found.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Validation failed. Check input fields.",
+            "message": "Validation failed. Check input fields.",
+            "translation": "Validation failed. Check input fields.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "OK, saved.",
+            "message": "OK, saved.",
+            "translation": "OK, saved.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "No changes.",
+            "message": "No changes.",
+            "translation": "No changes.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Network error. Server unreachable. Check your connection",
+            "message": "Network error. Server unreachable. Check your connection",
+            "translation": "Network error. Server unreachable. Check your connection",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -367,6 +409,90 @@
                     "expr": "sr.Results.Time"
                 }
             ],
+            "fuzzy": true
+        },
+        {
+            "id": "Personalia",
+            "message": "Personalia",
+            "translation": "Personalia",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Required field",
+            "message": "Required field",
+            "translation": "Required field",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Description (short)",
+            "message": "Description (short)",
+            "translation": "Description (short)",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Name variations",
+            "message": "Name variations",
+            "translation": "Name variations",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "One entry per line",
+            "message": "One entry per line",
+            "translation": "One entry per line",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Gender",
+            "message": "Gender",
+            "translation": "Gender",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Associated country/area",
+            "message": "Associated country/area",
+            "translation": "Associated country/area",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Associated nationality",
+            "message": "Associated nationality",
+            "translation": "Associated nationality",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Birthyear",
+            "message": "Birthyear",
+            "translation": "Birthyear",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "message": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "translation": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Deathyear",
+            "message": "Deathyear",
+            "translation": "Deathyear",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Uncertain",
+            "message": "Uncertain",
+            "translation": "Uncertain",
+            "translatorComment": "Copied from source.",
             "fuzzy": true
         }
     ]

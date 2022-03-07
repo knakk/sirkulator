@@ -84,6 +84,7 @@ var relators = map[string][2]string{
 
 // Relator is a known Marc relator, associated with a 3-letter code.
 // The codes are maintained by Library of Congress.
+// TODO drop struct; type Relator string suffices
 type Relator struct {
 	code string
 }

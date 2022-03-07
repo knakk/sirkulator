@@ -57,12 +57,12 @@ CREATE INDEX idx_link_id ON link (id);
 -- TODO consider other nouns as name for this table; a review in the
 --      context of books usually means something else..
 CREATE TABLE review (
+    id          INTEGER PRIMARY KEY,
     from_id     TEXT REFERENCES resource (id),
     type        TEXT NOT NULL,
     data        JSON,
-    queued_at   INTEGER NOT NULL, -- time.Now().Unix()
+    queued_at   INTEGER NOT NULL -- time.Now().Unix()
     -- status   TEXT, -- maybe? new|parked|etc, Status could also be stored in data column
-    PRIMARY KEY(from_id, type, data)
 );
 
 -- increment with 1 for each migration
