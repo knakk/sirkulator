@@ -372,8 +372,9 @@ func (p Person) Label() string {
 
 // Corporation TODO rename Organization?
 type Corporation struct {
-	YearRange      YearRange `json:"year_range,omitempty"`
+	YearRange      YearRange `json:"year_range"`
 	Name           string    `json:"name"`
+	Description    string    `json:"description"`
 	ParentName     string    `json:"parent_name,omitempty"`
 	NameVariations []string  `json:"name_variations"`
 	//Type           vocab.CorporationType `json:"type"` // University, Municipality, Music gorup, Record label etc

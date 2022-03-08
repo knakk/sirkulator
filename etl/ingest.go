@@ -537,7 +537,9 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 						// making sure to copy the ID from the discarded resource.
 						data.Resources[i] = p
 						data.Resources[i].ID = res.ID
-					} // TODO else log error?
+					} else {
+						log.Printf("Ingesor.Ingest: %v", err)
+					}
 				case sirkulator.TypeCorporation:
 					c, err := CorporationFromAuthority(rec.Data)
 					if err == nil {
@@ -545,7 +547,9 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 						// making sure to copy the ID from the discarded resource.
 						data.Resources[i] = c
 						data.Resources[i].ID = res.ID
-					} // TODO else log error?
+					} else {
+						log.Printf("Ingesor.Ingest: %v", err)
+					}
 					if parent := c.Data.(sirkulator.Corporation).ParentName; parent != "" {
 						// Add review to establish link to parent corporation
 						data.Reviews = append(data.Reviews, sirkulator.Relation{

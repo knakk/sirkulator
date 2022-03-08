@@ -19,6 +19,17 @@ func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
     corp := tmpl.Resource.Data.(*sirkulator.Corporation)
 %><ego:App Page=tmpl.Page>
+    <div class="sticky-top-left">
+        <button
+            class="save-resource"
+            hx-post="/metadata/corporation/<%= tmpl.Resource.ID %>"
+            hx-target="#corporation-form"
+            hx-include="#corporation-form">
+            Lagre
+        </button>
+        <p class="error" id="save-error-message"></p>
+        <p id="save-message"></p>
+    </div>
     <details open>
         <summary>
             <h3><%= tmpl.Resource.Label %></h3>
@@ -27,44 +38,10 @@ func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
             <div class="column column-wide pad">
                 <h4><%= l.Translate("Properties") %></h4>
                 <p><br/></p>
-                <form>
-
-                    <fieldset>
-                        <legend><%= l.Translate("Basic information") %></legend>
-                        <div>
-                            <input id="corp_name" name="corp_name" type="text" size="50" value="<%= corp.Name %>">
-                            <label for="corp_name"><%= l.Translate("Name") %></label>
-                        </div>
-                        <div>
-                            <input id="corp_description_short" name="corp_description_short" type="text" size="50" value="">
-                            <label for="corp_description_short"><%= l.Translate("Short description") %></label>
-                        </div>
-                         <div>
-                            <input id="corp_parentName" name="corp_parentName" type="text" size="50" value="<%= corp.ParentName %>">
-                            <label for="corp_parentName"><%= l.Translate("Parent name") %></label>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend><%= l.Translate("Lifespan") %></legend>
-                        <div>
-                            <input id="corp_foundationyear" name="corp_foundationyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= corp.YearRange.From %>">
-                            <label for="corp_foundationyear"><%= l.Translate("Foundation year") %></label>
-                        </div>
-                        <div>
-                            <input id="corp_deathyear" name="corp_deathyear" type="text" pattern="-?\d{1-4}" size="5" maxlength="5" value="<%= corp.YearRange.To %>">
-                            <label for="corp_deathyear"><%= l.Translate("Disestablishment year") %></label>
-                        </div>
-                        <div>
-                            <% if corp.YearRange.Approx { %>
-                                <input id="corp_lifespan_approx" name="corp_lifespan_approx" type="checkbox" checked>
-                            <% } else { %>
-                                <input id="corp_lifespan_approx" name="corp_lifespan_approx" type="checkbox">
-                            <% } %>
-                            <label for="corp_lifespan_approx"><%= l.Translate("uncertain") %></label>
-                        </div>
-                    </fieldset>
-                </form>
+                <ego:CorporationForm
+                    Corporation=corp
+                    Localizer=l
+                    UpdatedAt=tmpl.Resource.UpdatedAt.Unix() />
             </div>
             <div class="column pad">
                 <h4><%= l.Translate("Identificators and links") %></h4>

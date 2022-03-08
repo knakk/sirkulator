@@ -90,6 +90,9 @@ func createAgent(f marc.DataField, idFunc func() string) (res sirkulator.Resourc
 		res.Data = person
 	case "110", "610", "710":
 		res.Type = sirkulator.TypeCorporation
+		res.Data = sirkulator.Corporation{
+			Name: name,
+		}
 		res.Label = name
 	default:
 		panic("createAgent: unhandled Marc data field " + f.Tag)
