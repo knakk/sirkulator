@@ -236,9 +236,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 				Data:   map[string]interface{}{"label": p.Publisher},
 			})
 		}
-		if year := parseYear(f.ValueAt("c")); year != 0 {
-			p.Year = year
-			label = fmt.Sprintf("%s (%d)", label, year)
+		if year := parseYear(f.ValueAt("c")); year != "" {
+			p.Year = json.Number(year)
+			label = fmt.Sprintf("%s (%s)", label, year)
 		}
 	}
 	// Publisher series
@@ -265,8 +265,8 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	}
 	// Physical properties
 	if f, ok := rec.DataFieldAt("300"); ok {
-		if n := parsePages(f.ValueAt("a")); n != 0 {
-			p.NumPages = n
+		if n := parsePages(f.ValueAt("a")); n != "" {
+			p.NumPages = json.Number(n)
 		}
 	}
 	// Creator/Main entry
@@ -449,23 +449,21 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 
 var rxpYear = regexp.MustCompile(`\d{4}`)
 
-func parseYear(s string) int {
+func parseYear(s string) string {
 	matches := rxpYear.FindAllString(s, -1)
 	if len(matches) == 1 {
-		n, _ := strconv.Atoi(matches[0])
-		return n
+		return matches[0]
 	}
-	return 0
+	return ""
 }
 
 var rxpNumbers = regexp.MustCompile(`[0-9]+`)
 
-func parsePages(s string) int {
+func parsePages(s string) string {
 	for _, match := range rxpNumbers.FindAllString(s, -1) {
-		n, _ := strconv.Atoi(match)
-		return n
+		return match
 	}
-	return 0
+	return ""
 }
 
 func parseYearRange(s string) sirkulator.YearRange {

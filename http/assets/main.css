@@ -66,7 +66,7 @@ fieldset input[type="search"]:focus ~ label,
 fieldset input[type="checkbox"]:focus ~ label,
 fieldset textarea:focus ~ label { color: blue  }
 .field .selected-term, button.unselect-term { color: var(--textcolor); padding: 0.2rem 0.5rem;  border: 1px solid var(--textcolor);
-                                  appearance: none; background-color: #ddd; opacity: 0.8;  }
+                                   background-color: #ddd; opacity: 0.8; display: inline-block; }
 .field .selected-term { border-radius: 0 0 0 0.5rem; border-right:0 }
 button.unselect-term { border-radius: 0 0.5rem 0 0; cursor: pointer; border-left:0 }
 button.unselect-term span { background-color: #bbb;}

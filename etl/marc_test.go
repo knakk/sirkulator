@@ -82,12 +82,12 @@ func TestParseYearRange(t *testing.T) {
 func TestParsePages(t *testing.T) {
 	tests := []struct {
 		input string
-		want  int
+		want  string
 	}{
-		{"491", 491},
-		{" 491", 491},
-		{"491 sider", 491},
-		{"12 s", 12},
+		{"491", "491"},
+		{" 491", "491"},
+		{"491 sider", "491"},
+		{"12 s", "12"},
 	}
 
 	for _, test := range tests {
@@ -100,27 +100,27 @@ func TestParsePages(t *testing.T) {
 func TestParseYear(t *testing.T) {
 	tests := []struct {
 		input string
-		want  int
+		want  string
 	}{
 		// good:
-		{"1981", 1981},
-		{"1981 ", 1981},
-		{" 1981", 1981},
-		{"1981.", 1981},
-		{"cop. 1981", 1981},
-		{"c2004", 2004},
-		{"c2012.", 2012},
-		{"[1996]", 1996},
-		{"©2004", 2004},
-		{"[1986?]", 1986}, // ?
+		{"1981", "1981"},
+		{"1981 ", "1981"},
+		{" 1981", "1981"},
+		{"1981.", "1981"},
+		{"cop. 1981", "1981"},
+		{"c2004", "2004"},
+		{"c2012.", "2012"},
+		{"[1996]", "1996"},
+		{"©2004", "2004"},
+		{"[1986?]", "1986"}, // ?
 		// no-good:
-		{"[19-?]", 0},
-		{"[198-?]", 0},
-		{"[u.å.]", 0},
-		{"[s.a.]", 0},
-		{"c1993-2010 [2010]", 0},
-		{"20060101", 0},
-		{"2012, c2013.", 0},
+		{"[19-?]", ""},
+		{"[198-?]", ""},
+		{"[u.å.]", ""},
+		{"[s.a.]", ""},
+		{"c1993-2010 [2010]", ""},
+		{"20060101", ""},
+		{"2012, c2013.", ""},
 	}
 
 	for _, test := range tests {
@@ -324,10 +324,10 @@ func TestIngestOAIRecord(t *testing.T) {
 						Language:   "nob",
 						GenreForms: []string{"Dagbøker"},
 						Nonfiction: true,
-						Year:       2021,
+						Year:       "2021",
 						//YearFirst:  2021, TODO later
 						Publisher: "Aschehoug",
-						NumPages:  491,
+						NumPages:  "491",
 					},
 				},
 				{
@@ -612,9 +612,9 @@ func TestIngestOAIRecord(t *testing.T) {
 						LanguageOriginal: "swe",
 						//GenreForms: []string{"Romaner"}, // TODO
 						Fiction:   true,
-						Year:      1994,
+						Year:      "1994",
 						Publisher: "Aschehoug",
-						NumPages:  446,
+						NumPages:  "446",
 					},
 				},
 				{
@@ -877,12 +877,12 @@ func TestIngestOAIRecord(t *testing.T) {
 						Title:     "Planter og tradisjon",
 						Subtitle:  "floraen i levende tale og tradisjon i Norge 1925-1973",
 						Publisher: "Norges sopp- og nyttevekstforbund",
-						Year:      2021,
+						Year:      "2021",
 						//YearFirst: 1974 // TODO from note field 500
 						Language:   "nob",
 						GenreForms: []string{"Populærvitenskap"},
 						Nonfiction: true,
-						NumPages:   751,
+						NumPages:   "751",
 					},
 				},
 				{
@@ -1145,11 +1145,11 @@ func TestIngestOAIRecord(t *testing.T) {
 						Title:     "Deichman Bjørvika",
 						Subtitle:  "Lundhagem og Atelier Oslo arkitekter",
 						Publisher: "Pax forlag",
-						Year:      2022,
+						Year:      "2022",
 						//YearFirst: 2022
 						Language:   "nob",
 						Nonfiction: true,
-						NumPages:   271,
+						NumPages:   "271",
 					},
 				},
 				{
@@ -1466,12 +1466,12 @@ func TestIngestOAIRecord(t *testing.T) {
 						Title:      "Når noen klikker i vinkel",
 						Publisher:  "Gyldendal",
 						Series:     []string{"Søstrene Proxy blogger om verden"},
-						Year:       2022,
+						Year:       "2022",
 						Language:   "nob",
 						GenreForms: []string{"Romaner", "Humor"},
 						Audiences:  []vocab.Audience{vocab.TG1003, vocab.TG1004, vocab.TG1009},
 						Fiction:    true,
-						NumPages:   122,
+						NumPages:   "122",
 					},
 				},
 				{
@@ -1695,12 +1695,12 @@ func TestIngestOAIRecord(t *testing.T) {
 						Title:      "Den glemte byen",
 						Publisher:  "Cappelen Damm",
 						Series:     []string{"Ulvegutten Tal", "Min første leseløve"},
-						Year:       2017,
+						Year:       "2017",
 						Language:   "nob",
 						GenreForms: []string{"Romaner", "Lettlest", "Spenning", "Historisk litteratur"},
 						Audiences:  []vocab.Audience{vocab.TG1002, vocab.TG1006},
 						Fiction:    true,
-						NumPages:   53,
+						NumPages:   "53",
 					},
 				},
 				{
@@ -1855,7 +1855,7 @@ func TestPersonFromAuthority(t *testing.T) {
 				To:   "2001",
 			},
 			Gender:        vocab.GenderMale,
-			Countries:     []string{"iso3361/fi", "iso3361/no"},
+			Countries:     []string{"iso3166/FI", "iso3166/NO"},
 			Nationalities: []string{"bs/n.", "bs/sam."},
 		},
 		Links: [][2]string{{"bibsys", "90067942"}, {"isni", "0000000109115902"}, {"viaf", "59247880"}, {"bibbi", "37524"}},

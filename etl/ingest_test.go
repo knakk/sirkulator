@@ -304,8 +304,8 @@ func TestIngestISBN(t *testing.T) {
 		Title:      "Illustrert algeflora",
 		Language:   "nob",
 		Nonfiction: true,
-		Year:       1980,
-		NumPages:   63,
+		Year:       "1980",
+		NumPages:   "63",
 		Publisher:  "Cappelen",
 		GenreForms: []string{"Floraer", "Bestemmelseslitteratur"},
 	}
@@ -532,7 +532,7 @@ func TestIngestPersonFromLocalOAI(t *testing.T) {
 				From: "1949",
 			},
 			Gender:        vocab.GenderMale,
-			Countries:     []string{"iso3361/no"},
+			Countries:     []string{"iso3166/NO"},
 			Nationalities: []string{"bs/n."},
 		},
 	}

@@ -196,13 +196,13 @@ func (i *SearchSelect) Render(ctx context.Context, w io.Writer) {
 	for _, v := range i.Values {
 		v = strings.TrimPrefix(v, i.URIPrefix)
 		if label, ok := label(i.Options, v); ok {
-			io.WriteString(w, `<li><select class="selected-term" tabindex="-1"`)
+			io.WriteString(w, `<li><div class="selected-term">`)
+			io.WriteString(w, label)
+			io.WriteString(w, `</div><input type="hidden"`)
 			writeAttr(w, "name", i.ID)
-			io.WriteString(w, `><option selected`)
 			writeAttr(w, "value", v)
 			io.WriteString(w, `>`)
-			io.WriteString(w, label)
-			io.WriteString(w, `</option></select><button type="button" class="unselect-term"><span>✕</span></button></li>`)
+			io.WriteString(w, `<button type="button" class="unselect-term"><span>✕</span></button></li>`)
 		}
 	}
 	io.WriteString(w, `</ul><p class="info"><small>`)

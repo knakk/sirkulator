@@ -316,14 +316,14 @@ type Publication struct {
 	// Note, Year|YearFirst=0 means we cannot have a publication published in year 0,
 	// assumed this to be not a practical problem, not a lot of known classics published that year (TODO any?)
 	// https://en.wikipedia.org/wiki/Ancient_literature
-	Year int `json:"year,omitempty"`
+	Year json.Number `json:"year,omitempty"`
 
 	// "Work" / orignal title info
 	// WorkRepresentative bool  / WorkExample - prefer first edition in original language
 	// WorkClassic bool // homer, bible, pre 1500 books etc
-	YearFirst        int    `json:"year_first,omitempty"`
-	TitleOriginal    string `json:"title_original,omitempty"`
-	LanguageOriginal string `json:"language_original,omitempty"`
+	YearFirst        json.Number `json:"year_first,omitempty"`
+	TitleOriginal    string      `json:"title_original,omitempty"`
+	LanguageOriginal string      `json:"language_original,omitempty"`
 
 	// Content info
 	Language       string           `json:"language,omitempty"`
@@ -335,8 +335,8 @@ type Publication struct {
 	Subjects       []string
 
 	// Physical info
-	Format   string `json:"format"` // hardcover, paperback, innbundet, heftet etc... Binding?
-	NumPages int    `json:"numpages,omitempty"`
+	Format   string      `json:"format"` // hardcover, paperback, innbundet, heftet etc... Binding?
+	NumPages json.Number `json:"numpages,omitempty"`
 	// Weight   int    `json:"weight,omitempty"` // in grams
 	// Height   int    `json:"height,omitempty"` // in mm
 	// Width    int    `json:"width,omitempty"`  // in mm

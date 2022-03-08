@@ -1,0 +1,109 @@
+<%
+package html
+
+import (
+    "strings"
+
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type PublicationForm struct {
+    Publication *sirkulator.Publication
+    Localizer localizer.Localizer
+    UpdatedAt int64
+}
+
+
+func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
+    pub := form.Publication
+    l := form.Localizer
+%>
+
+<form id="publication-form">
+    <input id="updated_at" type="hidden" name="updated_at" value="<%= form.UpdatedAt %>" />
+
+    <fieldset>
+        <legend><%= l.Translate("Publication") %></legend>
+
+        <ego:InputString
+            ID="title"
+            Required=true
+            Value=pub.Title
+            Label=l.Translate("Title")
+            ValidationMsg=l.Translate("Required field") />
+
+        <ego:InputString
+            ID="subtitle"
+            Value=pub.Subtitle
+            Label=l.Translate("Subtitle") />
+
+        <ego:InputString
+            ID="publisher"
+            Value=pub.Publisher
+            Label=l.Translate("Publisher") />
+
+        <ego:InputString
+            ID="year"
+            Value=string(pub.Year)
+            Label=l.Translate("Year")
+            Size="4"
+            Validation=`\d{4}`
+            ValidationMsg=l.Translate("Year must be a 4-digit number") />
+
+    </fieldset>
+
+    <fieldset>
+        <legend><%= l.Translate("Content") %></legend>
+
+        <ego:InputString
+            ID="language"
+            Value=pub.Language
+            Label=l.Translate("Main language") />
+
+        <ego:InputText
+            ID="languages_other"
+            Rows=len(pub.LanguagesOther)
+            Label=l.Translate("Other languages")
+            Value=strings.Join(pub.LanguagesOther, "\n")
+            InfoMsg=l.Translate("One entry per line") />
+
+        <ego:InputBool
+            ID="fiction"
+            Value=pub.Fiction
+            Label=l.Translate("Fiksjon") />
+
+        <ego:InputBool
+            ID="nonfiction"
+            Value=pub.Nonfiction
+            Label=l.Translate("Fag") />
+
+        <ego:InputText
+            ID="genre_forms"
+            Rows=len(pub.GenreForms)
+            Label=l.Translate("Genre and forms")
+            Value=strings.Join(pub.GenreForms, "\n")
+            InfoMsg=l.Translate("One entry per line") />
+
+    </fieldset>
+
+    <fieldset>
+        <legend><%= l.Translate("Physical characteristics") %></legend>
+
+        <ego:InputString
+            ID="binding"
+            Value="TODO"
+            Label=l.Translate("Binding") />
+
+        <ego:InputString
+            ID="numpages"
+            Value=string(pub.NumPages)
+            Label=l.Translate("Number of pages")
+            Size="4"
+            Validation=`\d{1,4}`
+            ValidationMsg=l.Translate("Must be an integer") />
+
+    </fieldset>
+
+</form>
+<% } %>
