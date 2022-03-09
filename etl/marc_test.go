@@ -321,7 +321,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Data: sirkulator.Publication{
 						Title:      "Liv Køltzow",
 						Subtitle:   "dagbøker i utvalg 1964-2008",
-						Language:   "nob",
+						Language:   "iso6393/nob",
 						GenreForms: []string{"Dagbøker"},
 						Nonfiction: true,
 						Year:       "2021",
@@ -608,8 +608,8 @@ func TestIngestOAIRecord(t *testing.T) {
 					Data: sirkulator.Publication{
 						Title:            "Hendelser ved vann",
 						TitleOriginal:    "Händelser vid vatten",
-						Language:         "nob",
-						LanguageOriginal: "swe",
+						Language:         "iso6393/nob",
+						LanguageOriginal: "iso6393/swe",
 						//GenreForms: []string{"Romaner"}, // TODO
 						Fiction:   true,
 						Year:      "1994",
@@ -879,7 +879,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Publisher: "Norges sopp- og nyttevekstforbund",
 						Year:      "2021",
 						//YearFirst: 1974 // TODO from note field 500
-						Language:   "nob",
+						Language:   "iso6393/nob",
 						GenreForms: []string{"Populærvitenskap"},
 						Nonfiction: true,
 						NumPages:   "751",
@@ -1147,7 +1147,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Publisher: "Pax forlag",
 						Year:      "2022",
 						//YearFirst: 2022
-						Language:   "nob",
+						Language:   "iso6393/nob",
 						Nonfiction: true,
 						NumPages:   "271",
 					},
@@ -1467,7 +1467,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Publisher:  "Gyldendal",
 						Series:     []string{"Søstrene Proxy blogger om verden"},
 						Year:       "2022",
-						Language:   "nob",
+						Language:   "iso6393/nob",
 						GenreForms: []string{"Romaner", "Humor"},
 						Audiences:  []vocab.Audience{vocab.TG1003, vocab.TG1004, vocab.TG1009},
 						Fiction:    true,
@@ -1696,7 +1696,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Publisher:  "Cappelen Damm",
 						Series:     []string{"Ulvegutten Tal", "Min første leseløve"},
 						Year:       "2017",
-						Language:   "nob",
+						Language:   "iso6393/nob",
 						GenreForms: []string{"Romaner", "Lettlest", "Spenning", "Historisk litteratur"},
 						Audiences:  []vocab.Audience{vocab.TG1002, vocab.TG1006},
 						Fiction:    true,

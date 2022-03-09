@@ -157,6 +157,7 @@ type SearchSelect struct {
 	Label     string
 	Options   [][2]string
 	URIPrefix string
+	Value     string
 	Values    []string
 	InfoMsg   string
 	Multiple  bool
@@ -176,6 +177,10 @@ func (i *SearchSelect) Render(ctx context.Context, w io.Writer) {
 		i.InfoMsg = "&nbsp;"
 	}
 	io.WriteString(w, `<div class="field"><input type="search" autocomplete="off"`)
+	if !i.Multiple && i.Value != "" {
+		io.WriteString(w, ` disabled`)
+		i.Values = []string{i.Value}
+	}
 	writeAttr(w, "id", i.ID)
 	writeAttr(w, "list", i.ID+"_list")
 	io.WriteString(w, `><datalist`)

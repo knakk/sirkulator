@@ -53,8 +53,8 @@ textarea:focus        { outline: 0; box-shadow: 0 0 0 4px lightskyblue; }
 
 fieldset       { margin-bottom: 1rem; }
 fieldset .field { clear: both; }
-.field p, .field ul { clear: both;float:right; width: 75%; }
-.field ul li { display: inline-block; margin-right: 1rem }
+.field p, .field ul { clear: both; float:right; width: 75%; }
+.field ul li { display: inline-block; margin-right: 1rem; margin-top: 1rem;}
 
 .field label { float: left; text-align: right; margin-right:2rem; width: 20%; vertical-align: top; user-select: none; cursor: pointer; }
 fieldset input[type="text"],
@@ -89,6 +89,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
                 pointer-events: none; font-weight: bold; }
 
 .clickable    { cursor: pointer }
+.hidden       { display: none }
 
 .row     { display: flex; flex-wrap: wrap; width: 100%; }
 .column  { display: flex; flex-direction: column; flex: 1; }

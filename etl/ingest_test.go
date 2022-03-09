@@ -302,7 +302,7 @@ func TestIngestISBN(t *testing.T) {
 	// Verify that publication got stored
 	pubData := sirkulator.Publication{
 		Title:      "Illustrert algeflora",
-		Language:   "nob",
+		Language:   "iso6393/nob",
 		Nonfiction: true,
 		Year:       "1980",
 		NumPages:   "63",

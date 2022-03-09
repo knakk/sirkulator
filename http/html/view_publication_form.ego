@@ -5,6 +5,7 @@ import (
     "strings"
 
     "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/vocab/iso6393"
     "github.com/knakk/sirkulator/internal/localizer"
 )
 
@@ -56,17 +57,21 @@ func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
     <fieldset>
         <legend><%= l.Translate("Content") %></legend>
 
-        <ego:InputString
+        <ego:SearchSelect
             ID="language"
             Value=pub.Language
+            Multiple=false
+            URIPrefix="iso6393/"
+            Options=iso6393.Options(l.Lang)
             Label=l.Translate("Main language") />
 
-        <ego:InputText
+        <ego:SearchSelect
             ID="languages_other"
-            Rows=len(pub.LanguagesOther)
             Label=l.Translate("Other languages")
-            Value=strings.Join(pub.LanguagesOther, "\n")
-            InfoMsg=l.Translate("One entry per line") />
+            URIPrefix="iso6393/"
+            Options=iso6393.Options(l.Lang)
+            Multiple=true
+            Values=pub.LanguagesOther />
 
         <ego:InputBool
             ID="fiction"

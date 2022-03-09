@@ -15,6 +15,7 @@ import (
 	"github.com/knakk/sirkulator/vocab"
 	"github.com/knakk/sirkulator/vocab/bs/nationality"
 	"github.com/knakk/sirkulator/vocab/iso3166"
+	"github.com/knakk/sirkulator/vocab/iso6393"
 )
 
 // TODO more candidates: https://gist.github.com/boutros/221499f95397a4987a70ce726455319e
@@ -194,19 +195,19 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		}
 		// Language
 		if len(f.Value) > 38 {
-			lang := f.Value[35:38]
+			v := f.Value[35:38]
 			// Validate Marc language
-			if _, err := marc.ParseLanguage(lang); err == nil {
-				p.Language = lang
+			if lang, err := iso6393.ParseLanguageFromMarc(v); err == nil {
+				p.Language = lang.URI()
 			}
 		}
 		// TODO audience pos 22: a=adult, j=juvenile
 	}
 
 	if f, ok := rec.DataFieldAt("041"); ok {
-		lang := f.ValueAt("h")
-		if _, err := marc.ParseLanguage(lang); err == nil {
-			p.LanguageOriginal = lang
+		v := f.ValueAt("h")
+		if lang, err := iso6393.ParseLanguageFromMarc(v); err == nil {
+			p.LanguageOriginal = lang.URI()
 		}
 	}
 	if f, ok := rec.DataFieldAt("245"); ok {
