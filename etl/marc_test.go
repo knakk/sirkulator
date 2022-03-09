@@ -1157,6 +1157,9 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t2",
 					Label: "Deichman Bjørvika",
 					Links: [][2]string{{"bibsys", "1642068353945"}},
+					Data: sirkulator.Corporation{
+						Name: "Deichman Bjørvika",
+					},
 				},
 				{
 					Type:  sirkulator.TypePerson,
@@ -1469,7 +1472,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Year:       "2022",
 						Language:   "iso6393/nob",
 						GenreForms: []string{"Romaner", "Humor"},
-						Audiences:  []vocab.Audience{vocab.TG1003, vocab.TG1004, vocab.TG1009},
+						Audiences:  []string{vocab.TG1003.Code(), vocab.TG1004.Code(), vocab.TG1009.Code()},
 						Fiction:    true,
 						NumPages:   "122",
 					},
@@ -1698,7 +1701,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Year:       "2017",
 						Language:   "iso6393/nob",
 						GenreForms: []string{"Romaner", "Lettlest", "Spenning", "Historisk litteratur"},
-						Audiences:  []vocab.Audience{vocab.TG1002, vocab.TG1006},
+						Audiences:  []string{vocab.TG1002.Code(), vocab.TG1006.Code()},
 						Fiction:    true,
 						NumPages:   "53",
 					},

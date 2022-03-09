@@ -4,6 +4,7 @@ package html
 import (
     "strings"
 
+    "github.com/knakk/sirkulator/vocab"
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/vocab/iso6393"
     "github.com/knakk/sirkulator/internal/localizer"
@@ -14,7 +15,6 @@ type PublicationForm struct {
     Localizer localizer.Localizer
     UpdatedAt int64
 }
-
 
 func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
     pub := form.Publication
@@ -89,6 +89,13 @@ func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
             Label=l.Translate("Genre and forms")
             Value=strings.Join(pub.GenreForms, "\n")
             InfoMsg=l.Translate("One entry per line") />
+
+        <ego:SearchSelect
+            ID="audiences"
+            Label=l.Translate("Audience")
+            Options=vocab.AudienceOptions(l.Lang)
+            Multiple=true
+            Values=pub.Audiences />
 
     </fieldset>
 

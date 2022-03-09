@@ -1,7 +1,7 @@
 package vocab
 
 import (
-	"encoding/json"
+	"sort"
 	"strings"
 
 	"github.com/knakk/sirkulator/internal/localizer"
@@ -56,6 +56,11 @@ var audienceLabels = map[Audience][2]string{
 	TG1013: {"Bliss", "Bliss"},
 	TG1014: {"Capital letters", "Store bokstaver"},
 	TG1017: {"Widgit", "Widgit"},
+}
+
+var allAudiences = []Audience{
+	TG1000, TG1001, TG1002, TG1003, TG1004, TG1005, TG1006, TG1007, TG1008,
+	TG1009, TG1010, TG1011, TG1012, TG1013, TG1014, TG1015, TG1016, TG1017,
 }
 
 var audienceAliasesNo = map[Audience][]string{
@@ -134,6 +139,22 @@ func ParseAudienceCode(s string) (Audience, error) {
 	return "", ErrUnknown
 }
 
-func (a Audience) MarshalJSON() ([]byte, error) {
-	return json.Marshal(string(a))
+func AudienceOptions(lang language.Tag) (res [][2]string) {
+	match, _, _ := localizer.Matcher.Match(lang)
+
+	i := 0
+	if match == language.Norwegian {
+		i = 1
+
+	}
+	for _, a := range allAudiences {
+		res = append(res, [2]string{string(a), audienceLabels[a][i]})
+	}
+
+	// Sort by label
+	sort.Slice(res, func(i, j int) bool {
+		return res[i][1] < res[j][1]
+	})
+
+	return res
 }

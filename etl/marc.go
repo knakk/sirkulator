@@ -141,6 +141,16 @@ func matchOrCreate(agents *[]sirkulator.Resource, f marc.DataField, idFunc func(
 	return agent
 }
 
+func appendIfNew(existing []string, val string) []string {
+	for _, v := range existing {
+		if v == val {
+			return existing
+		}
+	}
+	existing = append(existing, val)
+	return existing
+}
+
 // TODO it currently never returns an error: when should it fail? For example not enough data
 // to construct a valid resource? No label?
 func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ingestion, error) {
@@ -310,9 +320,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	// Audience
 	for _, f := range rec.DataFieldsAt("385") {
 		if audience, err := vocab.ParseAudienceURL(f.ValueAt("0")); err == nil {
-			p.Audiences = append(p.Audiences, audience)
+			p.Audiences = append(p.Audiences, audience.Code())
 		} else if audience, err := vocab.ParseAudienceCode(f.ValueAt("b")); err == nil {
-			p.Audiences = append(p.Audiences, audience)
+			p.Audiences = append(p.Audiences, audience.Code())
 		}
 
 	}
@@ -348,7 +358,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		}
 		if val := f.ValueAt("a"); val != "" {
 			// TODO lowercase first letter?
-			p.GenreForms = append(p.GenreForms, val)
+			p.GenreForms = appendIfNew(p.GenreForms, val)
 		}
 	}
 
