@@ -621,7 +621,7 @@ func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 
 	// Associated countries
 	for _, country := range rec.ValuesAt("043", "c") {
-		if alpha2, err := iso3166.ParseAlpha2(country); err == nil {
+		if alpha2, err := iso3166.ParseCountry(country); err == nil {
 			person.Countries = append(person.Countries, alpha2.URI())
 		}
 	}
