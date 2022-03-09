@@ -13,6 +13,7 @@ import (
 	"github.com/knakk/sirkulator/isbn"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/vocab"
+	"github.com/knakk/sirkulator/vocab/bs/nationality"
 	"github.com/knakk/sirkulator/vocab/iso3166"
 )
 
@@ -627,8 +628,10 @@ func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 
 	// Associated nationalities
 	if f, ok := rec.DataFieldAt("386"); ok && f.ValueAt("2") == "bs-nasj" {
-		for _, nationality := range strings.Split(f.ValueAt("a"), "-") {
-			person.Nationalities = append(person.Nationalities, "bs/"+nationality)
+		for _, a := range strings.Split(f.ValueAt("a"), "-") {
+			if nat, err := nationality.Parse(a); err == nil {
+				person.Nationalities = append(person.Nationalities, nat.URI())
+			}
 		}
 	}
 

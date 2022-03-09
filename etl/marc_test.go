@@ -1856,7 +1856,7 @@ func TestPersonFromAuthority(t *testing.T) {
 			},
 			Gender:        vocab.GenderMale,
 			Countries:     []string{"iso3166/FI", "iso3166/NO"},
-			Nationalities: []string{"bs/n.", "bs/sam."},
+			Nationalities: []string{"bs/n", "bs/sam"},
 		},
 		Links: [][2]string{{"bibsys", "90067942"}, {"isni", "0000000109115902"}, {"viaf", "59247880"}, {"bibbi", "37524"}},
 	}

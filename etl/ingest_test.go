@@ -533,7 +533,7 @@ func TestIngestPersonFromLocalOAI(t *testing.T) {
 			},
 			Gender:        vocab.GenderMale,
 			Countries:     []string{"iso3166/NO"},
-			Nationalities: []string{"bs/n."},
+			Nationalities: []string{"bs/n"},
 		},
 	}
 	perGot, err := sql.GetResource(conn, sirkulator.TypePerson, "t2")
