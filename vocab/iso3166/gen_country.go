@@ -86,7 +86,7 @@ func (a Alpha2) URI() string {
 	return "iso3166/"+string(a)
 }
 
-// Label returns a string representation of the Alpha2 country in the desired language.
+// Label returns a string representation of the Cuntry in the desired language.
 func (a Alpha2) Label(tag language.Tag) string {
 	match, _, _ := localizer.Matcher.Match(tag)
 	if match == language.Norwegian{

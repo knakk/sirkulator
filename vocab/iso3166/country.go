@@ -11,8 +11,8 @@ import (
 	"github.com/knakk/sirkulator/vocab"
 )
 
-//go:generate go run gen_alpha2.go
-//go:generate go fmt alpha2.go
+//go:generate go run gen_country.go
+//go:generate go fmt country.go
 
 // Country is an ISO 3166-1 two-letter code, maintained by ublished by the International Organization
 // for Standardization (ISO), to represent countries, dependent territories, and special areas of
@@ -548,7 +548,7 @@ var allCodes = []Country{
 	VG, VI, VN, VU, WF, WS, XK, YE, YT, YU, ZA, ZM, ZW,
 }
 
-func ParseAlpha2(s string) (Country, error) {
+func ParseCountry(s string) (Country, error) {
 	s = strings.ToUpper(s)
 	if _, ok := alpha2Labels[Country(s)]; ok {
 		return Country(s), nil
@@ -565,7 +565,7 @@ func (a Country) URI() string {
 	return "iso3166/" + string(a)
 }
 
-// Label returns a string representation of the Alpha2 country in the desired language.
+// Label returns a string representation of the Country in the desired language.
 func (a Country) Label(tag language.Tag) string {
 	match, _, _ := localizer.Matcher.Match(tag)
 	if match == language.Norwegian {
