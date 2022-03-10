@@ -159,6 +159,7 @@ func (s *Server) image(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		return
 	}
+	defer s.db.Put(conn)
 
 	id := chi.URLParam(r, "id")
 	var rowID int64
