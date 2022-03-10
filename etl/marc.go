@@ -215,9 +215,21 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	}
 
 	if f, ok := rec.DataFieldAt("041"); ok {
-		v := f.ValueAt("h")
-		if lang, err := iso6393.ParseLanguageFromMarc(v); err == nil {
-			p.LanguageOriginal = lang.URI()
+		if f.Ind1 == "1" {
+			// The publication is a translation
+			v := f.ValueAt("h")
+			if lang, err := iso6393.ParseLanguageFromMarc(v); err == nil {
+				p.LanguageOriginal = lang.URI()
+			}
+		}
+		for _, v := range f.ValuesAt("a") {
+			if lang, err := iso6393.ParseLanguageFromMarc(v); err == nil {
+				if p.Language == "" {
+					p.Language = lang.URI()
+				} else if lang.URI() != p.Language {
+					p.LanguagesOther = appendIfNew(p.LanguagesOther, lang.URI())
+				}
+			}
 		}
 	}
 	if f, ok := rec.DataFieldAt("245"); ok {

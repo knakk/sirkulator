@@ -69,15 +69,15 @@ var languageLabels = map[Language][2]string{
 {{- end }}
 }
 
-var diffCodes = map[Language]string{
+var marcToLanguage = map[string]Language{
 	{{- range $row :=  .Diff }}
-		{{ index $row 0 }}: {{ index $row 1 | printf "%q"}},
+		{{ index $row 1 | printf "%q"}}: {{ index $row 0}},
 	{{- end }}
 	}
 
-var marcToLanguage = map[string]Language{
+var diffCodes = map[Language]string{
 	{{- range $row :=  .Diff }}
-		{{ index $row 1 | printf "%q" }}: {{ index $row 0 }},
+		{{ index $row 0 }}: {{ index $row 1 | printf "%q" }},
 	{{- end }}
 	}
 
@@ -191,11 +191,11 @@ func main() {
 		}
 
 		if rec[0] != rec[1] {
-			diff = append(diff, [2]string{strings.ToUpper(rec[0]), rec[1]})
+			diff = append(diff, [2]string{strings.ToUpper(rec[1]), rec[0]})
 		}
 		// Trim " (språk)" suffix from the Norwegian label.
 		rec[3] = strings.TrimSuffix(rec[3], " (språk)")
-		rec = append(rec, strings.ToUpper(rec[0])) // ALL CAPS for Language constant name
+		rec = append(rec, strings.ToUpper(rec[1])) // ALL CAPS for Language constant name
 		recs = append(recs, rec)
 	}
 
