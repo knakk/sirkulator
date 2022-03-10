@@ -209,6 +209,56 @@ func GetPublcationReviews(conn *sqlite.Conn, id string) ([]sirkulator.Relation, 
 	return res, nil
 }
 
+// TODO pagination? offset by rowid
+func GetAllReviews(conn *sqlite.Conn, limit int) ([]sirkulator.RelationExp, error) {
+	var res []sirkulator.RelationExp
+
+	const q = `
+	SELECT
+		rev.id,
+		rev.from_id,
+		rev.type,
+		rev.data,
+		res.type,
+		res.label
+	FROM
+		review rev
+		JOIN resource res ON (rev.from_id=res.id)
+	ORDER BY rev.queued_at
+	LIMIT ?`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		rel := sirkulator.RelationExp{
+			Relation: sirkulator.Relation{
+				ID:     stmt.ColumnInt64(0),
+				FromID: stmt.ColumnText(1),
+				Type:   stmt.ColumnText(2),
+			},
+			From: sirkulator.SimpleResource{
+				ID:    stmt.ColumnText(1),
+				Type:  sirkulator.ParseResourceType(stmt.ColumnText(4)),
+				Label: stmt.ColumnText(5),
+			},
+		}
+		var data map[string]interface{}
+		if err := json.Unmarshal([]byte(stmt.ColumnText(3)), &data); err != nil {
+			return err // TODO annotate
+		}
+		rel.Data = data
+		if data == nil {
+			return errors.New("review has no data")
+		}
+		res = append(res, rel)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, limit); err != nil {
+		return res, fmt.Errorf("sql.GetAllReviews(%d): %w", limit, err)
+	}
+
+	return res, nil
+}
+
 func GetImage(conn *sqlite.Conn, id string) (*sirkulator.Image, error) {
 	var img sirkulator.Image
 	const q = "SELECT type, width, height FROM files.image WHERE id=?"

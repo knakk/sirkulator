@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
 	"github.com/knakk/sirkulator/search"
+	"github.com/knakk/sirkulator/sql"
 	"golang.org/x/text/language"
 )
 
@@ -116,6 +118,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 		r.Get("/circulation", s.pageCirculation)
 		r.Route("/metadata", func(r chi.Router) {
 			r.Get("/", s.pageMetadata)
+			r.Get("/reviews", s.viewReviews)
 			r.Post("/import", s.importResources) // s.tmplImportResponse ?
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
@@ -221,6 +224,32 @@ func (s *Server) pageMetadata(w http.ResponseWriter, r *http.Request) {
 			Lang: s.Lang,
 			Path: r.URL.Path,
 		},
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) viewReviews(w http.ResponseWriter, r *http.Request) {
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 10 // default size
+	}
+
+	res, err := sql.GetAllReviews(conn, limit)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	tmpl := html.ViewReviews{
+		Reviews:   res,
+		Localizer: r.Context().Value("localizer").(localizer.Localizer),
 	}
 	tmpl.Render(r.Context(), w)
 }

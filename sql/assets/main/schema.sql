@@ -28,14 +28,14 @@ CREATE TABLE resource_edit_log (
 -- relation is obvious; for example 'subject_of', rather than just 'subject',
 -- where you wouldn't know if A is subject of B or B is subject of A.
 CREATE TABLE relation (
+    id       INTEGER PRIMARY KEY,
     from_id  TEXT NOT NULL REFERENCES resource (id),
     to_id    TEXT NOT NULL REFERENCES resource (id),
     type     TEXT NOT NULL, -- has_contributor|has_subject|in_series|followed_by|derived_from|translation_of|
-    data     JSON,
-
-    PRIMARY KEY(from_id, to_id, type, data)
+    data     JSON
 );
 
+CREATE INDEX idx_relation_from_id ON relation (from_id);
 CREATE INDEX idx_relation_to_id ON relation (to_id);
 
 CREATE TABLE link (

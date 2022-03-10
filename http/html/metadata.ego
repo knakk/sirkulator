@@ -13,13 +13,11 @@ type MetadataTemplate struct {
 func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
 %><ego:App Page=tmpl.Page>
-    <details>
-        <summary>
+    <details id="reviews-accordion">
+        <summary hx-get="/metadata/reviews" hx-target="#reviews" >
             <h3><%= l.Translate("Show metadata for review") %></h3>
         </summary>
-        <div>
-            <p>TODO: Table goes here</p>
-        </div>
+        <table id="reviews"></table>
     </details>
 
     <br/>
@@ -106,5 +104,17 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
             <div id="import-results" class="htmx-request-indicator htmx-inflight"></div>
         </div>
     </details>
+    <script>
+        document.body.addEventListener("htmx:beforeRequest", function(evt) {
+            if (evt.detail.target.id === "reviews") {
+                const el = document.getElementById("reviews-accordion");
+                if (el.open) {
+                    // TODO investigate options to define this on the element, eg:
+                    // hx-trigger="click && !reviews.accordion.open"
+                    evt.preventDefault();
+                }
+            }
+        })
+    </script>
 </ego:App>
 <% } %>

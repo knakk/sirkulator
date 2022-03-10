@@ -1,0 +1,48 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/vocab"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ViewReviews struct {
+    Reviews []sirkulator.RelationExp
+    Localizer localizer.Localizer
+}
+
+func (tmpl *ViewReviews) Render(ctx context.Context, w io.Writer) {
+    l := tmpl.Localizer
+%>
+
+<table id="reviews" class="reviews">
+    <thead>
+        <tr>
+            <th><%= l.Translate("Resource") %></th>
+            <th><%= l.Translate("Relation") %></th>
+            <th><%= l.Translate("Data") %></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for _, r := range tmpl.Reviews { %>
+            <tr class="review">
+                <td>
+                    <a href="<%= resourceLink(r.From) %>"><%= r.From.Label %></a>
+                </td>
+                <td>
+                    <%= vocab.ParseRelation(r.Type).Label(l.Lang) %>
+                </td>
+                <td>
+                    <%= r.Data["label"] %>
+                </td>
+                <td>
+                    <button><%= l.Translate("Search and connect to resource") %></button>
+                </td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<% } %>

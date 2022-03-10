@@ -399,10 +399,16 @@ type Character struct {
 // 4) Various
 
 type Relation struct {
+	ID     int64
 	FromID string
 	ToID   string
 	Type   string
 	Data   map[string]interface{} // TODO consider map[string]string or [][2]string
+}
+
+type RelationExp struct {
+	Relation
+	From SimpleResource
 }
 
 type Image struct {
