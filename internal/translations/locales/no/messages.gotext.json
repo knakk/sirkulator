@@ -82,46 +82,6 @@
             "translation": "Egenskaper"
         },
         {
-            "id": "Basic information",
-            "message": "Basic information",
-            "translation": "Grunnleggende informasjon"
-        },
-        {
-            "id": "Name",
-            "message": "Name",
-            "translation": "Navn"
-        },
-        {
-            "id": "Short description",
-            "message": "Short description",
-            "translation": "Kort beskrivelse"
-        },
-        {
-            "id": "Parent name",
-            "message": "Parent name",
-            "translation": ""
-        },
-        {
-            "id": "Lifespan",
-            "message": "Lifespan",
-            "translation": "Levetid"
-        },
-        {
-            "id": "Foundation year",
-            "message": "Foundation year",
-            "translation": ""
-        },
-        {
-            "id": "Disestablishment year",
-            "message": "Disestablishment year",
-            "translation": ""
-        },
-        {
-            "id": "uncertain",
-            "message": "uncertain",
-            "translation": ""
-        },
-        {
             "id": "Identificators and links",
             "message": "Identificators and links",
             "translation": "Identifikatorer og lenker"
@@ -182,71 +142,6 @@
             "translation": "Nettverksfeil. Kan ikke nå tjener. Sjekk forbindelsen."
         },
         {
-            "id": "Tittel",
-            "message": "Tittel",
-            "translation": "Tittel"
-        },
-        {
-            "id": "Subtitle",
-            "message": "Subtitle",
-            "translation": "Undertittel"
-        },
-        {
-            "id": "Publisher",
-            "message": "Publisher",
-            "translation": "Utgiver"
-        },
-        {
-            "id": "Edition",
-            "message": "Edition",
-            "translation": "Utgave"
-        },
-        {
-            "id": "Content",
-            "message": "Content",
-            "translation": "Innhold"
-        },
-        {
-            "id": "Main language",
-            "message": "Main language",
-            "translation": "Språk (hoved-)"
-        },
-        {
-            "id": "Other languages",
-            "message": "Other languages",
-            "translation": "Andre språk"
-        },
-        {
-            "id": "Fiction",
-            "message": "Fiction",
-            "translation": "Fiksjon"
-        },
-        {
-            "id": "Nonfiction",
-            "message": "Nonfiction",
-            "translation": "Fag"
-        },
-        {
-            "id": "Genre and forms",
-            "message": "Genre and forms",
-            "translation": "Sjanger og form"
-        },
-        {
-            "id": "Physical characteristics",
-            "message": "Physical characteristics",
-            "translation": "Fysiske egenskaper"
-        },
-        {
-            "id": "Binding",
-            "message": "Binding",
-            "translation": "Innbdinding"
-        },
-        {
-            "id": "Number of pages",
-            "message": "Number of pages",
-            "translation": "Sidetall"
-        },
-        {
             "id": "Cover-image",
             "message": "Cover-image",
             "translation": "Forsidebilde"
@@ -300,9 +195,14 @@
             ]
         },
         {
-            "id": "Personalia",
-            "message": "Personalia",
-            "translation": "Personalia"
+            "id": "Basic information",
+            "message": "Basic information",
+            "translation": "Grunnleggende informasjon"
+        },
+        {
+            "id": "Name",
+            "message": "Name",
+            "translation": "Navn"
         },
         {
             "id": "Required field",
@@ -310,8 +210,8 @@
             "translation": "Påkrevd felt"
         },
         {
-            "id": "Description (short)",
-            "message": "Description (short)",
+            "id": "Short description",
+            "message": "Short description",
             "translation": "Kort beskrivelse"
         },
         {
@@ -323,6 +223,46 @@
             "id": "One entry per line",
             "message": "One entry per line",
             "translation": "En innførsel per linje"
+        },
+        {
+            "id": "Parent name",
+            "message": "Parent name",
+            "translation": "Navn på overordnet"
+        },
+        {
+            "id": "Lifespan",
+            "message": "Lifespan",
+            "translation": "Levetid"
+        },
+        {
+            "id": "Foundation year",
+            "message": "Foundation year",
+            "translation": "Etablert"
+        },
+        {
+            "id": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "message": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
+            "translation": "År må være et 1-4 sifret heltall. Negative tall betyr BCE."
+        },
+        {
+            "id": "Disestablishment year",
+            "message": "Disestablishment year",
+            "translation": "Oppløst"
+        },
+        {
+            "id": "Uncertain",
+            "message": "Uncertain",
+            "translation": "Usikkert"
+        },
+        {
+            "id": "Personalia",
+            "message": "Personalia",
+            "translation": "Personalia"
+        },
+        {
+            "id": "Description (short)",
+            "message": "Description (short)",
+            "translation": "Kort beskrivelse"
         },
         {
             "id": "Gender",
@@ -345,19 +285,99 @@
             "translation": "Fødselsår"
         },
         {
-            "id": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
-            "message": "Year must be a 1-4 digit number. Negative numbers signify BCE.",
-            "translation": "År må være et 1-4 sifret heltall. Negative tall betyr BCE."
-        },
-        {
             "id": "Deathyear",
             "message": "Deathyear",
             "translation": "Dødsår"
         },
         {
-            "id": "Uncertain",
-            "message": "Uncertain",
-            "translation": "Usikkert"
+            "id": "Title",
+            "message": "Title",
+            "translation": "Tittel"
+        },
+        {
+            "id": "Subtitle",
+            "message": "Subtitle",
+            "translation": "Undertittel"
+        },
+        {
+            "id": "Publisher",
+            "message": "Publisher",
+            "translation": "Utgiver"
+        },
+        {
+            "id": "Year must be a 4-digit number",
+            "message": "Year must be a 4-digit number",
+            "translation": "År må være et 4-siffret heltall"
+        },
+        {
+            "id": "Content",
+            "message": "Content",
+            "translation": "Innhold"
+        },
+        {
+            "id": "Main language",
+            "message": "Main language",
+            "translation": "Språk (hoved-)"
+        },
+        {
+            "id": "Other languages",
+            "message": "Other languages",
+            "translation": "Andre språk"
+        },
+        {
+            "id": "Fiction",
+            "message": "Fiction",
+            "translation": "Fiksjon"
+        },
+        {
+            "id": "Nonfiction",
+            "message": "Nonfiction",
+            "translation": "Fag"
+        },
+        {
+            "id": "Genre and forms",
+            "message": "Genre and forms",
+            "translation": "Sjanger og form"
+        },
+        {
+            "id": "Audience",
+            "message": "Audience",
+            "translation": "Målgruppe"
+        },
+        {
+            "id": "Physical characteristics",
+            "message": "Physical characteristics",
+            "translation": "Fysiske egenskaper"
+        },
+        {
+            "id": "Binding",
+            "message": "Binding",
+            "translation": "Innbdinding"
+        },
+        {
+            "id": "Number of pages",
+            "message": "Number of pages",
+            "translation": "Sidetall"
+        },
+        {
+            "id": "Must be an integer",
+            "message": "Must be an integer",
+            "translation": "Må være et heltall"
+        },
+        {
+            "id": "Resource",
+            "message": "Resource",
+            "translation": "Ressurs"
+        },
+        {
+            "id": "Relation",
+            "message": "Relation",
+            "translation": "Relasjon"
+        },
+        {
+            "id": "Data",
+            "message": "Data",
+            "translation": "Data"
         }
     ]
 }

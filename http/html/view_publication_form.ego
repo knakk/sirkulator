@@ -76,12 +76,12 @@ func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
         <ego:InputBool
             ID="fiction"
             Value=pub.Fiction
-            Label=l.Translate("Fiksjon") />
+            Label=l.Translate("Fiction") />
 
         <ego:InputBool
             ID="nonfiction"
             Value=pub.Nonfiction
-            Label=l.Translate("Fag") />
+            Label=l.Translate("Nonfiction") />
 
         <ego:InputText
             ID="genre_forms"
