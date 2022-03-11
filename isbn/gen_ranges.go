@@ -88,7 +88,7 @@ func main() {
 			}
 			l, _ := strconv.Atoi(r.Length)
 			ranges := strings.Split(r.Range, "-")
-			fmt.Fprintf(f, "{%q,%q},", ranges[0][:l], ranges[1][:l])
+			fmt.Fprintf(f, "\n{%q,%q},", ranges[0][:l], ranges[1][:l])
 		}
 		fmt.Fprintf(f, "\t},")
 		fmt.Fprintf(f, "\t},\n")
