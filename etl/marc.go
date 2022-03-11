@@ -465,7 +465,9 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		}
 	}
 	sort.Slice(covers, func(i, j int) bool {
-		return strings.Contains(covers[i].URL, "original") && !strings.Contains(covers[j].URL, "original")
+		a := strings.Contains(covers[i].URL, "original") || strings.Contains(covers[i].URL, "ORG")
+		b := strings.Contains(covers[j].URL, "original") || strings.Contains(covers[j].URL, "ORG")
+		return a && !b
 	})
 	ing.Covers = covers
 

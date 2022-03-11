@@ -615,5 +615,4 @@ func (ig *Ingestor) indexResources(res []sirkulator.Resource) {
 	if err := ig.idx.Store(docs...); err != nil {
 		log.Println(err) // TODO or not
 	}
-	// TODO update indexed_at column in main.resource SQL db
 }

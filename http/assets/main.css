@@ -50,6 +50,7 @@ input:not(:focus):invalid ~ p.validation { visibility: visible; }
 
 input:focus,
 textarea:focus        { outline: 0; box-shadow: 0 0 0 4px lightskyblue; }
+input[type="search"]  { appearance: none;}
 
 fieldset       { margin-bottom: 1rem; }
 fieldset .field { clear: both; }
@@ -70,12 +71,15 @@ fieldset textarea:focus ~ label { color: blue  }
 .field .selected-term { border-radius: 0 0 0 0.5rem; border-right:0 }
 button.unselect-term { border-radius: 0 0.5rem 0 0; cursor: pointer; border-left:0 }
 button.unselect-term span { background-color: #bbb;}
+
 .radiofield { clear: both; padding-top: 1rem; }
+
 .radiofield .label { float: left; width: 20%; margin-right:2rem; text-align: right; font-weight:bold }
 .radiofield .radioptions { float: right; width: 75% }
 .radiofield input { width: 2rem;}
 .radiofield label { display: inline-block; cursor: pointer }
 .radiofield input[type="radio"]:focus + label { color: blue}
+.radiooptions label { font-weight: normal }
 
 details summary     { cursor: pointer;  background: lightsteelblue; padding: .5rem 1rem;}
 details summary > * { display: inline; }

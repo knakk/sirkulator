@@ -1,4 +1,3 @@
-// package localizer TODO rename il18n?
 package localizer
 
 import (

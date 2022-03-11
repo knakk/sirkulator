@@ -175,7 +175,6 @@ func (s *Server) indexResources(res []sirkulator.Resource) {
 	if err := s.idx.Store(docs...); err != nil {
 		log.Println(err) // TODO or not
 	}
-	// TODO update indexed_at column in main.resource SQL db
 }
 
 func (s *Server) image(w http.ResponseWriter, r *http.Request) {

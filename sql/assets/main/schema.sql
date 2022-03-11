@@ -6,7 +6,6 @@ CREATE TABLE resource (
     data        JSON NOT NULL DEFAULT '{}',
     created_at  INTEGER NOT NULL, -- time.Now().Unix()
     updated_at  INTEGER NOT NULL, -- time.Now().Unix()
-    indexed_at  INTEGER, -- time.Now().Unix() TODO drop this?
     archived_at INTEGER  -- time.Now().Unix()
 );
 -- TODO index on expression json_extract(data, '$.year')?
