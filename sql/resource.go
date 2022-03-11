@@ -280,15 +280,16 @@ func GetImage(conn *sqlite.Conn, id string) (*sirkulator.Image, error) {
 	return &img, nil
 }
 
-func UpdateResource(conn *sqlite.Conn, res sirkulator.Resource) (err error) {
+func UpdateResource(conn *sqlite.Conn, res sirkulator.Resource, label string) (err error) {
 	defer sqlitex.Save(conn)(&err)
 	stmt := conn.Prep(`
-			UPDATE resource SET data=$data, updated_at=$updated_at
+			UPDATE resource SET data=$data, label=$label, updated_at=$updated_at
 			WHERE id=$id
 		`)
 
 	stmt.SetText("$id", res.ID)
 	stmt.SetInt64("$updated_at", time.Now().Unix())
+	stmt.SetText("$label", label)
 	b, err := json.Marshal(res.Data)
 	if err != nil {
 		return err // TODO annotate

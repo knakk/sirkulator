@@ -124,16 +124,22 @@ func (s *Server) savePerson(w http.ResponseWriter, r *http.Request) {
 		ID:   id,
 		Type: sirkulator.TypePerson,
 		Data: newP,
-	}); err != nil {
+	}, newP.Label()); err != nil {
 		ServerError(w, err)
 		return
 	}
 
-	// TODO load resource from DB again?
-	// or make sql.UpdateResource return updated resource?
+	// Load resource from DB again
+	// TODO or make sql.UpdateResource return updated resource?
+	res, err = sql.GetResource(conn, sirkulator.TypePerson, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+	go s.indexResources([]sirkulator.Resource{res})
 
 	tmpl := html.PersonForm{
-		Person:    &newP,
+		Person:    res.Data.(*sirkulator.Person),
 		UpdatedAt: res.UpdatedAt.Unix(),
 		Localizer: l,
 	}

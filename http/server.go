@@ -15,6 +15,7 @@ import (
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/go-chi/chi/v5"
+	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/etl"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
@@ -153,6 +154,28 @@ func (s *Server) Close() error {
 		s.idx.Close() // TODO check err?
 	}
 	return s.srv.Shutdown(ctx)
+}
+
+func (s *Server) indexResources(res []sirkulator.Resource) {
+	if s.idx == nil {
+		return
+	}
+
+	var docs []search.Document
+	for _, r := range res {
+		docs = append(docs, search.Document{
+			ID:        r.ID,
+			Type:      r.Type.String(),
+			Label:     r.Label,
+			Gain:      1.0,
+			CreatedAt: r.CreatedAt,
+			UpdatedAt: r.UpdatedAt,
+		})
+	}
+	if err := s.idx.Store(docs...); err != nil {
+		log.Println(err) // TODO or not
+	}
+	// TODO update indexed_at column in main.resource SQL db
 }
 
 func (s *Server) image(w http.ResponseWriter, r *http.Request) {
