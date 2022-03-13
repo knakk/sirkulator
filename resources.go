@@ -409,6 +409,7 @@ type Relation struct {
 type RelationExp struct {
 	Relation
 	From SimpleResource
+	To   SimpleResource
 }
 
 type Image struct {

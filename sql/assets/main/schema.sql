@@ -18,7 +18,10 @@ CREATE TABLE resource_edit_log (
     PRIMARY KEY(resource_id, at)
 );
 
--- A relation describes a relation between two known resources.
+-- A relation describes a relation between two resources.
+--
+-- If to_id is NULL, the relation is considered a review which
+-- must be manually resolved.
 --
 -- If one part of the relation is a publication, it should be in the
 -- originating position (from_id).
@@ -27,11 +30,12 @@ CREATE TABLE resource_edit_log (
 -- relation is obvious; for example 'subject_of', rather than just 'subject',
 -- where you wouldn't know if A is subject of B or B is subject of A.
 CREATE TABLE relation (
-    id       INTEGER PRIMARY KEY,
-    from_id  TEXT NOT NULL REFERENCES resource (id),
-    to_id    TEXT NOT NULL REFERENCES resource (id),
-    type     TEXT NOT NULL, -- has_contributor|has_subject|in_series|followed_by|derived_from|translation_of|
-    data     JSON
+    id        INTEGER PRIMARY KEY,
+    from_id   TEXT NOT NULL REFERENCES resource (id),
+    to_id     TEXT REFERENCES resource (id),
+    type      TEXT NOT NULL, -- has_contributor|has_subject|in_series|followed_by|derived_from|translation_of|
+    data      JSON,
+    queued_at INTEGER -- Only set if to_id is NULL
 );
 
 CREATE INDEX idx_relation_from_id ON relation (from_id);
@@ -47,22 +51,6 @@ CREATE TABLE link (
 );
 
 CREATE INDEX idx_link_id ON link (id);
-
--- A review is a relation where we only know the identity of
--- the resource from which the relation is pointing, but the
--- resource it is pointing to, is unknown, and must be manually
--- matched by a human by looking at the information in data.
---
--- TODO consider other nouns as name for this table; a review in the
---      context of books usually means something else..
-CREATE TABLE review (
-    id          INTEGER PRIMARY KEY,
-    from_id     TEXT REFERENCES resource (id),
-    type        TEXT NOT NULL,
-    data        JSON,
-    queued_at   INTEGER NOT NULL -- time.Now().Unix()
-    -- status   TEXT, -- maybe? new|parked|etc, Status could also be stored in data column
-);
 
 -- increment with 1 for each migration
 PRAGMA user_version=1;

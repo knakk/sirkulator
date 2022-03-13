@@ -40,7 +40,6 @@ type Ingestor struct {
 type Ingestion struct {
 	Resources []sirkulator.Resource
 	Relations []sirkulator.Relation
-	Reviews   []sirkulator.Relation
 	Covers    []FileFetch
 }
 
@@ -288,7 +287,7 @@ func (ig *Ingestor) remoteRecord(ctx context.Context, idtype, id string) (Ingest
 	return Ingestion{}, sirkulator.ErrNotFound
 }
 
-// persistIngestion will store all resources, relations and reviews in
+// persistIngestion will store all resources and relations in
 // the Ingestion. No further validation of input is performed - all of
 // the given data is assumed to be valid at this point, as not to
 // trigger any SQL constraint errors when inserting into DB.
@@ -346,32 +345,23 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 
 	for _, rel := range data.Relations {
 		stmt := conn.Prep(`
-			INSERT INTO relation (from_id, to_id, type, data)
-				VALUES ($from_id, $to_id, $type, $data)
+			WITH v(from_id, type, data) AS (VALUES ($from_id, $type, $data))
+				INSERT INTO relation (from_id, to_id, type, data, queued_at)
+				SELECT
+					v.from_id,
+					res.id,
+					v.type,
+					JSON_PATCH(v.data, IIF(res.id IS NULL,
+						IIF($to_id != '', JSON_OBJECT('to_id', $to_id), '{}'), '{}')) AS data,
+					IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
+				FROM v LEFT JOIN resource res ON (res.id = $to_id)
 		`)
 
 		stmt.SetText("$from_id", rel.FromID)
 		stmt.SetText("$to_id", rel.ToID)
 		stmt.SetText("$type", rel.Type)
-		b, err := json.Marshal(rel.Data)
-		if err != nil {
-			return err // TODO annotate
-		}
-		stmt.SetBytes("$data", b)
-		if _, err := stmt.Step(); err != nil {
-			return err // TODO annotate
-		}
-	}
-
-	for _, rev := range data.Reviews {
-		stmt := conn.Prep(`
-			INSERT INTO review (from_id, type, data, queued_at)
-				VALUES ($from_id, $type, $data, $queued_at)
-		`)
-		stmt.SetText("$from_id", rev.FromID)
-		stmt.SetText("$type", rev.Type)
 		stmt.SetInt64("$queued_at", time.Now().Unix())
-		b, err := json.Marshal(rev.Data)
+		b, err := json.Marshal(rel.Data)
 		if err != nil {
 			return err // TODO annotate
 		}
@@ -552,7 +542,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 					}
 					if parent := c.Data.(sirkulator.Corporation).ParentName; parent != "" {
 						// Add review to establish link to parent corporation
-						data.Reviews = append(data.Reviews, sirkulator.Relation{
+						data.Relations = append(data.Relations, sirkulator.Relation{
 							FromID: res.ID,
 							Type:   "has_parent",
 							Data:   map[string]interface{}{"name": parent},

@@ -257,7 +257,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	if ok {
 		if publisher := f.ValueAt("b"); publisher != "" {
 			p.Publisher = publisher
-			ing.Reviews = append(ing.Reviews, sirkulator.Relation{
+			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
 				Type:   "published_by",
 				Data:   map[string]interface{}{"label": p.Publisher},
@@ -282,7 +282,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			if p.Publisher != "" {
 				data["publisher"] = p.Publisher
 			}
-			ing.Reviews = append(ing.Reviews, sirkulator.Relation{
+			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
 				Type:   "in_series",
 				Data:   data,

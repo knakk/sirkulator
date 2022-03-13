@@ -333,6 +333,11 @@ func TestIngestISBN(t *testing.T) {
 	wantRelations := []sirkulator.Relation{
 		{
 			FromID: "t1",
+			Type:   "published_by",
+			Data:   map[string]interface{}{"label": "Cappelen"},
+		},
+		{
+			FromID: "t1",
 			ToID:   "p0",
 			Type:   "has_contributor",
 			Data:   map[string]interface{}{"role": "aut", "main_entry": true},
@@ -363,36 +368,6 @@ func TestIngestISBN(t *testing.T) {
 		t.Fatal(err)
 	}
 	if diff := cmp.Diff(wantRelations, gotRelations); diff != "" {
-		t.Errorf("relations mismatch (-want +got):\n%s", diff)
-	}
-
-	// Verify that reviews where stored
-	wantReviews := []sirkulator.Relation{
-		{
-			FromID: "t1",
-			Type:   "published_by",
-			Data:   map[string]interface{}{"label": "Cappelen"},
-		},
-	}
-	var gotReviews []sirkulator.Relation
-	checkRev := func(stmt *sqlite.Stmt) error {
-		rel := sirkulator.Relation{
-			FromID: stmt.ColumnText(0),
-			Type:   stmt.ColumnText(1),
-		}
-		data := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(stmt.ColumnText(2)), &data); err != nil {
-			return err
-		}
-		rel.Data = data
-		gotReviews = append(gotReviews, rel)
-		return nil
-	}
-	const rq = "SELECT from_id, type, data FROM review WHERE from_id=?"
-	if err := sqlitex.Exec(conn, rq, checkRev, "t1"); err != nil {
-		t.Fatal(err)
-	}
-	if diff := cmp.Diff(wantReviews, gotReviews); diff != "" {
 		t.Errorf("relations mismatch (-want +got):\n%s", diff)
 	}
 

@@ -370,6 +370,11 @@ func TestIngestOAIRecord(t *testing.T) {
 			Relations: []sirkulator.Relation{
 				{
 					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Aschehoug"},
+				},
+				{
+					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
@@ -416,13 +421,6 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					ResourceID: "t1",
 					URL:        "https://media.aja.bs.no/4bfe1c40-8ee2-4601-b7eb-2e032a2e59b7/cover/thumbnail.jpg",
-				},
-			},
-			Reviews: []sirkulator.Relation{
-				{
-					FromID: "t1",
-					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Aschehoug"},
 				},
 			},
 		}
@@ -646,6 +644,11 @@ func TestIngestOAIRecord(t *testing.T) {
 			Relations: []sirkulator.Relation{
 				{
 					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Aschehoug"},
+				},
+				{
+					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
@@ -655,13 +658,6 @@ func TestIngestOAIRecord(t *testing.T) {
 					ToID:   "t3",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "trl"},
-				},
-			},
-			Reviews: []sirkulator.Relation{
-				{
-					FromID: "t1",
-					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Aschehoug"},
 				},
 			},
 		}
@@ -933,6 +929,11 @@ func TestIngestOAIRecord(t *testing.T) {
 			Relations: []sirkulator.Relation{
 				{
 					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Norges sopp- og nyttevekstforbund"},
+				},
+				{
+					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
@@ -961,13 +962,6 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": string("aut")},
 				},*/
-			},
-			Reviews: []sirkulator.Relation{
-				{
-					FromID: "t1",
-					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Norges sopp- og nyttevekstforbund"},
-				},
 			},
 			Covers: []FileFetch{
 				{
@@ -1218,6 +1212,11 @@ func TestIngestOAIRecord(t *testing.T) {
 			Relations: []sirkulator.Relation{
 				{
 					FromID: "t1",
+					Type:   "published_by",
+					Data:   map[string]interface{}{"label": "Pax forlag"},
+				},
+				{
+					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_subject",
 				},
@@ -1257,13 +1256,6 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": string("aut")},
 				},*/
-			},
-			Reviews: []sirkulator.Relation{
-				{
-					FromID: "t1",
-					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Pax forlag"},
-				},
 			},
 			Covers: []FileFetch{
 				{
@@ -1500,20 +1492,6 @@ func TestIngestOAIRecord(t *testing.T) {
 			Relations: []sirkulator.Relation{
 				{
 					FromID: "t1",
-					ToID:   "t2",
-					Type:   "has_contributor",
-					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
-				},
-				{
-					FromID: "t1",
-					ToID:   "t3",
-					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "bjd"},
-				},
-			},
-			Reviews: []sirkulator.Relation{
-				{
-					FromID: "t1",
 					Type:   "published_by",
 					Data:   map[string]interface{}{"label": "Gyldendal"},
 				},
@@ -1526,6 +1504,18 @@ func TestIngestOAIRecord(t *testing.T) {
 						"publisher": "Gyldendal",
 						//	"author": "Bjørn Ingvaldsen",
 					},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t2",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t3",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "bjd"},
 				},
 			},
 		}
@@ -1729,20 +1719,6 @@ func TestIngestOAIRecord(t *testing.T) {
 			Relations: []sirkulator.Relation{
 				{
 					FromID: "t1",
-					ToID:   "t2",
-					Type:   "has_contributor",
-					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
-				},
-				{
-					FromID: "t1",
-					ToID:   "t3",
-					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "ill"},
-				},
-			},
-			Reviews: []sirkulator.Relation{
-				{
-					FromID: "t1",
 					Type:   "published_by",
 					Data:   map[string]interface{}{"label": "Cappelen Damm"},
 				},
@@ -1762,6 +1738,18 @@ func TestIngestOAIRecord(t *testing.T) {
 						"label":     "Min første leseløve",
 						"publisher": "Cappelen Damm",
 					},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t2",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "t3",
+					Type:   "has_contributor",
+					Data:   map[string]interface{}{"role": "ill"},
 				},
 			},
 		}

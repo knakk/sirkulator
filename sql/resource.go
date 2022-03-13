@@ -172,6 +172,53 @@ func GetPublcationContributors(conn *sqlite.Conn, id string) ([]sirkulator.Publi
 	return res, nil
 }
 
+func GetPublcationRelations(conn *sqlite.Conn, id string) ([]sirkulator.RelationExp, error) {
+	var res []sirkulator.RelationExp
+
+	const q = `
+	SELECT
+		rel.id,
+		rel.type,
+		rel.to_id,
+		rel.data,
+		res.type as res_type,
+		res.label as res_label
+	FROM
+		relation rel
+		LEFT JOIN resource res ON (rel.to_id=res.id)
+	WHERE
+		rel.from_id=?`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		r := sirkulator.RelationExp{
+			Relation: sirkulator.Relation{
+				ID:   stmt.ColumnInt64(0),
+				Type: stmt.ColumnText(1),
+				ToID: stmt.ColumnText(2),
+			},
+			To: sirkulator.SimpleResource{
+				ID:    stmt.ColumnText(2),
+				Type:  sirkulator.ParseResourceType(stmt.ColumnText(4)),
+				Label: stmt.ColumnText(5),
+			},
+		}
+		var data map[string]interface{}
+		if err := json.Unmarshal([]byte(stmt.ColumnText(3)), &data); err != nil {
+			return err // TODO annotate
+		}
+		r.Relation.Data = data
+
+		res = append(res, r)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetPublicationRelations(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
 func GetPublcationReviews(conn *sqlite.Conn, id string) ([]sirkulator.Relation, error) {
 	var res []sirkulator.Relation
 
@@ -180,9 +227,10 @@ func GetPublcationReviews(conn *sqlite.Conn, id string) ([]sirkulator.Relation, 
 		type,
 		data
 	FROM
-		review
+		relation
 	WHERE
 		from_id=?
+	AND to_id IS NULL
 	ORDER BY queued_at`
 
 	fn := func(stmt *sqlite.Stmt) error {
@@ -215,16 +263,18 @@ func GetAllReviews(conn *sqlite.Conn, limit int) ([]sirkulator.RelationExp, erro
 
 	const q = `
 	SELECT
-		rev.id,
-		rev.from_id,
-		rev.type,
-		rev.data,
+		rel.id,
+		rel.from_id,
+		rel.type,
+		rel.data,
 		res.type,
 		res.label
 	FROM
-		review rev
-		JOIN resource res ON (rev.from_id=res.id)
-	ORDER BY rev.queued_at
+		relation rel
+		JOIN resource res ON (rel.from_id=res.id)
+	WHERE
+		rel.to_id IS NULL
+	ORDER BY rel.queued_at
 	LIMIT ?`
 
 	fn := func(stmt *sqlite.Stmt) error {

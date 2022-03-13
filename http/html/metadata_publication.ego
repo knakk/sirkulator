@@ -12,8 +12,7 @@ import (
 type PublicationTemplate struct {
     Page
     Resource sirkulator.Resource
-    Contributions []sirkulator.PublicationContribution
-    Reviews []sirkulator.Relation
+    Relations []sirkulator.RelationExp
     Image *sirkulator.Image
 }
 
@@ -97,27 +96,23 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
                     </tr>
                 </thead>
                 <tbody>
-                    <% for _, c := range tmpl.Contributions { %>
+                    <% for _, r := range tmpl.Relations { %>
                         <tr>
                             <td>
-                                <%= printRoles(c.Roles, l) %>
+                                <%= r.Type %>
                             </td>
-                            <td colspan="2">
-                                <a href="<%= resourceLink(c.Agent) %>"><%= c.Agent.Label %></a>
-                            </td>
-                        </tr>
-                    <% } %>
-                    <% for _, r := range tmpl.Reviews { %>
-                        <tr class="review">
-                            <td>
-                                <%= vocab.ParseRelation(r.Type).Label(l.Lang) %>
-                            </td>
-                            <td>
-                                <%= r.Data["label"] %>
-                            </td>
-                            <td>
-                                <button><%= l.Translate("Search and connect to resource") %></button>
-                            </td>
+                            <% if r.To.ID != "" { %>
+                                <td colspan="2">
+                                    <a href="<%= resourceLink(r.To) %>"><%= r.To.Label %></a>
+                                </td>
+                            <% } else { %>
+                                <td>
+                                    <%= r.Data["label"] %>
+                                </td>
+                                <td>
+                                    <button><%= l.Translate("Search and connect to resource") %></button>
+                                </td>
+                            <% } %>
                         </tr>
                     <% } %>
                 </tbody>
