@@ -2,12 +2,14 @@ package http
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/knakk/sirkulator"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/sql"
 	"github.com/knakk/sirkulator/vocab"
 )
@@ -37,11 +39,42 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		ServerError(w, err)
 		return
 	}
-	// Localize type label
-	for i, r := range rel {
-		rel[i].Relation.Type = vocab.ParseRelation(r.Type).Label(l.Lang)
+
+	// Localize type label, and group contributor nodes to one relation per agent
+	for i := len(rel) - 1; i >= 0; i-- {
+		// We loop backwards, which make it easier to remove relation if necessary
+		r := rel[i]
+		if r.Type == "has_contributor" {
+			newAgent := true
+			var roleLabel string
+			if role, ok := r.Data["role"].(string); ok {
+				relator, err := marc.ParseRelator(role)
+				if err == nil {
+					roleLabel = relator.Label(l.Lang)
+				}
+			}
+
+			// Check if we allready have a relation to agent
+			for j := len(rel) - 1; j > i; j-- {
+				if r.ToID == rel[j].ToID && rel[j].Data["role"] != nil { // TODO find a more reliable way of matching "has_contributor" relations
+					// Append role to relation type label
+					rel[j].Relation.Type = fmt.Sprintf("%s, %s", rel[j].Relation.Type, roleLabel)
+
+					// Remove current relation
+					rel = append(rel[:i], rel[i+1:]...)
+
+					newAgent = false
+					break
+				}
+			}
+
+			if newAgent {
+				rel[i].Relation.Type = roleLabel
+			}
+		} else {
+			rel[i].Relation.Type = vocab.ParseRelation(r.Type).Label(l.Lang)
+		}
 	}
-	// TODO:Group contribution relations by agent
 
 	img, _ := sql.GetImage(conn, id) // img is nil if err != nil TODO log err if err != ErrNotFound?
 
