@@ -31,6 +31,7 @@ const (
 	TypeCorporation
 	TypeLiteraryAward
 	TypeSeries
+	TypeDewey
 )
 
 func AllResourceTypes() []ResourceType {
@@ -41,6 +42,7 @@ func AllResourceTypes() []ResourceType {
 		TypeCorporation,
 		TypeLiteraryAward,
 		TypeSeries,
+		TypeDewey,
 	}
 }
 
@@ -57,21 +59,21 @@ func (r ResourceType) String() string {
 	if r > 7 || r < 0 {
 		r = 0 // "unknown"
 	}
-	return [...]string{"unknown", "publication", "publisher", "person", "corporation", "literary_award", "series"}[r]
+	return [...]string{"unknown", "publication", "publisher", "person", "corporation", "literary_award", "series", "dewey"}[r]
 }
 
 func (r ResourceType) enLabel() string {
 	if r > 7 || r < 0 {
 		r = 0 // "unknown"
 	}
-	return [...]string{"unknown", "publication", "publisher", "person", "corporation", "literary award", "series"}[r]
+	return [...]string{"Unknown", "Publication", "Publisher", "Person", "Corporation", "Literary award", "Series", "Dewey number"}[r]
 }
 
 func (r ResourceType) noLabel() string {
 	if r > 7 || r < 0 {
 		r = 0 // "ukjent"
 	}
-	return [...]string{"ukjent", "utgivelse", "forlag", "person", "korporasjon", "pris", "serie"}[r]
+	return [...]string{"Ukjent", "Utgivelse", "Forlag", "Person", "Korporasjon", "Litterær pris", "Serie", "Deweynummer"}[r]
 }
 
 // Label returns a localized string representation of ResourceType.
@@ -392,6 +394,16 @@ func (c Corporation) Label() string {
 type Character struct {
 	Name           string   `json:"name"`
 	NameVariations []string `json:"name_variations"`
+}
+
+type Dewey struct {
+	Number string   `json:"number"` // same as resource.ID
+	Name   string   `json:"name"`   // Only norwegian label for now
+	Terms  []string `json:"terms"`  // Henvisningstermer
+}
+
+func (d Dewey) Label() string {
+	return fmt.Sprintf("%s %s", d.Number, d.Name)
 }
 
 // 3) Circulation: Item, User, Staff etc

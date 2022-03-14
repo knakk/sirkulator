@@ -12,7 +12,11 @@ require (
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 )
 
-require golang.org/x/image v0.0.0-20211028202545-6944b10bf410
+require (
+	github.com/blugelabs/bluge v0.1.9
+	github.com/knakk/rdf v0.0.0-20190304171630-8521bf4c5042
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
+)
 
 // Build tools
 require github.com/benbjohnson/ego v0.4.3
@@ -26,7 +30,6 @@ require (
 	github.com/blevesearch/segment v0.9.0 // indirect
 	github.com/blevesearch/snowballstem v0.9.0 // indirect
 	github.com/blevesearch/vellum v1.0.5 // indirect
-	github.com/blugelabs/bluge v0.1.9 // indirect
 	github.com/blugelabs/bluge_segment_api v0.2.0 // indirect
 	github.com/blugelabs/ice v0.2.0 // indirect
 	github.com/caio/go-tdigest v3.1.0+incompatible // indirect

@@ -13,6 +13,8 @@ const (
 	RelationHasSubject     Relation = "has_subject"
 	RelationPublishedBy    Relation = "published_by"
 	RelationInSeries       Relation = "in_series"
+	RelationHasParent      Relation = "has_parent"
+	RelationHasPart        Relation = "has_part"
 	// TODO:
 	// - followed_by
 	// - derived_from
@@ -25,6 +27,8 @@ var relationLabels = map[string][2]string{
 	"has_subject":     {"Has subject", "Har som emne"},
 	"published_by":    {"Published by", "Utgitt av"},
 	"in_series":       {"In series", "I serien"},
+	"has_parent":      {"Has parent", "Hører til under"}, //  TODO norwegian label sounds odd
+	"has_part":        {"Has part", "Innehodler del"},
 }
 
 func ParseRelation(s string) Relation {
@@ -37,6 +41,10 @@ func ParseRelation(s string) Relation {
 		return RelationPublishedBy
 	case "in_series":
 		return RelationInSeries
+	case "has_parent":
+		return RelationHasParent
+	case "has_part":
+		return RelationHasPart
 	default:
 		return RelationInvalid
 	}

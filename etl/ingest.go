@@ -309,7 +309,7 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 		stmt.SetText("$id", res.ID)
 		stmt.SetText("$label", res.Label)
 		stmt.SetInt64("$now", now.Unix())
-		// TODO set created_at && update_at to time.Now.Unix()
+
 		b, err := json.Marshal(res.Data)
 		if err != nil {
 			return err // TODO annotate
@@ -346,15 +346,15 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	for _, rel := range data.Relations {
 		stmt := conn.Prep(`
 			WITH v(from_id, type, data) AS (VALUES ($from_id, $type, $data))
-				INSERT INTO relation (from_id, to_id, type, data, queued_at)
-				SELECT
-					v.from_id,
-					res.id,
-					v.type,
-					JSON_PATCH(v.data, IIF(res.id IS NULL,
-						IIF($to_id != '', JSON_OBJECT('to_id', $to_id), '{}'), '{}')) AS data,
-					IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
-				FROM v LEFT JOIN resource res ON (res.id = $to_id)
+			INSERT INTO relation (from_id, to_id, type, data, queued_at)
+			SELECT
+				v.from_id,
+				res.id,
+				v.type,
+				JSON_PATCH(v.data, IIF(res.id IS NULL,
+					IIF($to_id != '', JSON_OBJECT('to_id', $to_id), '{}'), '{}')) AS data,
+				IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
+			FROM v LEFT JOIN resource res ON (res.id = $to_id)
 		`)
 
 		stmt.SetText("$from_id", rel.FromID)
