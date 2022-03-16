@@ -42,7 +42,7 @@ func AllResourceTypes() []ResourceType {
 		TypeCorporation,
 		TypeLiteraryAward,
 		TypeSeries,
-		TypeDewey,
+		TypeDewey, // TODO TypeClassification?
 	}
 }
 

@@ -36,8 +36,9 @@ type importBatch struct {
 }
 
 type ImportAllJob struct {
-	wg   sync.WaitGroup // keeping track of indexing TODO consider sync.ErrGroup
-	peek *rdf.Triple
+	wg        sync.WaitGroup // keeping track of indexing TODO consider sync.ErrGroup
+	peek      *rdf.Triple
+	peekParts []string
 
 	// Setup:
 	DB        *sqlitex.Pool
@@ -87,7 +88,7 @@ func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
 	if err := sqlitex.ExecScript(conn, `
 		UPDATE relation
 		SET
-			to_id=JSON_EXTRACT(data ,'$.to_id'),
+			to_id = JSON_EXTRACT(data ,'$.to_id'),
 			data = JSON_REMOVE(data, '$.to_id'),
 			queued_at = NULL
 		WHERE
@@ -113,7 +114,10 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 		dewey importDewey
 		tr    rdf.Triple
 		err   error
+		parts []string
 	)
+	parts = append(parts, j.peekParts...)
+	j.peekParts = j.peekParts[:]
 
 	for {
 		if j.peek != nil {
@@ -133,6 +137,7 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 			if s != subj {
 				if len(numbers) == j.BatchSize {
 					j.peek = &tr
+					j.peekParts = parts
 					break
 				}
 				if subj != "" {
@@ -141,6 +146,8 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 				subj = s
 				dewey = numbers[subj]
 				dewey.Number = subj
+				dewey.Parts = append(dewey.Parts, parts...)
+				parts = parts[:0]
 			}
 		}
 
@@ -158,10 +165,14 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 				dewey.Updated = l.String()
 			}
 		case "http://www.w3.org/1999/02/22-rdf-syntax-ns#first":
+			// Blank nodes are always preceding the dewey number which points to them, so
+			// This belongs to dewey "next" number in the file.
+			// It's a tad brittle to base the parsing on the order of the triples..
+			// TODO consider more robust parsing
 			if o := tr.Obj.String(); strings.HasPrefix(o, "http://dewey.info/class/") {
 				o = strings.TrimPrefix(o, "http://dewey.info/class/")
 				o = strings.TrimSuffix(o, "/e23/")
-				dewey.Parts = append(dewey.Parts, o)
+				parts = append(parts, o)
 			}
 		case "http://www.w3.org/2004/02/skos/core#broader":
 			if o := tr.Obj.String(); strings.HasPrefix(o, "http://dewey.info/class/") {

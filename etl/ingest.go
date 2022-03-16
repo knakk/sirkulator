@@ -352,7 +352,7 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 				res.id,
 				v.type,
 				JSON_PATCH(v.data, IIF(res.id IS NULL,
-					IIF($to_id != '', JSON_OBJECT('to_id', $to_id), '{}'), '{}')) AS data,
+					IIF($to_id != '', JSON_OBJECT('label', $to_id), '{}'), '{}')) AS data,
 				IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
 			FROM v LEFT JOIN resource res ON (res.id = $to_id)
 		`)

@@ -21,7 +21,8 @@ CREATE TABLE resource_edit_log (
 -- A relation describes a relation between two resources.
 --
 -- If to_id is NULL, the relation is considered a review which
--- must be manually resolved.
+-- must be manually resolved. A review should have some info
+-- in `data` field to help with that - at least a `label` key.
 --
 -- If one part of the relation is a publication, it should be in the
 -- originating position (from_id).

@@ -381,6 +381,12 @@ func TestIngestOAIRecord(t *testing.T) {
 				},
 				{
 					FromID: "t1",
+					ToID:   "839.82374",
+					Type:   "has_classification",
+					Data:   map[string]interface{}{"edition": string("23/nor")},
+				},
+				{
+					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_subject",
 				},
@@ -652,6 +658,12 @@ func TestIngestOAIRecord(t *testing.T) {
 					ToID:   "t2",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
+				},
+				{
+					FromID: "t1",
+					ToID:   "839.73",
+					Type:   "has_classification",
+					Data:   map[string]interface{}{"edition": string("4/nor")},
 				},
 				{
 					FromID: "t1",
@@ -938,6 +950,12 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
 				},
+				{
+					FromID: "t1",
+					ToID:   "581.6309481",
+					Type:   "has_classification",
+					Data:   map[string]interface{}{"edition": string("23/nor")},
+				},
 				/*{
 					FromID: "t1",
 					ToID:   "t3",
@@ -1214,6 +1232,12 @@ func TestIngestOAIRecord(t *testing.T) {
 					FromID: "t1",
 					Type:   "published_by",
 					Data:   map[string]interface{}{"label": "Pax forlag"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "727.8244821",
+					Type:   "has_classification",
+					Data:   map[string]interface{}{"edition": string("23/nor")},
 				},
 				{
 					FromID: "t1",
@@ -1513,6 +1537,12 @@ func TestIngestOAIRecord(t *testing.T) {
 				},
 				{
 					FromID: "t1",
+					ToID:   "839.8238",
+					Type:   "has_classification",
+					Data:   map[string]interface{}{"edition": string("23/nor")},
+				},
+				{
+					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"role": "bjd"},
@@ -1744,6 +1774,12 @@ func TestIngestOAIRecord(t *testing.T) {
 					ToID:   "t2",
 					Type:   "has_contributor",
 					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+				},
+				{
+					FromID: "t1",
+					ToID:   "839.823",
+					Type:   "has_classification",
+					Data:   map[string]interface{}{"edition": string("23/nor")},
 				},
 				{
 					FromID: "t1",

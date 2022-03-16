@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/dewey"
 	"github.com/knakk/sirkulator/isbn"
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/vocab"
@@ -337,6 +338,36 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			p.Audiences = append(p.Audiences, audience.Code())
 		}
 
+	}
+
+	// Dewey Decimal Classification numbers
+classLoop:
+	for _, f := range rec.DataFieldsAt("082", "083") {
+		if num := f.ValueAt("a"); dewey.LooksLike(num) {
+
+			// Check for duplicates
+			for _, r := range relations {
+				if r.ToID == num {
+					continue classLoop
+				}
+			}
+
+			var data map[string]interface{}
+			if ed := f.ValueAt("2"); ed != "" {
+				data = make(map[string]interface{})
+				data["edition"] = ed
+			}
+
+			relations = append(relations, sirkulator.Relation{
+				FromID: pID,
+				ToID:   num,
+				Type:   vocab.RelationHasClassification.String(),
+				Data:   data,
+			})
+
+			// TODO consider making it a review if edition is not recent (<23)
+			// example: 9788283140378
+		}
 	}
 
 	// Subjects

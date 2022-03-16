@@ -344,6 +344,11 @@ func TestIngestISBN(t *testing.T) {
 		},
 		{
 			FromID: "t1",
+			Type:   "has_classification",
+			Data:   map[string]interface{}{"edition": string("3/nor"), "label": string("589.3")},
+		},
+		{
+			FromID: "t1",
 			ToID:   "p0",
 			Type:   "has_contributor",
 			Data:   map[string]interface{}{"role": "ill"},
