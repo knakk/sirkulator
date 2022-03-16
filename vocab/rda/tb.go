@@ -4,9 +4,9 @@
 package rda
 
 import (
-	"golang.org/x/text/language"
-	"github.com/knakk/sirkulator/vocab"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/vocab"
+	"golang.org/x/text/language"
 )
 
 //go:generate go run gen_codes.go
@@ -24,13 +24,10 @@ var labelsTB = map[string][2]string{
 	"1010": {"comb binding", ""},
 }
 
-var deprecatedTB = map[string]string{
-}
-
+var deprecatedTB = map[string]string{}
 
 // TB is a RDA Term Code.
 type TB string
-
 
 func (t TB) Code() string {
 	return string(t)
@@ -48,7 +45,7 @@ func (t TB) Label(tag language.Tag) string {
 	return labelsTB[string(t)][0]
 }
 
-func ParseTB (s string) (TB, error) {
+func ParseTB(s string) (TB, error) {
 	if _, ok := labelsTB[s]; ok {
 		return TB(s), nil
 	}
@@ -57,4 +54,3 @@ func ParseTB (s string) (TB, error) {
 	}
 	return TB("unknown"), vocab.ErrUnknown
 }
-

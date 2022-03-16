@@ -371,19 +371,19 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Aschehoug"},
+					Data:   map[string]any{"label": "Aschehoug"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
+					Data:   map[string]any{"role": "aut", "main_entry": true},
 				},
 				{
 					FromID: "t1",
 					ToID:   "839.82374",
 					Type:   "has_classification",
-					Data:   map[string]interface{}{"edition": string("23/nor")},
+					Data:   map[string]any{"edition": string("23/nor")},
 				},
 				{
 					FromID: "t1",
@@ -394,13 +394,13 @@ func TestIngestOAIRecord(t *testing.T) {
 					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "edt"},
+					Data:   map[string]any{"role": "edt"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t4",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "edt"},
+					Data:   map[string]any{"role": "edt"},
 				},
 			},
 			Covers: []FileFetch{
@@ -651,25 +651,25 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Aschehoug"},
+					Data:   map[string]any{"label": "Aschehoug"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
+					Data:   map[string]any{"role": "aut", "main_entry": true},
 				},
 				{
 					FromID: "t1",
 					ToID:   "839.73",
 					Type:   "has_classification",
-					Data:   map[string]interface{}{"edition": string("4/nor")},
+					Data:   map[string]any{"edition": string("4/nor")},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "trl"},
+					Data:   map[string]any{"role": "trl"},
 				},
 			},
 		}
@@ -942,19 +942,19 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Norges sopp- og nyttevekstforbund"},
+					Data:   map[string]any{"label": "Norges sopp- og nyttevekstforbund"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "aut", "main_entry": true},
+					Data:   map[string]any{"role": "aut", "main_entry": true},
 				},
 				{
 					FromID: "t1",
 					ToID:   "581.6309481",
 					Type:   "has_classification",
-					Data:   map[string]interface{}{"edition": string("23/nor")},
+					Data:   map[string]any{"edition": string("23/nor")},
 				},
 				/*{
 					FromID: "t1",
@@ -1231,13 +1231,13 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Pax forlag"},
+					Data:   map[string]any{"label": "Pax forlag"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "727.8244821",
 					Type:   "has_classification",
-					Data:   map[string]interface{}{"edition": string("23/nor")},
+					Data:   map[string]any{"edition": string("23/nor")},
 				},
 				{
 					FromID: "t1",
@@ -1248,25 +1248,25 @@ func TestIngestOAIRecord(t *testing.T) {
 					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "edt"},
+					Data:   map[string]any{"role": "edt"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t4",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "aut"},
+					Data:   map[string]any{"role": "aut"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t5",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "aut"},
+					Data:   map[string]any{"role": "aut"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t6",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "aut"},
+					Data:   map[string]any{"role": "aut"},
 				},
 				/*{
 					FromID: "t1",
@@ -1517,12 +1517,12 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Gyldendal"},
+					Data:   map[string]any{"label": "Gyldendal"},
 				},
 				{
 					FromID: "t1",
 					Type:   "in_series",
-					Data: map[string]interface{}{
+					Data: map[string]any{
 						"label":     "Søstrene Proxy blogger om verden",
 						"number":    1,
 						"publisher": "Gyldendal",
@@ -1533,19 +1533,19 @@ func TestIngestOAIRecord(t *testing.T) {
 					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+					Data:   map[string]any{"main_entry": true, "role": "aut"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "839.8238",
 					Type:   "has_classification",
-					Data:   map[string]interface{}{"edition": string("23/nor")},
+					Data:   map[string]any{"edition": string("23/nor")},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "bjd"},
+					Data:   map[string]any{"role": "bjd"},
 				},
 			},
 		}
@@ -1750,12 +1750,12 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "published_by",
-					Data:   map[string]interface{}{"label": "Cappelen Damm"},
+					Data:   map[string]any{"label": "Cappelen Damm"},
 				},
 				{
 					FromID: "t1",
 					Type:   "in_series",
-					Data: map[string]interface{}{
+					Data: map[string]any{
 						"label":     "Ulvegutten Tal",
 						"number":    8,
 						"publisher": "Cappelen Damm",
@@ -1764,7 +1764,7 @@ func TestIngestOAIRecord(t *testing.T) {
 				{
 					FromID: "t1",
 					Type:   "in_series",
-					Data: map[string]interface{}{
+					Data: map[string]any{
 						"label":     "Min første leseløve",
 						"publisher": "Cappelen Damm",
 					},
@@ -1773,19 +1773,19 @@ func TestIngestOAIRecord(t *testing.T) {
 					FromID: "t1",
 					ToID:   "t2",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"main_entry": true, "role": "aut"},
+					Data:   map[string]any{"main_entry": true, "role": "aut"},
 				},
 				{
 					FromID: "t1",
 					ToID:   "839.823",
 					Type:   "has_classification",
-					Data:   map[string]interface{}{"edition": string("23/nor")},
+					Data:   map[string]any{"edition": string("23/nor")},
 				},
 				{
 					FromID: "t1",
 					ToID:   "t3",
 					Type:   "has_contributor",
-					Data:   map[string]interface{}{"role": "ill"},
+					Data:   map[string]any{"role": "ill"},
 				},
 			},
 		}

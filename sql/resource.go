@@ -202,7 +202,7 @@ func GetPublcationRelations(conn *sqlite.Conn, id string) ([]sirkulator.Relation
 				Label: stmt.ColumnText(5),
 			},
 		}
-		var data map[string]interface{}
+		var data map[string]any
 		if err := json.Unmarshal([]byte(stmt.ColumnText(3)), &data); err != nil {
 			return err // TODO annotate
 		}
@@ -238,7 +238,7 @@ func GetPublcationReviews(conn *sqlite.Conn, id string) ([]sirkulator.Relation, 
 			FromID: id,
 			Type:   stmt.ColumnText(0),
 		}
-		var data map[string]interface{}
+		var data map[string]any
 		if err := json.Unmarshal([]byte(stmt.ColumnText(1)), &data); err != nil {
 			return err // TODO annotate
 		}
@@ -290,7 +290,7 @@ func GetAllReviews(conn *sqlite.Conn, limit int) ([]sirkulator.RelationExp, erro
 				Label: stmt.ColumnText(5),
 			},
 		}
-		var data map[string]interface{}
+		var data map[string]any
 		if err := json.Unmarshal([]byte(stmt.ColumnText(3)), &data); err != nil {
 			return err // TODO annotate
 		}

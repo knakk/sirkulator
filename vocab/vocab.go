@@ -26,4 +26,6 @@ type Term interface {
 	// Alias or synonyms for the term. Only aliases matching the language.Tag
 	// should be returned.
 	Alias(language.Tag) []string
+
+	// Parent() (Term, bool)
 }

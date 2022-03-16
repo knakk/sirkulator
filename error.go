@@ -36,7 +36,7 @@ func (e Error) Error() string {
 }
 
 // Errorf returns an Error with the given code and formatted message.
-func Errorf(code string, format string, args ...interface{}) *Error {
+func Errorf(code string, format string, args ...any) *Error {
 	return &Error{
 		Code:    code,
 		Message: fmt.Sprintf(format, args...),

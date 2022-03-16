@@ -34,7 +34,7 @@ func mustGzip(s string) []byte {
 	return b.Bytes()
 }
 
-func mustJson(o interface{}) []byte {
+func mustJson(o any) []byte {
 	b, err := json.Marshal(o)
 	if err != nil {
 		panic(err)
@@ -334,24 +334,24 @@ func TestIngestISBN(t *testing.T) {
 		{
 			FromID: "t1",
 			Type:   "published_by",
-			Data:   map[string]interface{}{"label": "Cappelen"},
+			Data:   map[string]any{"label": "Cappelen"},
 		},
 		{
 			FromID: "t1",
 			ToID:   "p0",
 			Type:   "has_contributor",
-			Data:   map[string]interface{}{"role": "aut", "main_entry": true},
+			Data:   map[string]any{"role": "aut", "main_entry": true},
 		},
 		{
 			FromID: "t1",
 			Type:   "has_classification",
-			Data:   map[string]interface{}{"edition": string("3/nor"), "label": string("589.3")},
+			Data:   map[string]any{"edition": string("3/nor"), "label": string("589.3")},
 		},
 		{
 			FromID: "t1",
 			ToID:   "p0",
 			Type:   "has_contributor",
-			Data:   map[string]interface{}{"role": "ill"},
+			Data:   map[string]any{"role": "ill"},
 		},
 	}
 	var gotRelations []sirkulator.Relation
@@ -361,7 +361,7 @@ func TestIngestISBN(t *testing.T) {
 			ToID:   stmt.ColumnText(1),
 			Type:   stmt.ColumnText(2),
 		}
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		if err := json.Unmarshal([]byte(stmt.ColumnText(3)), &data); err != nil {
 			return err
 		}

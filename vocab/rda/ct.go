@@ -4,9 +4,9 @@
 package rda
 
 import (
-	"golang.org/x/text/language"
-	"github.com/knakk/sirkulator/vocab"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/vocab"
+	"golang.org/x/text/language"
 )
 
 //go:generate go run gen_codes.go
@@ -73,10 +73,8 @@ var deprecatedCT = map[string]string{
 	"1050": "Video carriers (Deprecated)",
 }
 
-
 // CT is a RDA Term Code.
 type CT string
-
 
 func (t CT) Code() string {
 	return string(t)
@@ -94,7 +92,7 @@ func (t CT) Label(tag language.Tag) string {
 	return labelsCT[string(t)][0]
 }
 
-func ParseCT (s string) (CT, error) {
+func ParseCT(s string) (CT, error) {
 	if _, ok := labelsCT[s]; ok {
 		return CT(s), nil
 	}
@@ -103,4 +101,3 @@ func ParseCT (s string) (CT, error) {
 	}
 	return CT("unknown"), vocab.ErrUnknown
 }
-

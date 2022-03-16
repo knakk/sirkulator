@@ -261,7 +261,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
 				Type:   "published_by",
-				Data:   map[string]interface{}{"label": p.Publisher},
+				Data:   map[string]any{"label": p.Publisher},
 			})
 		}
 		if year := parseYear(f.ValueAt("c")); year != "" {
@@ -273,7 +273,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	for _, f := range rec.DataFieldsAt("490") {
 		if series := f.ValueAt("a"); series != "" {
 			p.Series = append(p.Series, series)
-			data := map[string]interface{}{"label": series}
+			data := map[string]any{"label": series}
 			if num := f.ValueAt("v"); num != "" {
 				n, err := strconv.Atoi(num)
 				if err == nil {
@@ -316,7 +316,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			FromID: pID,
 			ToID:   agent.ID,
 			Type:   "has_contributor",
-			Data:   map[string]interface{}{"role": role, "main_entry": true},
+			Data:   map[string]any{"role": role, "main_entry": true},
 		})
 
 		if role == "aut" {
@@ -352,9 +352,9 @@ classLoop:
 				}
 			}
 
-			var data map[string]interface{}
+			var data map[string]any
 			if ed := f.ValueAt("2"); ed != "" {
-				data = make(map[string]interface{})
+				data = make(map[string]any)
 				data["edition"] = ed
 			}
 
@@ -424,7 +424,7 @@ classLoop:
 						FromID: pID,
 						ToID:   agent.ID,
 						Type:   "has_contributor",
-						Data:   map[string]interface{}{"role": role},
+						Data:   map[string]any{"role": role},
 					})
 				}
 			}
@@ -443,7 +443,7 @@ classLoop:
 						FromID: pID,
 						ToID:   agent.ID,
 						Type:   "has_contributor",
-						Data:   map[string]interface{}{"role": role},
+						Data:   map[string]any{"role": role},
 					})
 				}
 			}

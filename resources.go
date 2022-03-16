@@ -96,7 +96,7 @@ type Resource struct {
 	ID    string
 	Label string // Synthesized from Data properties
 	Links [][2]string
-	Data  interface{} // TODO PersistableResource?
+	Data  any // TODO Persistable?
 	// TODO candidates/thinking:
 	// Description string   // Short description (max 50 characters)
 	// Aliases     []string // To function as "synonyms", giving hits when searching, but not for display?
@@ -415,7 +415,7 @@ type Relation struct {
 	FromID string
 	ToID   string
 	Type   string
-	Data   map[string]interface{} // TODO consider map[string]string or [][2]string
+	Data   map[string]any // TODO consider map[string]string or [][2]string
 }
 
 type RelationExp struct {

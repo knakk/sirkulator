@@ -1,6 +1,6 @@
 module github.com/knakk/sirkulator
 
-go 1.17
+go 1.18
 
 require crawshaw.io/sqlite v0.3.3-0.20211110021503-9d454769e7b5
 
@@ -36,6 +36,8 @@ require (
 	github.com/dgryski/go-metro v0.0.0-20180109044635-280f6062b5bc // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
-	golang.org/x/tools v0.0.0-20190206041539-40960b6deb8e // indirect
+	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )

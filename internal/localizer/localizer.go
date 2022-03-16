@@ -73,6 +73,6 @@ func GetFromAcceptLang(lang string) Localizer {
 	return Get(tag)
 }
 
-func (l Localizer) Translate(key message.Reference, args ...interface{}) string {
+func (l Localizer) Translate(key message.Reference, args ...any) string {
 	return l.printer.Sprintf(key, args...)
 }

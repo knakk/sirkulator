@@ -545,7 +545,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 						data.Relations = append(data.Relations, sirkulator.Relation{
 							FromID: res.ID,
 							Type:   "has_parent",
-							Data:   map[string]interface{}{"name": parent},
+							Data:   map[string]any{"name": parent},
 						})
 					}
 				}

@@ -4,9 +4,9 @@
 package rda
 
 import (
-	"golang.org/x/text/language"
-	"github.com/knakk/sirkulator/vocab"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/vocab"
+	"golang.org/x/text/language"
 )
 
 //go:generate go run gen_codes.go
@@ -22,13 +22,10 @@ var labelsMT = map[string][2]string{
 	"1008": {"video", "video"},
 }
 
-var deprecatedMT = map[string]string{
-}
-
+var deprecatedMT = map[string]string{}
 
 // MT is a RDA Term Code.
 type MT string
-
 
 func (t MT) Code() string {
 	return string(t)
@@ -46,7 +43,7 @@ func (t MT) Label(tag language.Tag) string {
 	return labelsMT[string(t)][0]
 }
 
-func ParseMT (s string) (MT, error) {
+func ParseMT(s string) (MT, error) {
 	if _, ok := labelsMT[s]; ok {
 		return MT(s), nil
 	}
@@ -55,4 +52,3 @@ func ParseMT (s string) (MT, error) {
 	}
 	return MT("unknown"), vocab.ErrUnknown
 }
-

@@ -4,9 +4,9 @@
 package rda
 
 import (
-	"golang.org/x/text/language"
-	"github.com/knakk/sirkulator/vocab"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/vocab"
+	"golang.org/x/text/language"
 )
 
 //go:generate go run gen_codes.go
@@ -38,13 +38,10 @@ var labelsCO = map[string][2]string{
 	"1023": {"two-dimensional moving image", "todimensjonalt levende bilde"},
 }
 
-var deprecatedCO = map[string]string{
-}
-
+var deprecatedCO = map[string]string{}
 
 // CO is a RDA Term Code.
 type CO string
-
 
 func (t CO) Code() string {
 	return string(t)
@@ -62,7 +59,7 @@ func (t CO) Label(tag language.Tag) string {
 	return labelsCO[string(t)][0]
 }
 
-func ParseCO (s string) (CO, error) {
+func ParseCO(s string) (CO, error) {
 	if _, ok := labelsCO[s]; ok {
 		return CO(s), nil
 	}
@@ -71,4 +68,3 @@ func ParseCO (s string) (CO, error) {
 	}
 	return CO("unknown"), vocab.ErrUnknown
 }
-
