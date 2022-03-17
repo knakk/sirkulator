@@ -128,6 +128,8 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Get("/person/{id}", s.pagePerson)
 			r.Post("/person/{id}/contributions", s.viewContributions)
 			r.Get("/publication/{id}", s.pagePublication)
+			r.Get("/dewey/{id}", s.pageDewey)
+			r.Get("/dewey/{id}/partsof", s.viewDeweyPartsOf)
 		})
 	})
 

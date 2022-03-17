@@ -40,6 +40,9 @@ func readData(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt *sq
 	case sirkulator.TypeCorporation:
 		res.Data = &sirkulator.Corporation{}
 		return readResource(res, t)
+	case sirkulator.TypeDewey:
+		res.Data = &sirkulator.Dewey{}
+		return readResource(res, t)
 	default:
 		panic("sql.GetResource: readData: TODO")
 	}
@@ -77,6 +80,131 @@ func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirku
 	return res, nil
 }
 
+func GetDeweyParts(conn *sqlite.Conn, id string) ([][2]string, error) {
+	const q = `
+      SELECT res.id, res.label
+      FROM relation rel
+      JOIN resource res ON (rel.to_id=res.id AND rel.type='has_part')
+     WHERE rel.from_id=?` // TODO consider json_extract(data, '$.name') as label
+
+	var res [][2]string
+	fn := func(stmt *sqlite.Stmt) error {
+		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		return nil
+	}
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetDeweyParts(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetDeweyPartsOf(conn *sqlite.Conn, id string, fromID string, limit int) ([][2]string, error) {
+	const q = `
+    SELECT res.id, res.label
+      FROM relation rel
+      JOIN resource res ON (rel.from_id=res.id AND rel.type='has_part')
+     WHERE rel.to_id=?
+       AND res.id > ?
+     ORDER BY res.id
+     LIMIT ?` // TODO consider json_extract(data, '$.name') as label
+
+	var res [][2]string
+	fn := func(stmt *sqlite.Stmt) error {
+		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		return nil
+	}
+	if err := sqlitex.Exec(conn, q, fn, id, fromID, limit); err != nil {
+		return res, fmt.Errorf("sql.GetDeweyPartsOf(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetDeweyPartsOfCount(conn *sqlite.Conn, id string) (int, error) {
+	stmt := conn.Prep(`
+        SELECT count(res.id), res.label
+          FROM relation rel
+          JOIN resource res ON (rel.from_id=res.id AND rel.type='has_part')
+         WHERE rel.to_id=$id`)
+	stmt.SetText("$id", id)
+
+	n, err := sqlitex.ResultInt(stmt)
+	if err != nil {
+		return 0, err
+	}
+
+	return n, nil
+}
+
+func GetDeweyPublications(conn *sqlite.Conn, id string) ([][2]string, error) {
+	const q = `
+    SELECT res.id, res.label
+      FROM resource res
+      JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+     WHERE rel.to_id=?` // TODO consider json_extract(data, '$.name') as label
+
+	var res [][2]string
+	fn := func(stmt *sqlite.Stmt) error {
+		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		return nil
+	}
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetDeweyPublications(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetDeweyParents(conn *sqlite.Conn, id string) ([][2]string, error) {
+	const q = `
+    WITH RECURSIVE parents (id, label) AS (
+        SELECT res.id, res.label
+          FROM relation rel
+          JOIN resource res ON (rel.to_id=res.id AND rel.type='has_parent')
+         WHERE rel.from_id=?
+
+        UNION ALL
+
+        SELECT res.id, res.label
+          FROM relation rel
+          JOIN resource res ON (rel.to_id=res.id AND rel.type='has_parent')
+          JOIN parents p ON (p.id = rel.from_id)
+    )
+    SELECT * FROM parents;`
+	// TODO consider json_extract(data, '$.name') as label
+
+	var res [][2]string
+	fn := func(stmt *sqlite.Stmt) error {
+		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		return nil
+	}
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetDeweyParents(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetDeweyChildren(conn *sqlite.Conn, id string) ([][2]string, error) {
+	const q = `
+    SELECT res.id, res.label
+      FROM relation rel
+      JOIN resource res ON (rel.from_id=res.id AND rel.type='has_parent')
+     WHERE rel.to_id=?` // TODO consider json_extract(data, '$.name') as label
+
+	var res [][2]string
+	fn := func(stmt *sqlite.Stmt) error {
+		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		return nil
+	}
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetDeweyChildren(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
 // TODO orderBy year|label orderAsc bool
 func GetAgentContributions(conn *sqlite.Conn, id string, sortBy string, sortAsc bool) ([]sirkulator.AgentContribution, error) {
 	var res []sirkulator.AgentContribution
@@ -95,20 +223,20 @@ func GetAgentContributions(conn *sqlite.Conn, id string, sortBy string, sortAsc 
 	}
 
 	q := fmt.Sprintf(`
-	SELECT
-		r.from_id,
-		resource.type as res_type,
-		resource.label as res_label,
-		json_extract(resource.data, '$.year') AS year,
-		GROUP_CONCAT(json_extract(r.data, '$.role')) as role
-	FROM
-		relation r
-		JOIN resource ON (from_id=resource.id)
-	WHERE
-		r.type='has_contributor'
-	AND to_id=?
-	GROUP BY r.from_id
-	ORDER BY %s %s`, sortBy, sortDir)
+    SELECT
+        r.from_id,
+        resource.type as res_type,
+        resource.label as res_label,
+        json_extract(resource.data, '$.year') AS year,
+        GROUP_CONCAT(json_extract(r.data, '$.role')) as role
+    FROM
+        relation r
+        JOIN resource ON (from_id=resource.id)
+    WHERE
+        r.type='has_contributor'
+    AND to_id=?
+    GROUP BY r.from_id
+    ORDER BY %s %s`, sortBy, sortDir)
 
 	fn := func(stmt *sqlite.Stmt) error {
 		c := sirkulator.AgentContribution{}
@@ -137,18 +265,18 @@ func GetPublcationContributors(conn *sqlite.Conn, id string) ([]sirkulator.Publi
 	var res []sirkulator.PublicationContribution
 
 	const q = `
-	SELECT
-		r.to_id,
-		resource.type as res_type,
-		resource.label as res_label,
-		GROUP_CONCAT(json_extract(r.data, '$.role')) as role
-	FROM
-		relation r
-		JOIN resource ON (to_id=resource.id)
-	WHERE
-		r.type='has_contributor'
-	AND from_id=?
-	GROUP BY r.to_id`
+    SELECT
+        r.to_id,
+        resource.type as res_type,
+        resource.label as res_label,
+        GROUP_CONCAT(json_extract(r.data, '$.role')) as role
+    FROM
+        relation r
+        JOIN resource ON (to_id=resource.id)
+    WHERE
+        r.type='has_contributor'
+    AND from_id=?
+    GROUP BY r.to_id`
 
 	fn := func(stmt *sqlite.Stmt) error {
 		c := sirkulator.PublicationContribution{}
@@ -176,18 +304,18 @@ func GetPublcationRelations(conn *sqlite.Conn, id string) ([]sirkulator.Relation
 	var res []sirkulator.RelationExp
 
 	const q = `
-	SELECT
-		rel.id,
-		rel.type,
-		rel.to_id,
-		rel.data,
-		res.type as res_type,
-		res.label as res_label
-	FROM
-		relation rel
-		LEFT JOIN resource res ON (rel.to_id=res.id)
-	WHERE
-		rel.from_id=?`
+    SELECT
+        rel.id,
+        rel.type,
+        rel.to_id,
+        rel.data,
+        res.type as res_type,
+        res.label as res_label
+    FROM
+        relation rel
+        LEFT JOIN resource res ON (rel.to_id=res.id)
+    WHERE
+        rel.from_id=?`
 
 	fn := func(stmt *sqlite.Stmt) error {
 		r := sirkulator.RelationExp{
@@ -223,15 +351,15 @@ func GetPublcationReviews(conn *sqlite.Conn, id string) ([]sirkulator.Relation, 
 	var res []sirkulator.Relation
 
 	const q = `
-	SELECT
-		type,
-		data
-	FROM
-		relation
-	WHERE
-		from_id=?
-	AND to_id IS NULL
-	ORDER BY queued_at`
+    SELECT
+        type,
+        data
+    FROM
+        relation
+    WHERE
+        from_id=?
+    AND to_id IS NULL
+    ORDER BY queued_at`
 
 	fn := func(stmt *sqlite.Stmt) error {
 		rel := sirkulator.Relation{
@@ -262,20 +390,20 @@ func GetAllReviews(conn *sqlite.Conn, limit int) ([]sirkulator.RelationExp, erro
 	var res []sirkulator.RelationExp
 
 	const q = `
-	SELECT
-		rel.id,
-		rel.from_id,
-		rel.type,
-		rel.data,
-		res.type,
-		res.label
-	FROM
-		relation rel
-		JOIN resource res ON (rel.from_id=res.id)
-	WHERE
-		rel.to_id IS NULL
-	ORDER BY rel.queued_at
-	LIMIT ?`
+    SELECT
+        rel.id,
+        rel.from_id,
+        rel.type,
+        rel.data,
+        res.type,
+        res.label
+    FROM
+        relation rel
+        JOIN resource res ON (rel.from_id=res.id)
+    WHERE
+        rel.to_id IS NULL
+    ORDER BY rel.queued_at
+    LIMIT ?`
 
 	fn := func(stmt *sqlite.Stmt) error {
 		rel := sirkulator.RelationExp{
@@ -333,9 +461,9 @@ func GetImage(conn *sqlite.Conn, id string) (*sirkulator.Image, error) {
 func UpdateResource(conn *sqlite.Conn, res sirkulator.Resource, label string) (err error) {
 	defer sqlitex.Save(conn)(&err)
 	stmt := conn.Prep(`
-			UPDATE resource SET data=$data, label=$label, updated_at=$updated_at
-			WHERE id=$id
-		`)
+            UPDATE resource SET data=$data, label=$label, updated_at=$updated_at
+            WHERE id=$id
+        `)
 
 	stmt.SetText("$id", res.ID)
 	stmt.SetInt64("$updated_at", time.Now().Unix())

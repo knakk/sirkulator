@@ -85,17 +85,25 @@ func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
 		return context.Canceled
 	}
 	defer j.DB.Put(conn)
+
 	if err := sqlitex.ExecScript(conn, `
 		UPDATE relation
 		SET
-			to_id = JSON_EXTRACT(data ,'$.to_id'),
-			data = JSON_REMOVE(data, '$.to_id'),
+			to_id = candidates.new_to_id,
+			data = json_remove(data, '$.to_id'),
 			queued_at = NULL
-		WHERE
-			JSON_EXTRACT(data ,'$.to_id') IS NOT NULL
-		`); err != nil {
+		FROM (
+			SELECT rel.id, rel.from_id, json_extract(rel.data ,'$.to_id') AS new_to_id
+			  FROM relation rel
+			  JOIN resource res ON (json_extract(rel.data ,'$.to_id')=res.id)
+			 WHERE rel.to_id IS NULL)
+			AS candidates
+		WHERE relation.id=candidates.id;`); err != nil {
 		return err
 	}
+
+	// TODO avoid inserting duplicate relations, or delete them at this point:
+	// DELETE FROM relation WHERE rowid NOT IN (SELECT min(rowid) FROM relation GROUP BY from_id, to_id, type);
 
 	// Wait for indexing to complete
 	j.wg.Wait()
@@ -155,6 +163,7 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 		case "http://www.w3.org/2004/02/skos/core#prefLabel":
 			dewey.Name = strings.TrimSuffix(tr.Obj.String(), "@nb")
 		case "http://www.w3.org/2004/02/skos/core#altLabel":
+			// TODO appendIfNew
 			dewey.Terms = append(dewey.Terms, strings.TrimSuffix(tr.Obj.String(), "@nb"))
 		case "http://purl.org/dc/terms/created":
 			if l, ok := tr.Obj.(rdf.Literal); ok {
@@ -281,9 +290,9 @@ func (j *ImportAllJob) persist(ctx context.Context, batch importBatch) (err erro
 				v.from_id,
 				res.id,
 				v.type,
-				JSON_PATCH(v.data, IIF(res.id IS NULL,
-					IIF($to_id != '', JSON_OBJECT('to_id', $to_id), '{}'), '{}')) AS data,
-				IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
+				json_patch(v.data, iif(res.id IS NULL,
+					iif($to_id != '', json_object('to_id', $to_id), '{}'), '{}')) AS data,
+				iif(res.id IS NULL, $queued_at, NULL) AS queued_at
 			FROM v LEFT JOIN resource res ON (res.id = $to_id)
 		`)
 

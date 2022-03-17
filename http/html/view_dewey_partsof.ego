@@ -1,0 +1,27 @@
+<%
+package html
+
+import (
+    "strings"
+)
+
+type ViewDeweyPartsOf struct {
+    MaxCount int
+    PartsOf  [][2]string
+}
+
+func (tmpl *ViewDeweyPartsOf) Render(ctx context.Context, w io.Writer) {
+%>
+
+<table id="parts-of">
+    <tbody>
+        <% for _, p := range tmpl.PartsOf { %>
+            <tr>
+                <td><strong><%= p[0] %></strong>
+                <td><a href="/metadata/dewey/<%= p[0] %>"><%= strings.TrimPrefix(p[1], p[0]) %></a></td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<% } %>

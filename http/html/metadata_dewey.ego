@@ -1,0 +1,108 @@
+<%
+package html
+
+import (
+    "fmt"
+    "strings"
+
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type DeweyTemplate struct {
+    Page
+    Resource     sirkulator.Resource
+    Parents      [][2]string
+    Children     [][2]string
+    Parts        [][2]string
+    Publications [][2]string
+    PartsOfCount int
+}
+
+func (tmpl *DeweyTemplate) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+    dewey := tmpl.Resource.Data.(*sirkulator.Dewey)
+
+
+%><ego:App Page=tmpl.Page>
+    <details open>
+        <summary>
+            <h3><%= tmpl.Resource.Label %></h3>
+        </summary>
+        <div class="border row">
+            <div class="column column-wide pad">
+                <% if len(tmpl.Parents) > 0 { %>
+                    <h4><%= l.Translate("Broader terms") %> (<%= len(tmpl.Parents) %>)</h4>
+                    <table>
+                        <% for _, p := range tmpl.Parents { %>
+                            <tr>
+                                <td><strong><%= p[0] %></strong></td>
+                                <td><a href="/metadata/dewey/<%= p[0] %>"><%= strings.TrimPrefix(p[1], p[0]) %></a></td>
+                            </tr>
+                        <% } %>
+                    </table>
+                <% } %>
+
+                <% if len(tmpl.Children) > 0 { %>
+                    <h4><%= l.Translate("Narrower terms") %> (<%= len(tmpl.Children) %>)</h4>
+                    <table>
+                        <% for _, p := range tmpl.Children { %>
+                            <tr>
+                                <td><strong><%= p[0] %></strong></td>
+                                <td><a href="/metadata/dewey/<%= p[0] %>"><%= strings.TrimPrefix(p[1], p[0]) %></a></td>
+                            </tr>
+                        <% } %>
+                    </table>
+                <% } %>
+
+                <% if len(tmpl.Parts) > 0 { %>
+                    <h4><%= l.Translate("Has components")%> (<%= len(tmpl.Parts) %>)</h4>
+                    <table>
+                        <% for _, p := range tmpl.Parts { %>
+                            <tr>
+                                <td><strong><%= p[0] %></strong></td>
+                                <td><a href="/metadata/dewey/<%= p[0] %>"><%= strings.TrimPrefix(p[1], p[0]) %></a></td>
+                            </tr>
+                        <% } %>
+                    </table>
+                <% } %>
+
+            </div>
+            <div class="column pad">
+                <h4><%= l.Translate("Henvisningstermer") %></h4>
+                <% for _, t := range dewey.Terms { %>
+                    <p><%= t %></p>
+                <% } %>
+            </div>
+        </div>
+    </details>
+
+    <br/>
+
+    <details>
+        <summary hx-get="/metadata/dewey/<%= tmpl.Resource.ID %>/partsof?count=<%= tmpl.PartsOfCount %>" hx-target="#parts-of" hx-trigger="click once">
+            <h3><%= l.Translate("Dewey numbers where %s is a component", dewey.Number) %> (<%= tmpl.PartsOfCount %>)</h3>
+        </summary>
+        <div class="border pad">
+            <table id="parts-of">
+            </table>
+        </div>
+    </details>
+
+    <br/>
+
+    <details>
+        <summary>
+            <h3><%= l.Translate("Publcations classified with") %> <%= dewey.Number %> (<%= len(tmpl.Publications) %>)</h3>
+        </summary>
+        <div class="border pad">
+           <% if len(tmpl.Publications) > 0 { %>
+                <% for _, p := range tmpl.Publications { %>
+                    <p><a href="/metadata/publication/<%= p[0] %>"><%= p[1] %></a></p>
+                <% } %>
+            <% } %>
+        </div>
+    </details>
+
+</ego:App>
+<% } %>

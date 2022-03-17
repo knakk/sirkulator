@@ -397,9 +397,10 @@ type Character struct {
 }
 
 type Dewey struct {
-	Number string   `json:"number"` // same as resource.ID
-	Name   string   `json:"name"`   // Only norwegian label for now
-	Terms  []string `json:"terms"`  // Henvisningstermer
+	Number string   `json:"number"`  // same as resource.ID
+	Name   string   `json:"name"`    // Only norwegian label for now
+	Terms  []string `json:"terms"`   // Henvisningstermer
+	IsHelp bool     `json:"is_help"` // Nummer fra hjelpetabell (Add table) TODO correct term?
 }
 
 func (d Dewey) Label() string {
