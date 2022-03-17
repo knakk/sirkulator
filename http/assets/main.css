@@ -141,3 +141,7 @@ th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
 .sticky-top-left { position: sticky; top: 1rem; float: left; margin-left: -11rem; text-align: right; width: 10rem }
 .sticky-top-left p { margin-top: 1rem; }
 .error { background-color: var(--red-bg);}
+
+
+/* dewey page */
+table.dewey td:first-of-type { width: 12em; text-align: right; padding-right: 1em }

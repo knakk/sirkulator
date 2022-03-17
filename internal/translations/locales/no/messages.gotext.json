@@ -112,6 +112,46 @@
             "translation": "Andre relasjoner"
         },
         {
+            "id": "Broader terms",
+            "message": "Broader terms",
+            "translation": "Overordnede begrep"
+        },
+        {
+            "id": "Narrower terms",
+            "message": "Narrower terms",
+            "translation": "Underordnede begrep"
+        },
+        {
+            "id": "Has components",
+            "message": "Has components",
+            "translation": "Er oppbyggd av"
+        },
+        {
+            "id": "Reference terms",
+            "message": "Reference terms",
+            "translation": "Henvisningstermer"
+        },
+        {
+            "id": "Dewey numbers where {Number} is a component",
+            "message": "Dewey numbers where {Number} is a component",
+            "translation": "Deweynummer hvor {Number} inngår",
+            "placeholders": [
+                {
+                    "id": "Number",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "dewey.Number"
+                }
+            ]
+        },
+        {
+            "id": "Publications classified with",
+            "message": "Publications classified with",
+            "translation": "Utgivelser klassifisert med"
+        },
+        {
             "id": "Already in catalogue",
             "message": "Already in catalogue",
             "translation": "Allerede i katalogen"
@@ -253,6 +293,16 @@
             "id": "Uncertain",
             "message": "Uncertain",
             "translation": "Usikkert"
+        },
+        {
+            "id": "Previous page",
+            "message": "Previous page",
+            "translation": "Forrige side"
+        },
+        {
+            "id": "Next page",
+            "message": "Next page",
+            "translation": "Neste side"
         },
         {
             "id": "Personalia",

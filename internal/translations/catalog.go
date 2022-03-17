@@ -39,171 +39,188 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d hits (%v)":                34,
-	"1 per line":                  12,
-	"Agent":                       32,
-	"Already in catalogue":        22,
-	"Associated country/area":     50,
-	"Associated nationality":      51,
-	"Audience":                    64,
-	"Basic information":           35,
-	"Binding":                     66,
-	"Birthyear":                   52,
-	"Circulation":                 1,
-	"Configuration":               5,
-	"Content":                     58,
-	"Contributions and relations": 30,
-	"Cover-image":                 28,
-	"Data":                        71,
-	"Deathyear":                   53,
-	"Description (short)":         48,
-	"Disestablishment year":       45,
-	"Fiction":                     61,
-	"Foundation year":             43,
-	"Gender":                      49,
-	"Genre and forms":             63,
-	"Holdings":                    4,
-	"Home":                        0,
-	"ISBN, ISSN or EAN":           11,
-	"Identificators and links":    16,
-	"Identifiers":                 10,
-	"Import":                      9,
-	"Lifespan":                    42,
-	"Main language":               59,
-	"Metadata":                    3,
-	"Must be an integer":          68,
-	"Name":                        36,
-	"Name variations":             39,
-	"Network error. Server unreachable. Check your connection": 27,
-	"No changes.":                            26,
-	"Nonfiction":                             62,
-	"Number of pages":                        67,
-	"OK, saved.":                             25,
-	"One entry per line":                     40,
+	"%d hits (%v)":                          40,
+	"1 per line":                            12,
+	"Agent":                                 38,
+	"Already in catalogue":                  28,
+	"Associated country/area":               58,
+	"Associated nationality":                59,
+	"Audience":                              72,
+	"Basic information":                     41,
+	"Binding":                               74,
+	"Birthyear":                             60,
+	"Broader terms":                         22,
+	"Circulation":                           1,
+	"Configuration":                         5,
+	"Content":                               66,
+	"Contributions and relations":           36,
+	"Cover-image":                           34,
+	"Data":                                  79,
+	"Deathyear":                             61,
+	"Description (short)":                   56,
+	"Dewey numbers where %s is a component": 26,
+	"Disestablishment year":                 51,
+	"Fiction":                               69,
+	"Foundation year":                       49,
+	"Gender":                                57,
+	"Genre and forms":                       71,
+	"Has components":                        24,
+	"Holdings":                              4,
+	"Home":                                  0,
+	"ISBN, ISSN or EAN":                     11,
+	"Identificators and links":              16,
+	"Identifiers":                           10,
+	"Import":                                9,
+	"Lifespan":                              48,
+	"Main language":                         67,
+	"Metadata":                              3,
+	"Must be an integer":                    76,
+	"Name":                                  42,
+	"Name variations":                       45,
+	"Narrower terms":                        23,
+	"Network error. Server unreachable. Check your connection": 33,
+	"Next page":                              54,
+	"No changes.":                            32,
+	"Nonfiction":                             70,
+	"Number of pages":                        75,
+	"OK, saved.":                             31,
+	"One entry per line":                     46,
 	"Orders":                                 2,
-	"Other languages":                        60,
+	"Other languages":                        68,
 	"Other relations":                        21,
-	"Parent name":                            41,
-	"Personalia":                             47,
-	"Physical characteristics":               65,
+	"Parent name":                            47,
+	"Personalia":                             55,
+	"Physical characteristics":               73,
 	"Preview":                                13,
+	"Previous page":                          53,
 	"Properties":                             15,
 	"Publication":                            20,
-	"Publication cover-image":                29,
+	"Publication cover-image":                35,
 	"Publications and contributions":         17,
-	"Publisher":                              56,
-	"Relation":                               70,
-	"Required field":                         37,
-	"Resource":                               69,
-	"Resource not found.":                    23,
+	"Publications classified with":           27,
+	"Publisher":                              64,
+	"Reference terms":                        25,
+	"Relation":                               78,
+	"Required field":                         43,
+	"Resource":                               77,
+	"Resource not found.":                    29,
 	"Role":                                   18,
-	"Role/relation":                          31,
-	"Search and connect to resource":         33,
+	"Role/relation":                          37,
+	"Search and connect to resource":         39,
 	"Search/browse catalogue":                8,
-	"Short description":                      38,
+	"Short description":                      44,
 	"Show metadata for review":               7,
 	"Show recent transactions":               6,
-	"Subtitle":                               55,
-	"Title":                                  54,
-	"Uncertain":                              46,
-	"Validation failed. Check input fields.": 24,
+	"Subtitle":                               63,
+	"Title":                                  62,
+	"Uncertain":                              52,
+	"Validation failed. Check input fields.": 30,
 	"Year":                                   19,
-	"Year must be a 1-4 digit number. Negative numbers signify BCE.": 44,
-	"Year must be a 4-digit number":                                  57,
+	"Year must be a 1-4 digit number. Negative numbers signify BCE.": 50,
+	"Year must be a 4-digit number":                                  65,
 	"wait...":                                                        14,
 }
 
-var enIndex = []uint32{ // 73 elements
+var enIndex = []uint32{ // 81 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000051,
 	0x0000006a, 0x00000082, 0x00000089, 0x00000095,
 	0x000000a7, 0x000000b2, 0x000000ba, 0x000000c2,
 	0x000000cd, 0x000000e6, 0x00000105, 0x0000010a,
-	0x0000010f, 0x0000011b, 0x0000012b, 0x00000140,
-	0x00000154, 0x0000017b, 0x00000186, 0x00000192,
-	0x000001cb, 0x000001d7, 0x000001ef, 0x0000020b,
+	0x0000010f, 0x0000011b, 0x0000012b, 0x00000139,
+	0x00000148, 0x00000157, 0x00000167, 0x00000190,
+	0x000001ad, 0x000001c2, 0x000001d6, 0x000001fd,
 	// Entry 20 - 3F
-	0x00000219, 0x0000021f, 0x0000023e, 0x00000251,
-	0x00000263, 0x00000268, 0x00000277, 0x00000289,
-	0x00000299, 0x000002ac, 0x000002b8, 0x000002c1,
-	0x000002d1, 0x00000310, 0x00000326, 0x00000330,
-	0x0000033b, 0x0000034f, 0x00000356, 0x0000036e,
-	0x00000385, 0x0000038f, 0x00000399, 0x0000039f,
-	0x000003a8, 0x000003b2, 0x000003d0, 0x000003d8,
-	0x000003e6, 0x000003f6, 0x000003fe, 0x00000409,
+	0x00000208, 0x00000214, 0x0000024d, 0x00000259,
+	0x00000271, 0x0000028d, 0x0000029b, 0x000002a1,
+	0x000002c0, 0x000002d3, 0x000002e5, 0x000002ea,
+	0x000002f9, 0x0000030b, 0x0000031b, 0x0000032e,
+	0x0000033a, 0x00000343, 0x00000353, 0x00000392,
+	0x000003a8, 0x000003b2, 0x000003c0, 0x000003ca,
+	0x000003d5, 0x000003e9, 0x000003f0, 0x00000408,
+	0x0000041f, 0x00000429, 0x00000433, 0x00000439,
 	// Entry 40 - 5F
-	0x00000419, 0x00000422, 0x0000043b, 0x00000443,
-	0x00000453, 0x00000466, 0x0000046f, 0x00000478,
-	0x0000047d,
-} // Size: 316 bytes
+	0x00000442, 0x0000044c, 0x0000046a, 0x00000472,
+	0x00000480, 0x00000490, 0x00000498, 0x000004a3,
+	0x000004b3, 0x000004bc, 0x000004d5, 0x000004dd,
+	0x000004ed, 0x00000500, 0x00000509, 0x00000512,
+	0x00000517,
+} // Size: 348 bytes
 
-const enData string = "" + // Size: 1149 bytes
+const enData string = "" + // Size: 1303 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Show recent transactions\x02Show metadata for review\x02Search/bro" +
 	"wse catalogue\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
 	"e\x02Preview\x02wait...\x02Properties\x02Identificators and links\x02Pub" +
 	"lications and contributions\x02Role\x02Year\x02Publication\x02Other rela" +
-	"tions\x02Already in catalogue\x02Resource not found.\x02Validation faile" +
-	"d. Check input fields.\x02OK, saved.\x02No changes.\x02Network error. Se" +
-	"rver unreachable. Check your connection\x02Cover-image\x02Publication co" +
-	"ver-image\x02Contributions and relations\x02Role/relation\x02Agent\x02Se" +
-	"arch and connect to resource\x02%[1]d hits (%[2]v)\x02Basic information" +
-	"\x02Name\x02Required field\x02Short description\x02Name variations\x02On" +
-	"e entry per line\x02Parent name\x02Lifespan\x02Foundation year\x02Year m" +
-	"ust be a 1-4 digit number. Negative numbers signify BCE.\x02Disestablish" +
-	"ment year\x02Uncertain\x02Personalia\x02Description (short)\x02Gender" +
-	"\x02Associated country/area\x02Associated nationality\x02Birthyear\x02De" +
-	"athyear\x02Title\x02Subtitle\x02Publisher\x02Year must be a 4-digit numb" +
-	"er\x02Content\x02Main language\x02Other languages\x02Fiction\x02Nonficti" +
-	"on\x02Genre and forms\x02Audience\x02Physical characteristics\x02Binding" +
-	"\x02Number of pages\x02Must be an integer\x02Resource\x02Relation\x02Dat" +
-	"a"
+	"tions\x02Broader terms\x02Narrower terms\x02Has components\x02Reference " +
+	"terms\x02Dewey numbers where %[1]s is a component\x02Publications classi" +
+	"fied with\x02Already in catalogue\x02Resource not found.\x02Validation f" +
+	"ailed. Check input fields.\x02OK, saved.\x02No changes.\x02Network error" +
+	". Server unreachable. Check your connection\x02Cover-image\x02Publicatio" +
+	"n cover-image\x02Contributions and relations\x02Role/relation\x02Agent" +
+	"\x02Search and connect to resource\x02%[1]d hits (%[2]v)\x02Basic inform" +
+	"ation\x02Name\x02Required field\x02Short description\x02Name variations" +
+	"\x02One entry per line\x02Parent name\x02Lifespan\x02Foundation year\x02" +
+	"Year must be a 1-4 digit number. Negative numbers signify BCE.\x02Disest" +
+	"ablishment year\x02Uncertain\x02Previous page\x02Next page\x02Personalia" +
+	"\x02Description (short)\x02Gender\x02Associated country/area\x02Associat" +
+	"ed nationality\x02Birthyear\x02Deathyear\x02Title\x02Subtitle\x02Publish" +
+	"er\x02Year must be a 4-digit number\x02Content\x02Main language\x02Other" +
+	" languages\x02Fiction\x02Nonfiction\x02Genre and forms\x02Audience\x02Ph" +
+	"ysical characteristics\x02Binding\x02Number of pages\x02Must be an integ" +
+	"er\x02Resource\x02Relation\x02Data"
 
-var noIndex = []uint32{ // 73 elements
+var noIndex = []uint32{ // 81 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000055,
 	0x00000075, 0x0000008a, 0x00000093, 0x000000a3,
 	0x000000b8, 0x000000c4, 0x000000d1, 0x000000d9,
 	0x000000e4, 0x000000fe, 0x00000113, 0x00000119,
-	0x0000011d, 0x00000127, 0x00000138, 0x0000014d,
-	0x00000161, 0x00000188, 0x00000194, 0x000001a4,
-	0x000001dc, 0x000001e9, 0x00000202, 0x00000217,
+	0x0000011d, 0x00000127, 0x00000138, 0x0000014b,
+	0x0000015f, 0x0000016e, 0x00000180, 0x0000019f,
+	0x000001bb, 0x000001d0, 0x000001e4, 0x0000020b,
 	// Entry 20 - 3F
-	0x00000226, 0x0000022d, 0x00000247, 0x0000025b,
-	0x00000275, 0x0000027a, 0x00000288, 0x00000299,
-	0x000002a8, 0x000002c0, 0x000002d4, 0x000002dc,
-	0x000002e5, 0x00000323, 0x0000032c, 0x00000335,
-	0x00000340, 0x00000351, 0x00000358, 0x0000036f,
-	0x00000386, 0x00000392, 0x0000039b, 0x000003a2,
-	0x000003ae, 0x000003b6, 0x000003d9, 0x000003e1,
-	0x000003f1, 0x000003fe, 0x00000406, 0x0000040a,
+	0x00000217, 0x00000227, 0x0000025f, 0x0000026c,
+	0x00000285, 0x0000029a, 0x000002a9, 0x000002b0,
+	0x000002ca, 0x000002de, 0x000002f8, 0x000002fd,
+	0x0000030b, 0x0000031c, 0x0000032b, 0x00000343,
+	0x00000357, 0x0000035f, 0x00000368, 0x000003a6,
+	0x000003af, 0x000003b8, 0x000003c5, 0x000003d0,
+	0x000003db, 0x000003ec, 0x000003f3, 0x0000040a,
+	0x00000421, 0x0000042d, 0x00000436, 0x0000043d,
 	// Entry 40 - 5F
-	0x0000041a, 0x00000425, 0x00000438, 0x00000444,
-	0x0000044d, 0x00000462, 0x0000046a, 0x00000473,
-	0x00000478,
-} // Size: 316 bytes
+	0x00000449, 0x00000451, 0x00000474, 0x0000047c,
+	0x0000048c, 0x00000499, 0x000004a1, 0x000004a5,
+	0x000004b5, 0x000004c0, 0x000004d3, 0x000004df,
+	0x000004e8, 0x000004fd, 0x00000505, 0x0000050e,
+	0x00000513,
+} // Size: 348 bytes
 
-const noData string = "" + // Size: 1144 bytes
+const noData string = "" + // Size: 1299 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vis siste transaksjoner\x02Vis opplysninger til gjennomsyn" +
 	"\x02Søk/bla i katalogen\x02Importer\x02Identifikatorer\x02ISBN, ISSN ell" +
 	"er EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02Egenskaper\x02Identif" +
 	"ikatorer og lenker\x02Utgivelser og bidrag\x02Rolle\x02År\x02Utgivelse" +
-	"\x02Andre relasjoner\x02Allerede i katalogen\x02Ressurs ikke funnet\x02V" +
-	"alidering feilet. Sjekk inputfeltene.\x02OK, lagret.\x02Ingen endringer" +
-	"\x02Nettverksfeil. Kan ikke nå tjener. Sjekk forbindelsen.\x02Forsidebil" +
-	"de\x02Utgivelsens forsidebilde\x02Bidrag og relasjoner\x02Rolle/relasjon" +
-	"\x02Aktør\x02Søk og koble til ressurs\x02%[1]d treff (%[2]v)\x02Grunnleg" +
-	"gende informasjon\x02Navn\x02Påkrevd felt\x02Kort beskrivelse\x02Navneva" +
-	"rianter\x02En innførsel per linje\x02Navn på overordnet\x02Levetid\x02Et" +
-	"ablert\x02År må være et 1-4 sifret heltall. Negative tall betyr BCE.\x02" +
-	"Oppløst\x02Usikkert\x02Personalia\x02Kort beskrivelse\x02Kjønn\x02Assosi" +
-	"ert land/område\x02Assosiert nasjonalitet\x02Fødselsår\x02Dødsår\x02Titt" +
-	"el\x02Undertittel\x02Utgiver\x02År må være et 4-siffret heltall\x02Innho" +
-	"ld\x02Språk (hoved-)\x02Andre språk\x02Fiksjon\x02Fag\x02Sjanger og form" +
-	"\x02Målgruppe\x02Fysiske egenskaper\x02Innbdinding\x02Sidetall\x02Må vær" +
-	"e et heltall\x02Ressurs\x02Relasjon\x02Data"
+	"\x02Andre relasjoner\x02Overordnede begrep\x02Underordnede begrep\x02Er " +
+	"oppbyggd av\x02Henvisningstermer\x02Deweynummer hvor %[1]s inngår\x02Utg" +
+	"ivelser klassifisert med\x02Allerede i katalogen\x02Ressurs ikke funnet" +
+	"\x02Validering feilet. Sjekk inputfeltene.\x02OK, lagret.\x02Ingen endri" +
+	"nger\x02Nettverksfeil. Kan ikke nå tjener. Sjekk forbindelsen.\x02Forsid" +
+	"ebilde\x02Utgivelsens forsidebilde\x02Bidrag og relasjoner\x02Rolle/rela" +
+	"sjon\x02Aktør\x02Søk og koble til ressurs\x02%[1]d treff (%[2]v)\x02Grun" +
+	"nleggende informasjon\x02Navn\x02Påkrevd felt\x02Kort beskrivelse\x02Nav" +
+	"nevarianter\x02En innførsel per linje\x02Navn på overordnet\x02Levetid" +
+	"\x02Etablert\x02År må være et 1-4 sifret heltall. Negative tall betyr BC" +
+	"E.\x02Oppløst\x02Usikkert\x02Forrige side\x02Neste side\x02Personalia" +
+	"\x02Kort beskrivelse\x02Kjønn\x02Assosiert land/område\x02Assosiert nasj" +
+	"onalitet\x02Fødselsår\x02Dødsår\x02Tittel\x02Undertittel\x02Utgiver\x02Å" +
+	"r må være et 4-siffret heltall\x02Innhold\x02Språk (hoved-)\x02Andre spr" +
+	"åk\x02Fiksjon\x02Fag\x02Sjanger og form\x02Målgruppe\x02Fysiske egenska" +
+	"per\x02Innbdinding\x02Sidetall\x02Må være et heltall\x02Ressurs\x02Relas" +
+	"jon\x02Data"
 
-	// Total table size 2925 bytes (2KiB); checksum: A0861C2A
+	// Total table size 3298 bytes (3KiB); checksum: E6E3EF7

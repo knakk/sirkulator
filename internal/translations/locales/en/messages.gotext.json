@@ -156,6 +156,58 @@
             "fuzzy": true
         },
         {
+            "id": "Broader terms",
+            "message": "Broader terms",
+            "translation": "Broader terms",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Narrower terms",
+            "message": "Narrower terms",
+            "translation": "Narrower terms",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Has components",
+            "message": "Has components",
+            "translation": "Has components",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Reference terms",
+            "message": "Reference terms",
+            "translation": "Reference terms",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Dewey numbers where {Number} is a component",
+            "message": "Dewey numbers where {Number} is a component",
+            "translation": "Dewey numbers where {Number} is a component",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Number",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "dewey.Number"
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Publications classified with",
+            "message": "Publications classified with",
+            "translation": "Publications classified with",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Already in catalogue",
             "message": "Already in catalogue",
             "translation": "Already in catalogue",
@@ -345,6 +397,20 @@
             "id": "Uncertain",
             "message": "Uncertain",
             "translation": "Uncertain",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Previous page",
+            "message": "Previous page",
+            "translation": "Previous page",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Next page",
+            "message": "Next page",
+            "translation": "Next page",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

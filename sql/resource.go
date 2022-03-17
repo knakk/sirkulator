@@ -99,26 +99,58 @@ func GetDeweyParts(conn *sqlite.Conn, id string) ([][2]string, error) {
 	return res, nil
 }
 
-func GetDeweyPartsOf(conn *sqlite.Conn, id string, fromID string, limit int) ([][2]string, error) {
-	const q = `
-    SELECT res.id, res.label
-      FROM relation rel
-      JOIN resource res ON (rel.from_id=res.id AND rel.type='has_part')
-     WHERE rel.to_id=?
-       AND res.id > ?
-     ORDER BY res.id
-     LIMIT ?` // TODO consider json_extract(data, '$.name') as label
+func GetDeweyPartsOf(conn *sqlite.Conn, id, from, to string, limit int) ([][2]string, bool, error) {
+	var (
+		q        string
+		fromOrTo string
+	)
+	if from != "" || to == "" {
+		q = `
+        SELECT res.id, res.label
+          FROM relation rel
+          JOIN resource res ON (rel.from_id=res.id AND rel.type='has_part')
+         WHERE rel.to_id=?
+           AND res.id > ?
+         ORDER BY res.id ASC
+         LIMIT ?` // TODO consider json_extract(data, '$.name') as label
+		fromOrTo = from
+	} else {
+		q = `
+        SELECT res.id, res.label
+          FROM relation rel
+          JOIN resource res ON (rel.from_id=res.id AND rel.type='has_part')
+         WHERE rel.to_id=?
+           AND res.id < ?
+         ORDER BY res.id DESC
+         LIMIT ?` // TODO consider json_extract(data, '$.name') as label
+		fromOrTo = to
+	}
 
 	var res [][2]string
+	hasMore := false
 	fn := func(stmt *sqlite.Stmt) error {
 		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
 		return nil
 	}
-	if err := sqlitex.Exec(conn, q, fn, id, fromID, limit); err != nil {
-		return res, fmt.Errorf("sql.GetDeweyPartsOf(%q): %w", id, err)
+	if err := sqlitex.Exec(conn, q, fn, id, fromOrTo, limit+1); err != nil {
+		return res, hasMore, fmt.Errorf("sql.GetDeweyPartsOf(%q, %s, %s, %d): %w", id, from, to, limit, err)
 	}
 
-	return res, nil
+	// We try to fetch one more that requested, so that we know if there
+	// are more results to be had.
+	if len(res) > limit {
+		hasMore = true
+		res = res[:limit]
+	}
+
+	if to != "" {
+		// reverse res
+		for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
+			res[i], res[j] = res[j], res[i]
+		}
+	}
+
+	return res, hasMore, nil
 }
 
 func GetDeweyPartsOfCount(conn *sqlite.Conn, id string) (int, error) {
