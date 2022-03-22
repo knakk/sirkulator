@@ -53,5 +53,20 @@ CREATE TABLE link (
 
 CREATE INDEX idx_link_id ON link (id);
 
+CREATE TABLE job_run (
+    id       INTEGER PRIMARY KEY,
+    name     TEXT NOT NULL,
+    start_at INTEGER NOT NULL, -- time.Now().Unix()
+    stop_at  INTEGER,          -- time.Now().Unix()
+    status   TEXT NOT NULL,    -- running|done|failed|cancelled
+    output   BLOB -- gzipped text
+);
+
+CREATE TABL job_schedule (
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    cron TEXT NOT NULL
+);
+
 -- increment with 1 for each migration
 PRAGMA user_version=1;
