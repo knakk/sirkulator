@@ -62,10 +62,10 @@ CREATE TABLE job_run (
     output   BLOB -- gzipped text
 );
 
-CREATE TABL job_schedule (
-    id   INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    cron TEXT NOT NULL
+CREATE TABLE job_schedule (
+    id       INTEGER PRIMARY KEY,
+    name     TEXT NOT NULL,
+    cron     TEXT NOT NULL -- cron expression with seconds precision
 );
 
 -- increment with 1 for each migration

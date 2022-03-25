@@ -10,7 +10,7 @@ import (
 )
 
 var defaultClient = http.Client{
-	Timeout: 5 * time.Second,
+	Timeout: 60 * time.Second,
 }
 
 const maxDownloadBytes = 10e+6

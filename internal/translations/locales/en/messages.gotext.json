@@ -44,9 +44,30 @@
             "fuzzy": true
         },
         {
+            "id": "Maintenance",
+            "message": "Maintenance",
+            "translation": "Maintenance",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Show recent transactions",
             "message": "Show recent transactions",
             "translation": "Show recent transactions",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Latest job runs",
+            "message": "Latest job runs",
+            "translation": "Latest job runs",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Scheduled jobs",
+            "message": "Scheduled jobs",
+            "translation": "Scheduled jobs",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -415,6 +436,41 @@
             "fuzzy": true
         },
         {
+            "id": "Started (duration)",
+            "message": "Started (duration)",
+            "translation": "Started (duration)",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Status",
+            "message": "Status",
+            "translation": "Status",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Actions",
+            "message": "Actions",
+            "translation": "Actions",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "View output",
+            "message": "View output",
+            "translation": "View output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Cancel",
+            "message": "Cancel",
+            "translation": "Cancel",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Personalia",
             "message": "Personalia",
             "translation": "Personalia",
@@ -586,6 +642,62 @@
             "id": "Data",
             "message": "Data",
             "translation": "Data",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Add new schedule",
+            "message": "Add new schedule",
+            "translation": "Add new schedule",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Job",
+            "message": "Job",
+            "translation": "Job",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Choose job",
+            "message": "Choose job",
+            "translation": "Choose job",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Cron expression",
+            "message": "Cron expression",
+            "translation": "Cron expression",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Schedule job",
+            "message": "Schedule job",
+            "translation": "Schedule job",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Run now (one-off)",
+            "message": "Run now (one-off)",
+            "translation": "Run now (one-off)",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Schedules",
+            "message": "Schedules",
+            "translation": "Schedules",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Delete",
+            "message": "Delete",
+            "translation": "Delete",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

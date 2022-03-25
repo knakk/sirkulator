@@ -93,7 +93,7 @@ func TestRunner(t *testing.T) {
 		}
 
 		// Verify job run was stored in DB.
-		run, err := r.getJobRun(context.Background(), id)
+		run, err := r.GetJobRun(context.Background(), id)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -138,7 +138,7 @@ func TestRunner(t *testing.T) {
 		}
 
 		// Verify job run was stored in DB.
-		run, err := r.getJobRun(context.Background(), id)
+		run, err := r.GetJobRun(context.Background(), id)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -184,7 +184,7 @@ func TestRunner(t *testing.T) {
 		}
 
 		// Verify job run was stored in DB.
-		run, err := r.getJobRun(context.Background(), id)
+		run, err := r.GetJobRun(context.Background(), id)
 		if err != nil {
 			t.Fatal(err)
 		}

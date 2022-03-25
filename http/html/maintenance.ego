@@ -1,0 +1,36 @@
+<%
+package html
+
+import "github.com/knakk/sirkulator/internal/localizer"
+
+type MaintenanceTemplate struct {
+    Page
+}
+
+func (tmpl *MaintenanceTemplate) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%><ego:App Page=tmpl.Page>
+    <details open>
+        <summary>
+            <h3><%= l.Translate("Latest job runs") %></h3>
+        </summary>
+        <div hx-get="/maintenance/runs"
+             hx-trigger="load, every 10s, runTriggered from:body">
+        </div>
+    </details>
+
+    <br/>
+
+    <details open>
+        <summary>
+            <h3><%= l.Translate("Scheduled jobs") %></h3>
+        </summary>
+        <div
+            id="scheduled-jobs"
+            class="border pad"
+            hx-get="/maintenance/schedules"
+            hx-trigger="load, jobScheduled from:body, scheduleDeleted from:body">
+        </div>
+    </details>
+</ego:App>
+<% } %>

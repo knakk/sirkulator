@@ -58,6 +58,12 @@ func (app *App) Render(ctx context.Context, w io.Writer) {
                 Path: "/configuration",
             },
         },
+        {
+            MenuItem: MenuItem{
+                Name: l.Translate("Maintenance"),
+                Path: "/maintenance",
+            },
+        },
     }
 
 %>

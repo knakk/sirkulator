@@ -32,9 +32,24 @@
             "translation": "Konfigurasjon"
         },
         {
+            "id": "Maintenance",
+            "message": "Maintenance",
+            "translation": "Vedlikehold"
+        },
+        {
             "id": "Show recent transactions",
             "message": "Show recent transactions",
             "translation": "Vis siste transaksjoner"
+        },
+        {
+            "id": "Latest job runs",
+            "message": "Latest job runs",
+            "translation": "Siste kjøringer"
+        },
+        {
+            "id": "Scheduled jobs",
+            "message": "Scheduled jobs",
+            "translation": "Planlagte kjøringer"
         },
         {
             "id": "Show metadata for review",
@@ -305,6 +320,31 @@
             "translation": "Neste side"
         },
         {
+            "id": "Started (duration)",
+            "message": "Started (duration)",
+            "translation": "Startet (varighet)"
+        },
+        {
+            "id": "Status",
+            "message": "Status",
+            "translation": "Status"
+        },
+        {
+            "id": "Actions",
+            "message": "Actions",
+            "translation": "Handlinger"
+        },
+        {
+            "id": "View output",
+            "message": "View output",
+            "translation": "Vis utdata"
+        },
+        {
+            "id": "Cancel",
+            "message": "Cancel",
+            "translation": "Avbryt"
+        },
+        {
             "id": "Personalia",
             "message": "Personalia",
             "translation": "Personalia"
@@ -428,6 +468,46 @@
             "id": "Data",
             "message": "Data",
             "translation": "Data"
+        },
+        {
+            "id": "Add new schedule",
+            "message": "Add new schedule",
+            "translation": "Sett opp ny kjøring"
+        },
+        {
+            "id": "Job",
+            "message": "Job",
+            "translation": "Jobb"
+        },
+        {
+            "id": "Choose job",
+            "message": "Choose job",
+            "translation": "Velg jobb"
+        },
+        {
+            "id": "Cron expression",
+            "message": "Cron expression",
+            "translation": "Cron-uttrykk"
+        },
+        {
+            "id": "Schedule job",
+            "message": "Schedule job",
+            "translation": "Legg til"
+        },
+        {
+            "id": "Run now (one-off)",
+            "message": "Run now (one-off)",
+            "translation": "Kjør nå (en gang)"
+        },
+        {
+            "id": "Schedules",
+            "message": "Schedules",
+            "translation": "Planlagte kjøringer"
+        },
+        {
+            "id": "Delete",
+            "message": "Delete",
+            "translation": "Slett"
         }
     ]
 }

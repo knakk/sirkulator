@@ -1,0 +1,49 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator/runner"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ViewSchedules struct {
+    JobNames []string
+    Schedules []runner.Schedule
+    Localizer localizer.Localizer
+}
+
+func (tmpl *ViewSchedules) Render(ctx context.Context, w io.Writer) {
+    l := tmpl.Localizer
+%>
+
+<h4><%= l.Translate("Add new schedule") %></h4>
+<form hx-post="/maintenance/schedule" hx-swap="none">
+    <label for="job_name"><%= l.Translate("Job") %></label>
+    <select id="job_name" name="job_name" required>
+        <option value="">--<%= l.Translate("Choose job") %>--</option>
+        <% for _, job := range tmpl.JobNames { %>
+            <option value="<%= job %>"><%= job %></option>
+        <% } %>
+    </select>
+    <label for="cron_expr"><%= l.Translate("Cron expression") %></label>
+    <input
+        id="cron_expr"
+        type="text"
+        name="cron_expr"
+        pattern="(@(annually|yearly|monthly|weekly|daily|hourly))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ?){5,7})">
+    <button type="submit"><%= l.Translate("Schedule job") %></button>
+    <button hx-post="/maintenance/run" hx-swap="none"><%= l.Translate("Run now (one-off)") %></button>
+</form>
+<h4><%= l.Translate("Schedules") %></h4>
+<table>
+    <% for _, s := range tmpl.Schedules { %>
+        <tr>
+            <td><%= s.Name %></td>
+            <td><%= s.Cron %></td>
+            <td><button hx-delete="/maintenance/schedule/<%= s.ID %>" hx-swap="none"><%= l.Translate("Delete") %></button></td>
+        </tr>
+    <% } %>
+</table>
+
+
+<% } %>

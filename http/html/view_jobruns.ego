@@ -1,0 +1,54 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator/runner"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ViewJobRuns struct {
+    Runs []runner.JobRun
+    Localizer localizer.Localizer
+}
+
+func (tmpl *ViewJobRuns) Render(ctx context.Context, w io.Writer) {
+    l := tmpl.Localizer
+%>
+
+<table id="job_runs" class="job_runs">
+    <thead>
+        <tr>
+            <th><%= l.Translate("Started (duration)") %></th>
+            <th><%= l.Translate("Name") %></th>
+            <th><%= l.Translate("Status") %></th>
+            <th><%= l.Translate("Actions") %></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for _, r := range tmpl.Runs { %>
+            <tr>
+                <td>
+                    <%= r.StartAt %><% if r.Status != "running" && r.Status != "crashed" { %>
+                        &nbsp;(<%= r.StopAt.Sub(r.StartAt) %>)
+                    <% } %>
+                </td>
+                <td>
+                    <%= r.Name %>
+                </td>
+                <td>
+                    <%= r.Status %>
+                </td>
+                <td>
+                    <% if r.Status == "running" { %>
+                        <button><%= l.Translate("Cancel") %></button>
+                    <% } else { %>
+                        <a href="/maintenance/run/<%= r.ID %>/output" target="_blank" ><%= l.Translate("View output") %></a>
+                    <% } %>
+                </td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<% } %>

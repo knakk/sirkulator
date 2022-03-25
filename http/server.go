@@ -16,9 +16,11 @@ import (
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/go-chi/chi/v5"
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/dewey"
 	"github.com/knakk/sirkulator/etl"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/runner"
 	"github.com/knakk/sirkulator/search"
 	"github.com/knakk/sirkulator/sql"
 	"golang.org/x/text/language"
@@ -29,10 +31,11 @@ var embeddedFS embed.FS
 
 // Server represents the HTTP server responsible for serving Sirkulators admin interface.
 type Server struct {
-	ln  net.Listener
-	srv *http.Server
-	db  *sqlitex.Pool
-	idx *search.Index
+	ln     net.Listener
+	srv    *http.Server
+	db     *sqlitex.Pool
+	idx    *search.Index
+	runner *runner.Runner
 
 	// The follwing fields should be set before calls to Open:
 
@@ -45,10 +48,18 @@ type Server struct {
 // NewServer returns a new Server with the given database and index and assets settings.
 func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *search.Index) *Server {
 	s := Server{
-		Addr: "localhost:0", // assign random port as default, useful for testing
-		db:   db,
-		idx:  idx,
+		Addr:   "localhost:0", // assign random port as default, useful for testing
+		db:     db,
+		idx:    idx,
+		runner: runner.New(db),
 	}
+
+	s.runner.Register(&dewey.ImportAllJob{
+		DB:        db,
+		Idx:       idx,
+		BatchSize: 100,
+	})
+
 	s.srv = &http.Server{
 		BaseContext:       func(net.Listener) context.Context { return ctx },
 		ReadTimeout:       5 * time.Second,
@@ -117,6 +128,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 
 		r.Get("/", s.pageHome)
 		r.Get("/circulation", s.pageCirculation)
+
 		r.Route("/metadata", func(r chi.Router) {
 			r.Get("/", s.pageMetadata)
 			r.Get("/reviews", s.viewReviews)
@@ -130,6 +142,18 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Get("/publication/{id}", s.pagePublication)
 			r.Get("/dewey/{id}", s.pageDewey)
 			r.Get("/dewey/{id}/partsof", s.viewDeweyPartsOf)
+		})
+
+		r.Route("/maintenance", func(r chi.Router) {
+			r.Get("/", s.pageMaintenance)
+			r.Get("/runs", s.viewJobRuns)
+			r.Post("/schedule", s.scheduleJob)
+			r.Get("/schedules", s.viewSchedules)
+			r.Delete("/schedule/{id}", s.deleteSchedule)
+			r.Route("/run", func(r chi.Router) {
+				r.Post("/", s.runJob)
+				r.Get("/{id}/output", s.viewJobRunOutput)
+			})
 		})
 	})
 

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -15,12 +15,14 @@ import (
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/rdf"
 	"github.com/knakk/sirkulator"
+	"github.com/knakk/sirkulator/http/client"
 	"github.com/knakk/sirkulator/search"
 	"github.com/knakk/sirkulator/vocab"
 )
 
 type importDewey struct {
 	Number     string
+	Notaion    string
 	Parent     string
 	Name       string
 	Terms      []string
@@ -51,10 +53,9 @@ func (j *ImportAllJob) Name() string {
 }
 
 func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
-	// TODO fetch from URL: https://data.ub.uio.no/dumps/wdno.nt.bz2
-	f, err := os.Open("wdno.nt.bz2")
+	f, err := client.Open(ctx, "https://data.ub.uio.no/dumps/wdno.nt.bz2")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer f.Close()
 
@@ -102,8 +103,11 @@ func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
 		return err
 	}
 
-	// TODO avoid inserting duplicate relations, or delete them at this point:
-	// DELETE FROM relation WHERE rowid NOT IN (SELECT min(rowid) FROM relation GROUP BY from_id, to_id, type);
+	// Some duplicate relations might be insetred, delete them at this point:
+	if err := sqlitex.ExecScript(conn,
+		"DELETE FROM relation WHERE rowid NOT IN (SELECT min(rowid) FROM relation GROUP BY from_id, to_id, type)"); err != nil {
+		fmt.Fprintf(w, "failed to delete duplicate relations: %v\n", err)
+	}
 
 	// Wait for indexing to complete
 	j.wg.Wait()
@@ -111,6 +115,18 @@ func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
 	fmt.Fprintf(w, "%v done importing %d dewey numbers\n", time.Now().Local().Format(time.RFC3339), c)
 
 	return nil
+}
+
+var rxpAddNumber = regexp.MustCompile(`\d(A|B|C)?--\d{1,3}\.\d+`)
+
+func appendIfNew(existing []string, val string) []string {
+	for _, v := range existing {
+		if v == val {
+			return existing
+		}
+	}
+	existing = append(existing, val)
+	return existing
 }
 
 func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
@@ -125,7 +141,7 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 		parts []string
 	)
 	parts = append(parts, j.peekParts...)
-	j.peekParts = j.peekParts[:]
+	j.peekParts = j.peekParts[:0]
 
 	for {
 		if j.peek != nil {
@@ -163,8 +179,7 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 		case "http://www.w3.org/2004/02/skos/core#prefLabel":
 			dewey.Name = strings.TrimSuffix(tr.Obj.String(), "@nb")
 		case "http://www.w3.org/2004/02/skos/core#altLabel":
-			// TODO appendIfNew
-			dewey.Terms = append(dewey.Terms, strings.TrimSuffix(tr.Obj.String(), "@nb"))
+			dewey.Terms = appendIfNew(dewey.Terms, strings.TrimSuffix(tr.Obj.String(), "@nb"))
 		case "http://purl.org/dc/terms/created":
 			if l, ok := tr.Obj.(rdf.Literal); ok {
 				dewey.Created = l.String()
@@ -181,7 +196,11 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 			if o := tr.Obj.String(); strings.HasPrefix(o, "http://dewey.info/class/") {
 				o = strings.TrimPrefix(o, "http://dewey.info/class/")
 				o = strings.TrimSuffix(o, "/e23/")
-				parts = append(parts, o)
+				if rxpAddNumber.MatchString(o) {
+					// convert eg '6--919.94' to '6--91994'
+					o = strings.Replace(o, ".", "", -1)
+				}
+				parts = appendIfNew(parts, o)
 			}
 		case "http://www.w3.org/2004/02/skos/core#broader":
 			if o := tr.Obj.String(); strings.HasPrefix(o, "http://dewey.info/class/") {
@@ -189,6 +208,8 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 				o = strings.TrimSuffix(o, "/e23/")
 				dewey.Parent = o
 			}
+		case "http://www.w3.org/2004/02/skos/core#notation":
+			dewey.Notaion = tr.Obj.String()
 		case "http://www.w3.org/2002/07/owl#deprecated":
 			dewey.Deprecated = true
 		}
@@ -257,7 +278,7 @@ func (j *ImportAllJob) persist(ctx context.Context, batch importBatch) (err erro
 
 	for _, res := range batch.Resources {
 		stmt := conn.Prep(`
-			INSERT INTO resource (type, id, label, data, created_at, updated_at, archived_at)
+			INSERT OR IGNORE INTO resource (type, id, label, data, created_at, updated_at, archived_at)
 				VALUES ($type, $id, $label, $data, $created, $updated, $archived)
 		`)
 
@@ -329,7 +350,7 @@ func (j *ImportAllJob) index(batch []sirkulator.Resource) {
 		})
 	}
 	if err := j.Idx.Store(docs...); err != nil {
-		log.Printf("ImportAllJob.index: %v", err)
+		log.Printf("ImportAllJob.index: %v", err) // TODO remove, or write to w
 	}
 }
 
@@ -341,6 +362,7 @@ type ImportUpdatesJob struct {
 
 	// Setup:
 	Since time.Time // Timestamp of latest local update on a Dewey number.
+	// SELECT max(date(datetime(updated_at, 'unixepoch'))) FROM resource WHEre type='dewey';
 }
 
 */

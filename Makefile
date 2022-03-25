@@ -1,5 +1,5 @@
 js:
-	@curl -L "https://unpkg.com/htmx.org@1.6.1" > http/assets/htmx.min.js
+	@curl -L "https://unpkg.com/htmx.org@1.7.0" > http/assets/htmx.min.js
 
 translate: generate
 	@go generate ./internal/translations/translations.go
