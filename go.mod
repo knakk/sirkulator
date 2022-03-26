@@ -15,6 +15,7 @@ require (
 require (
 	github.com/blugelabs/bluge v0.1.9
 	github.com/knakk/rdf v0.0.0-20190304171630-8521bf4c5042
+	github.com/knakk/sparql v0.0.0-20220326141742-15797a7da0ca
 	github.com/robfig/cron/v3 v3.0.1
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 )
@@ -36,6 +37,7 @@ require (
 	github.com/caio/go-tdigest v3.1.0+incompatible // indirect
 	github.com/dgryski/go-metro v0.0.0-20180109044635-280f6062b5bc // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/knakk/digest v0.0.0-20160404164910-fd45becddc49 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect

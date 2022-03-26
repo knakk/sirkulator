@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"sync"
@@ -18,6 +20,7 @@ import (
 	"github.com/knakk/sirkulator/http/client"
 	"github.com/knakk/sirkulator/search"
 	"github.com/knakk/sirkulator/vocab"
+	"github.com/knakk/sparql"
 )
 
 type importDewey struct {
@@ -37,7 +40,17 @@ type importBatch struct {
 	Relations []sirkulator.Relation
 }
 
-type ImportAllJob struct {
+type FusekiDescribeNT struct {
+	Query string
+}
+
+func (f FusekiDescribeNT) GenRequest(endpoint string) (*http.Request, error) {
+	url := fmt.Sprintf("%s?query=%s&format=nt", endpoint, url.QueryEscape(f.Query))
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	return req, err
+}
+
+type ImportJob struct {
 	wg        sync.WaitGroup // keeping track of indexing TODO consider sync.ErrGroup
 	peek      *rdf.Triple
 	peekParts []string
@@ -46,21 +59,77 @@ type ImportAllJob struct {
 	DB        *sqlitex.Pool
 	Idx       *search.Index
 	BatchSize int // Number of resources to persist to DB at a time
+	Update    bool
 }
 
-func (j *ImportAllJob) Name() string {
+func (j *ImportJob) Name() string {
+	if j.Update {
+		return "dewey_import_update"
+	}
 	return "dewey_import_all"
 }
 
-func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
+func (j *ImportJob) open(ctx context.Context, w io.Writer) (io.ReadCloser, error) {
+	if j.Update {
+		conn := j.DB.Get(ctx)
+		if conn == nil {
+			return nil, context.Canceled
+		}
+		stmt := conn.Prep(`
+			SELECT max(date(datetime(updated_at, 'unixepoch'))) AS latest
+			  FROM resource
+			 WHERE type='dewey'`)
+
+		date, err := sqlitex.ResultText(stmt)
+		if err != nil {
+			return nil, err
+		}
+		sparqlEndpoint := "https://data.ub.uio.no/sparql"
+		fmt.Fprintf(w, "finding most recent dewey update in DB: %s\n", date)
+		fmt.Fprintf(w, "querying sparql endpoint at %s for updates since %s\n", sparqlEndpoint, date)
+		repo, err := sparql.NewRepo(sparqlEndpoint)
+		if err != nil {
+			return nil, err
+		}
+		q := fmt.Sprintf(`
+		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+		PREFIX purl: <http://purl.org/dc/terms/>
+		PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+		DESCRIBE ?d WHERE {
+		?d a skos:Concept ;
+			skos:inScheme <http://dewey.info/scheme/edition/e23/> ;
+			purl:created ?created ;
+			purl:modified ?modified .
+
+		FILTER (?modified >= "%s"^^xsd:date)
+		}`, date)
+		f, err := repo.QueryWithoutParsing(FusekiDescribeNT{Query: q})
+		if err != nil {
+			return nil, err
+		}
+		return f, nil
+	}
+	fmt.Fprintln(w, "downloading webdewey n-triples dump from url: https://data.ub.uio.no/dumps/wdno.nt.bz2")
 	f, err := client.Open(ctx, "https://data.ub.uio.no/dumps/wdno.nt.bz2")
+	return f, err
+}
+
+func (j *ImportJob) Run(ctx context.Context, w io.Writer) error {
+	f, err := j.open(ctx, w)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	d := rdf.NewTripleDecoder(bzip2.NewReader(f), rdf.NTriples)
-	fmt.Fprintf(w, "%v start importing deweynumbers\n", time.Now().Local().Format(time.RFC3339))
+	var d rdf.TripleDecoder
+	if j.Update {
+		d = rdf.NewTripleDecoder(f, rdf.NTriples)
+	} else {
+		d = rdf.NewTripleDecoder(bzip2.NewReader(f), rdf.NTriples)
+	}
+
+	fmt.Fprintln(w, "start importing deweynumbers")
 	c := 0
 	for {
 		batch, err := j.getBatch(d)
@@ -112,7 +181,11 @@ func (j *ImportAllJob) Run(ctx context.Context, w io.Writer) error {
 	// Wait for indexing to complete
 	j.wg.Wait()
 
-	fmt.Fprintf(w, "%v done importing %d dewey numbers\n", time.Now().Local().Format(time.RFC3339), c)
+	if j.Update {
+		fmt.Fprintf(w, "done updating/importing %d dewey numbers\n", c)
+	} else {
+		fmt.Fprintf(w, "done importing %d dewey numbers\n", c)
+	}
 
 	return nil
 }
@@ -129,7 +202,7 @@ func appendIfNew(existing []string, val string) []string {
 	return existing
 }
 
-func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
+func (j *ImportJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 
 	numbers := make(map[string]importDewey, j.BatchSize)
 
@@ -158,6 +231,9 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 		if s := tr.Subj.String(); strings.HasPrefix(s, "http://dewey.info/class/") {
 			s = strings.TrimPrefix(s, "http://dewey.info/class/")
 			s = strings.TrimSuffix(s, "/e23/")
+			if strings.Contains(s, "--") {
+				s = "T" + s
+			}
 			if s != subj {
 				if len(numbers) == j.BatchSize {
 					j.peek = &tr
@@ -200,12 +276,18 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 					// convert eg '6--919.94' to '6--91994'
 					o = strings.Replace(o, ".", "", -1)
 				}
+				if strings.Contains(o, "--") {
+					o = "T" + o
+				}
 				parts = appendIfNew(parts, o)
 			}
 		case "http://www.w3.org/2004/02/skos/core#broader":
 			if o := tr.Obj.String(); strings.HasPrefix(o, "http://dewey.info/class/") {
 				o = strings.TrimPrefix(o, "http://dewey.info/class/")
 				o = strings.TrimSuffix(o, "/e23/")
+				if strings.Contains(o, "--") {
+					o = "T" + o
+				}
 				dewey.Parent = o
 			}
 		case "http://www.w3.org/2004/02/skos/core#notation":
@@ -268,7 +350,7 @@ func (j *ImportAllJob) getBatch(d rdf.TripleDecoder) (importBatch, error) {
 	return batch, nil
 }
 
-func (j *ImportAllJob) persist(ctx context.Context, batch importBatch) (err error) {
+func (j *ImportJob) persist(ctx context.Context, batch importBatch) (err error) {
 	conn := j.DB.Get(ctx)
 	if conn == nil {
 		return context.Canceled
@@ -278,8 +360,13 @@ func (j *ImportAllJob) persist(ctx context.Context, batch importBatch) (err erro
 
 	for _, res := range batch.Resources {
 		stmt := conn.Prep(`
-			INSERT OR IGNORE INTO resource (type, id, label, data, created_at, updated_at, archived_at)
+			INSERT INTO resource (type, id, label, data, created_at, updated_at, archived_at)
 				VALUES ($type, $id, $label, $data, $created, $updated, $archived)
+			ON CONFLICT(id) DO UPDATE
+				SET label=$label,
+					data=$data,
+					updated_at=$updated,
+					archived_at=$archived
 		`)
 
 		stmt.SetText("$type", res.Type.String())
@@ -304,6 +391,10 @@ func (j *ImportAllJob) persist(ctx context.Context, batch importBatch) (err erro
 	}
 
 	for _, rel := range batch.Relations {
+		delQ := `DELETE FROM relation 	WHERE id=? AND (type='has_parent' OR type='has_part')`
+		if err := sqlitex.Exec(conn, delQ, nil, rel.FromID); err != nil {
+			return err // TODO annotate
+		}
 		stmt := conn.Prep(`
 			WITH v(from_id, type, data) AS (VALUES ($from_id, $type, $data))
 			INSERT INTO relation (from_id, to_id, type, data, queued_at)
@@ -334,7 +425,7 @@ func (j *ImportAllJob) persist(ctx context.Context, batch importBatch) (err erro
 	return nil
 }
 
-func (j *ImportAllJob) index(batch []sirkulator.Resource) {
+func (j *ImportJob) index(batch []sirkulator.Resource) {
 	j.wg.Add(1)
 	defer j.wg.Done()
 
@@ -350,19 +441,6 @@ func (j *ImportAllJob) index(batch []sirkulator.Resource) {
 		})
 	}
 	if err := j.Idx.Store(docs...); err != nil {
-		log.Printf("ImportAllJob.index: %v", err) // TODO remove, or write to w
+		log.Printf("ImportJob.index: %v", err) // TODO remove, or write to w
 	}
 }
-
-/*
-
-type ImportUpdatesJob struct {
-	db  *sqlitex.Pool
-	idx *search.Index
-
-	// Setup:
-	Since time.Time // Timestamp of latest local update on a Dewey number.
-	// SELECT max(date(datetime(updated_at, 'unixepoch'))) FROM resource WHEre type='dewey';
-}
-
-*/

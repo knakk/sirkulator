@@ -54,11 +54,8 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 		runner: runner.New(db),
 	}
 
-	s.runner.Register(&dewey.ImportAllJob{
-		DB:        db,
-		Idx:       idx,
-		BatchSize: 100,
-	})
+	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100})
+	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100, Update: true})
 
 	s.srv = &http.Server{
 		BaseContext:       func(net.Listener) context.Context { return ctx },
