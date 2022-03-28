@@ -6,4 +6,4 @@ scratch
 *.ego.go
 out.gotext.json 
 *.db
-*.js
+htmx.min.js

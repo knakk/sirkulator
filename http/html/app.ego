@@ -82,6 +82,7 @@ func (app *App) Render(ctx context.Context, w io.Writer) {
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="/assets/main.css">
     <script src="/assets/htmx.min.js"></script>
+    <script src="/assets/sirkulator.js"></script>
 </head>
 <body>
     <header>

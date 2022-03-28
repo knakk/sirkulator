@@ -161,6 +161,7 @@ type SearchSelect struct {
 	Values    []string
 	InfoMsg   string
 	Multiple  bool
+	Required  bool
 }
 
 func label(opts [][2]string, val string) (string, bool) {
@@ -172,21 +173,37 @@ func label(opts [][2]string, val string) (string, bool) {
 	return "", false
 }
 
+func sliceContains(slice []string, v string) bool {
+	for _, s := range slice {
+		if s == v {
+			return true
+		}
+	}
+	return false
+}
+
 func (i *SearchSelect) Render(ctx context.Context, w io.Writer) {
 	if i.InfoMsg == "" {
 		i.InfoMsg = "&nbsp;"
 	}
-	io.WriteString(w, `<div class="field"><input type="search" autocomplete="off"`)
+	io.WriteString(w, `<div class="field"><input class="search-select`)
 	if !i.Multiple && i.Value != "" {
-		io.WriteString(w, ` disabled`)
+		io.WriteString(w, ` single-value" disabled`)
 		i.Values = []string{i.Value}
+	} else {
+		io.WriteString(w, `"`)
 	}
+	io.WriteString(w, ` type="search" autocomplete="off"`)
 	writeAttr(w, "id", i.ID)
 	writeAttr(w, "list", i.ID+"_list")
 	io.WriteString(w, `><datalist`)
 	writeAttr(w, "id", i.ID+"_list")
 	io.WriteString(w, `>`)
 	for _, opt := range i.Options {
+		if sliceContains(i.Values, i.URIPrefix+opt[0]) {
+			// exclude already selected values from datalist
+			continue
+		}
 		io.WriteString(w, `<option`)
 		writeAttr(w, "value", opt[0])
 		io.WriteString(w, `>`)

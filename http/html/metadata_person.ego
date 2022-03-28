@@ -201,15 +201,6 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
                 .innerHTML = "<%= l.Translate("Network error. Server unreachable. Check your connection") %>";
         });
 
-
-        function removeTerm(e) {
-            e.target.closest("li").remove();
-        };
-
-         // TODO create "selected-term" web component and bundle removal js code with it
-        document.querySelectorAll(".unselect-term").forEach(
-            e => e.addEventListener("click", (e) => removeTerm(e)));
-
     </script>
 </ego:App>
 <% } %>
