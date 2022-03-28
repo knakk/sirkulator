@@ -70,20 +70,22 @@ func New(db *sqlitex.Pool) *Runner {
 		id2entryID: make(map[int64]cron.EntryID),
 	}
 
-	// TODO consider make start/init (= registerJobs, loadSchedules, cron.Start) a separate method
+	return &r
+}
+
+func (r *Runner) Start(ctx context.Context) error {
 	r.registerDefaultJobs()
-	if err := r.loadSchedules(context.Background()); err != nil {
-		log.Println(err) // TODO think about runner init error and propagation, probably better to fail earlier
+	if err := r.loadSchedules(ctx); err != nil {
+		return err
 	}
 	// In case server stopped/crashed while jobs where running, they will still have status 'running' in db
 	// Close those as 'crashed'
 	if err := r.closeActiveRuns(context.Background()); err != nil {
-		log.Println(err) // TODO think about runner init error and propagation, probably better to fail earlier
+		return err
 	}
 
 	r.cron.Start()
-
-	return &r
+	return nil
 }
 
 func (r *Runner) Stop() context.Context {
@@ -213,10 +215,10 @@ func WrapForCron(r *Runner, job Job, cronID *cron.EntryID) cron.Job {
 
 }
 
-// Start a job immedeatly. Returns the job run ID and a channel which will send
+// RunJob runs a job immedeatly. Returns the job run ID and a channel which will send
 // when the job is completed.
 // TODO return JobRun instead, align with cron scheduled jobs (running map etc)
-func (r *Runner) Start(ctx context.Context, jobName string) (int64, chan struct{}, error) {
+func (r *Runner) RunJob(ctx context.Context, jobName string) (int64, chan struct{}, error) {
 	r.mu.RLock()
 	job, ok := r.jobs[jobName]
 	defer r.mu.RUnlock()
@@ -506,6 +508,10 @@ func (r *Runner) GetJobRun(ctx context.Context, id int64) (JobRun, error) {
 	}
 	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
 		return run, fmt.Errorf("GetJobRun(%d): %w", id, err)
+	}
+
+	if run.ID == 0 {
+		return run, sirkulator.ErrNotFound
 	}
 
 	return run, nil

@@ -56,6 +56,10 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 
 	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100})
 	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100, Update: true})
+	if err := s.runner.Start(ctx); err != nil {
+		// TODO consider setting up separatly and pass to NewServer as an argument, like db and idx.
+		log.Printf("NewServer start runner %v\n", err)
+	}
 
 	s.srv = &http.Server{
 		BaseContext:       func(net.Listener) context.Context { return ctx },
@@ -203,7 +207,6 @@ func (s *Server) indexResources(res []sirkulator.Resource) {
 func (s *Server) image(w http.ResponseWriter, r *http.Request) {
 	conn := s.db.Get(r.Context())
 	if conn == nil {
-		// TODO which statuscode/response is appropriate?
 		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		return
 	}

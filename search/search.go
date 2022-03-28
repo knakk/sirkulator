@@ -142,7 +142,7 @@ func (idx *Index) Search(ctx context.Context, q, resType, sortBy, sortDir string
 
 	switch sortBy {
 	case "created", "updated":
-		req.SortBy([]string{sortDir + sortBy, "label"}) // sortDir "-"" = descending
+		req.SortBy([]string{sortDir + sortBy, "label"}) // sortDir "-" = descending
 	default:
 		// sort by score
 	}

@@ -45,7 +45,6 @@ func (s *Server) savePerson(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	conn := s.db.Get(r.Context())
 	if conn == nil {
-		// TODO which statuscode/response is appropriate?
 		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		return
 	}
@@ -150,7 +149,6 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	conn := s.db.Get(r.Context())
 	if conn == nil {
-		// TODO which statuscode/response is appropriate?
 		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		return
 	}
@@ -190,7 +188,6 @@ func (s *Server) viewContributions(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	conn := s.db.Get(r.Context())
 	if conn == nil {
-		// TODO which statuscode/response is appropriate?
 		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		return
 	}

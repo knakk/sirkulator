@@ -135,7 +135,7 @@ func (s *Server) runJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, _, err := s.runner.Start(context.Background(), jobName); err != nil {
+	if _, _, err := s.runner.RunJob(context.Background(), jobName); err != nil {
 		ServerError(w, err)
 		return
 	}

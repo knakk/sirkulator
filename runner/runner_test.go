@@ -79,7 +79,7 @@ func TestRunner(t *testing.T) {
 		}
 		r := New(db)
 		r.Register(job)
-		id, done, err := r.Start(context.Background(), job.Name())
+		id, done, err := r.RunJob(context.Background(), job.Name())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -124,7 +124,7 @@ func TestRunner(t *testing.T) {
 		}
 		r := New(db)
 		r.Register(job)
-		id, done, err := r.Start(context.Background(), job.Name())
+		id, done, err := r.RunJob(context.Background(), job.Name())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -169,7 +169,7 @@ func TestRunner(t *testing.T) {
 		r := New(db)
 		r.Register(job)
 		ctx, cancel := context.WithCancel(context.Background())
-		id, done, err := r.Start(ctx, job.Name())
+		id, done, err := r.RunJob(ctx, job.Name())
 		if err != nil {
 			t.Fatal(err)
 		}

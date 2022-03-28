@@ -3,6 +3,7 @@ package sirkulator
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -15,8 +16,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-type PersistableResource interface {
-	Valid() bool
+type Persistable interface {
+	Validate(url.Values) (any, bool)
 	Label() string
 }
 
