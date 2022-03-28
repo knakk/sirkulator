@@ -120,7 +120,7 @@ func TestRunner(t *testing.T) {
 			shodFail: true,
 			dir:      dir,
 			filename: filename,
-			errMsg:   fmt.Sprintf("failed to create file: %s", filename),
+			errMsg:   fmt.Sprintf("failed to create file: %s\nfailed with: failed to create file: %s", filename, filename),
 		}
 		r := New(db)
 		r.Register(job)
@@ -164,7 +164,7 @@ func TestRunner(t *testing.T) {
 			slow:     true,
 			dir:      dir,
 			filename: filename,
-			errMsg:   "\nJob cancelled.",
+			errMsg:   "\nJob cancelled.\nfailed with: context canceled",
 		}
 		r := New(db)
 		r.Register(job)
