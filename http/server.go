@@ -56,6 +56,8 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 
 	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100})
 	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100, Update: true})
+	s.runner.Register(&search.Indexer{DB: db, Idx: idx, BatchSize: 100})
+
 	if err := s.runner.Start(ctx); err != nil {
 		// TODO consider setting up separatly and pass to NewServer as an argument, like db and idx.
 		log.Printf("NewServer start runner %v\n", err)
@@ -190,14 +192,7 @@ func (s *Server) indexResources(res []sirkulator.Resource) {
 
 	var docs []search.Document
 	for _, r := range res {
-		docs = append(docs, search.Document{
-			ID:        r.ID,
-			Type:      r.Type.String(),
-			Label:     r.Label,
-			Gain:      1.0,
-			CreatedAt: r.CreatedAt,
-			UpdatedAt: r.UpdatedAt,
-		})
+		docs = append(docs, r.Document())
 	}
 	if err := s.idx.Store(docs...); err != nil {
 		log.Println(err) // TODO or not
@@ -380,8 +375,8 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+
 	q := r.PostForm.Get("q")
-	resType := r.PostForm.Get("type")
 
 	// TODO sortby/direction is rather cumbersome without client side state in javascript;
 	// consider something like alpine.js (but only if there are many other use cases)
@@ -393,7 +388,13 @@ func (s *Server) searchResources(w http.ResponseWriter, r *http.Request) {
 		sortDir = ""   // ascending
 	}
 
-	res, err := s.idx.Search(r.Context(), q, resType, sortBy, sortDir, 10)
+	res, err := s.idx.Search(r.Context(), q, search.QueryOptions{
+		Type:         r.PostForm.Get("type"),
+		SortBy:       sortBy,
+		SortDir:      sortDir,
+		Limit:        10,
+		InclArchived: r.PostForm.Get("include_archived") != "",
+	})
 	if err != nil {
 		// TODO do we filter out all user errors above in parseform?
 		ServerError(w, err)

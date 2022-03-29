@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sort"
 	"sync"
 	"time"
 
@@ -563,5 +564,6 @@ func (r *Runner) JobNames() []string {
 	for _, job := range r.jobs {
 		jobs = append(jobs, job.Name())
 	}
+	sort.Strings(jobs)
 	return jobs
 }

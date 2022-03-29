@@ -98,7 +98,7 @@ func (idx *Index) Store(docs ...Document) error {
 			AddField(bluge.NewDateTimeField("updated", doc.UpdatedAt).StoreValue()).
 			AddField(bluge.NewNumericField("gain", doc.Gain)) // TODO https://github.com/mschoch/bluge-custom-score
 		if !doc.ArchivedAt.IsZero() {
-			d.AddField(bluge.NewDateTimeField("archived", doc.ArchivedAt).StoreValue())
+			d.AddField(bluge.NewKeywordField("flags", "archived"))
 		}
 		if err := idx.writer.Update(d.ID(), d); err != nil {
 			return fmt.Errorf("search: Index.Store: writing doc %s: %w", d.ID(), err)
@@ -120,7 +120,7 @@ func (idx Index) batchStore(docs []Document) error {
 			AddField(bluge.NewDateTimeField("updated", doc.UpdatedAt).StoreValue()).
 			AddField(bluge.NewNumericField("gain", doc.Gain)) // TODO https://github.com/mschoch/bluge-custom-score
 		if !doc.ArchivedAt.IsZero() {
-			d.AddField(bluge.NewDateTimeField("archived", doc.ArchivedAt).StoreValue())
+			d.AddField(bluge.NewKeywordField("flags", "archived"))
 		}
 		batch.Update(d.ID(), d)
 	}
@@ -131,8 +131,15 @@ func (idx Index) batchStore(docs []Document) error {
 	return nil
 }
 
-// TODO too many arguments to method: take query struct instead?
-func (idx *Index) Search(ctx context.Context, q, resType, sortBy, sortDir string, limit int) (Results, error) {
+type QueryOptions struct {
+	Type         string
+	SortBy       string
+	SortDir      string
+	Limit        int
+	InclArchived bool
+}
+
+func (idx *Index) Search(ctx context.Context, q string, opt QueryOptions) (Results, error) {
 	res := Results{}
 	var query bluge.Query
 	if q == "" {
@@ -140,16 +147,22 @@ func (idx *Index) Search(ctx context.Context, q, resType, sortBy, sortDir string
 	} else {
 		query = bluge.NewFuzzyQuery(q).SetField("label")
 	}
-	if resType != "" {
-		query = bluge.NewBooleanQuery().
-			AddMust(query).
-			AddMust(bluge.NewMatchQuery(resType).SetField("type"))
-	}
-	req := bluge.NewTopNSearch(limit, query).WithStandardAggregations()
 
-	switch sortBy {
+	boolq := bluge.NewBooleanQuery().
+		AddMust(query)
+	if !opt.InclArchived {
+		boolq.AddMustNot(bluge.NewMatchQuery("archived").SetField("flags"))
+	}
+
+	if opt.Type != "" {
+		boolq.AddMust(bluge.NewMatchQuery(opt.Type).SetField("type"))
+	}
+
+	req := bluge.NewTopNSearch(opt.Limit, boolq).WithStandardAggregations()
+
+	switch opt.SortBy {
 	case "created", "updated":
-		req.SortBy([]string{sortDir + sortBy, "label"}) // sortDir "-" = descending
+		req.SortBy([]string{opt.SortDir + opt.SortBy, "label"}) // sortDir "-" = descending
 	default:
 		// sort by score
 	}
@@ -213,29 +226,3 @@ type Hit struct {
 	Document
 	Score float64
 }
-
-/*
-func DefaultBatchChan() chan<- Document {
-	return defaultBatchChan
-}
-
-var (
-	defaultBatchSize = 100
-	defaultBatchWait = time.Second * 2
-	defaultBatchChan = make(chan Document, defaultBatchSize)
-)
-
-type Indexer struct {
-}
-
-func (i Indexer) Run(ctx context.Context, db *sqlitex.Pool, w io.Writer) {
-	for {
-
-	}
-}
-
-func Index(ctx context.Context, db *sqlitex.Pool, docs []Document) error {
-	return nil
-}
-
-*/

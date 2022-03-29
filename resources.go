@@ -11,6 +11,7 @@ import (
 
 	"github.com/knakk/sirkulator/internal/localizer"
 	"github.com/knakk/sirkulator/marc"
+	"github.com/knakk/sirkulator/search"
 	"github.com/knakk/sirkulator/vocab"
 	"github.com/teris-io/shortid"
 	"golang.org/x/text/language"
@@ -106,6 +107,18 @@ type Resource struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	ArchivedAt time.Time
+}
+
+func (r Resource) Document() search.Document {
+	return search.Document{
+		ID:         r.ID,
+		Type:       r.Type.String(),
+		Label:      r.Label,
+		Gain:       1.0,
+		CreatedAt:  r.CreatedAt,
+		UpdatedAt:  r.UpdatedAt,
+		ArchivedAt: r.ArchivedAt,
+	}
 }
 
 // SimpleResource is a minimal representation of a Resource that can be

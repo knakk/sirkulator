@@ -39,220 +39,222 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%d hits (%v)":                          43,
-	"1 per line":                            15,
-	"Actions":                               60,
-	"Add new schedule":                      88,
-	"Agent":                                 41,
-	"Already in catalogue":                  31,
-	"Associated country/area":               66,
-	"Associated nationality":                67,
-	"Audience":                              80,
-	"Basic information":                     44,
-	"Binding":                               82,
-	"Birthyear":                             68,
-	"Broader terms":                         25,
+	"%d hits (%v)":                          44,
+	"1 per line":                            16,
+	"Actions":                               61,
+	"Add new schedule":                      89,
+	"Agent":                                 42,
+	"Already in catalogue":                  32,
+	"Associated country/area":               67,
+	"Associated nationality":                68,
+	"Audience":                              81,
+	"Basic information":                     45,
+	"Binding":                               83,
+	"Birthyear":                             69,
+	"Broader terms":                         26,
 	"Cancel":                                62,
-	"Choose job":                            90,
+	"Choose job":                            91,
 	"Circulation":                           1,
 	"Configuration":                         5,
-	"Content":                               74,
-	"Contributions and relations":           39,
-	"Cover-image":                           37,
-	"Cron expression":                       91,
-	"Data":                                  87,
-	"Deathyear":                             69,
-	"Delete":                                95,
-	"Description (short)":                   64,
-	"Dewey numbers where %s is a component": 29,
-	"Disestablishment year":                 54,
-	"Fiction":                               77,
-	"Foundation year":                       52,
-	"Gender":                                65,
-	"Genre and forms":                       79,
-	"Has components":                        27,
+	"Content":                               75,
+	"Contributions and relations":           40,
+	"Cover-image":                           38,
+	"Cron expression":                       92,
+	"Data":                                  88,
+	"Deathyear":                             70,
+	"Delete":                                96,
+	"Description (short)":                   65,
+	"Dewey numbers where %s is a component": 30,
+	"Disestablishment year":                 55,
+	"Fiction":                               78,
+	"Foundation year":                       53,
+	"Gender":                                66,
+	"Genre and forms":                       80,
+	"Has components":                        28,
 	"Holdings":                              4,
 	"Home":                                  0,
-	"ISBN, ISSN or EAN":                     14,
-	"Identificators and links":              19,
-	"Identifiers":                           13,
-	"Import":                                12,
-	"Job":                                   89,
+	"ISBN, ISSN or EAN":                     15,
+	"Identificators and links":              20,
+	"Identifiers":                           14,
+	"Import":                                13,
+	"Job":                                   90,
 	"Latest job runs":                       8,
-	"Lifespan":                              51,
-	"Main language":                         75,
+	"Lifespan":                              52,
+	"Main language":                         76,
 	"Maintenance":                           6,
 	"Metadata":                              3,
-	"Must be an integer":                    84,
-	"Name":                                  45,
-	"Name variations":                       48,
-	"Narrower terms":                        26,
-	"Network error. Server unreachable. Check your connection": 36,
-	"Next page":                              57,
-	"No changes.":                            35,
-	"Nonfiction":                             78,
-	"Number of pages":                        83,
-	"OK, saved.":                             34,
-	"One entry per line":                     49,
+	"Must be an integer":                    85,
+	"Name":                                  46,
+	"Name variations":                       49,
+	"Narrower terms":                        27,
+	"Network error. Server unreachable. Check your connection": 37,
+	"Next page":                              58,
+	"No changes.":                            36,
+	"Nonfiction":                             79,
+	"Number of pages":                        84,
+	"OK, saved.":                             35,
+	"One entry per line":                     50,
 	"Orders":                                 2,
-	"Other languages":                        76,
-	"Other relations":                        24,
-	"Parent name":                            50,
-	"Personalia":                             63,
-	"Physical characteristics":               81,
-	"Preview":                                16,
-	"Previous page":                          56,
-	"Properties":                             18,
-	"Publication":                            23,
-	"Publication cover-image":                38,
-	"Publications and contributions":         20,
-	"Publications classified with":           30,
-	"Publisher":                              72,
-	"Reference terms":                        28,
-	"Relation":                               86,
-	"Required field":                         46,
-	"Resource":                               85,
-	"Resource not found.":                    32,
-	"Role":                                   21,
-	"Role/relation":                          40,
-	"Run now (one-off)":                      93,
-	"Schedule job":                           92,
+	"Other languages":                        77,
+	"Other relations":                        25,
+	"Parent name":                            51,
+	"Personalia":                             64,
+	"Physical characteristics":               82,
+	"Preview":                                17,
+	"Previous page":                          57,
+	"Properties":                             19,
+	"Publication":                            24,
+	"Publication cover-image":                39,
+	"Publications and contributions":         21,
+	"Publications classified with":           31,
+	"Publisher":                              73,
+	"Reference terms":                        29,
+	"Relation":                               87,
+	"Required field":                         47,
+	"Resource":                               86,
+	"Resource not found.":                    33,
+	"Role":                                   22,
+	"Role/relation":                          41,
+	"Run now (one-off)":                      94,
+	"Schedule job":                           93,
 	"Scheduled jobs":                         9,
-	"Schedules":                              94,
-	"Search and connect to resource":         42,
+	"Schedules":                              95,
+	"Search and connect to resource":         43,
 	"Search/browse catalogue":                11,
-	"Short description":                      47,
+	"Short description":                      48,
 	"Show metadata for review":               10,
 	"Show recent transactions":               7,
-	"Started (duration)":                     58,
-	"Status":                                 59,
-	"Subtitle":                               71,
-	"Title":                                  70,
-	"Uncertain":                              55,
-	"Validation failed. Check input fields.": 33,
-	"View output":                            61,
-	"Year":                                   22,
-	"Year must be a 1-4 digit number. Negative numbers signify BCE.": 53,
-	"Year must be a 4-digit number":                                  73,
-	"wait...":                                                        17,
+	"Started (duration)":                     59,
+	"Status":                                 60,
+	"Subtitle":                               72,
+	"Title":                                  71,
+	"Uncertain":                              56,
+	"Validation failed. Check input fields.": 34,
+	"View output":                            63,
+	"Year":                                   23,
+	"Year must be a 1-4 digit number. Negative numbers signify BCE.": 54,
+	"Year must be a 4-digit number":                                  74,
+	"include archived":                                               12,
+	"wait...":                                                        18,
 }
 
-var enIndex = []uint32{ // 97 elements
+var enIndex = []uint32{ // 98 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x00000018,
 	0x00000021, 0x0000002a, 0x00000038, 0x00000044,
 	0x0000005d, 0x0000006d, 0x0000007c, 0x00000095,
-	0x000000ad, 0x000000b4, 0x000000c0, 0x000000d2,
-	0x000000dd, 0x000000e5, 0x000000ed, 0x000000f8,
-	0x00000111, 0x00000130, 0x00000135, 0x0000013a,
-	0x00000146, 0x00000156, 0x00000164, 0x00000173,
-	0x00000182, 0x00000192, 0x000001bb, 0x000001d8,
+	0x000000ad, 0x000000be, 0x000000c5, 0x000000d1,
+	0x000000e3, 0x000000ee, 0x000000f6, 0x000000fe,
+	0x00000109, 0x00000122, 0x00000141, 0x00000146,
+	0x0000014b, 0x00000157, 0x00000167, 0x00000175,
+	0x00000184, 0x00000193, 0x000001a3, 0x000001cc,
 	// Entry 20 - 3F
-	0x000001ed, 0x00000201, 0x00000228, 0x00000233,
-	0x0000023f, 0x00000278, 0x00000284, 0x0000029c,
-	0x000002b8, 0x000002c6, 0x000002cc, 0x000002eb,
-	0x000002fe, 0x00000310, 0x00000315, 0x00000324,
-	0x00000336, 0x00000346, 0x00000359, 0x00000365,
-	0x0000036e, 0x0000037e, 0x000003bd, 0x000003d3,
-	0x000003dd, 0x000003eb, 0x000003f5, 0x00000408,
-	0x0000040f, 0x00000417, 0x00000423, 0x0000042a,
+	0x000001e9, 0x000001fe, 0x00000212, 0x00000239,
+	0x00000244, 0x00000250, 0x00000289, 0x00000295,
+	0x000002ad, 0x000002c9, 0x000002d7, 0x000002dd,
+	0x000002fc, 0x0000030f, 0x00000321, 0x00000326,
+	0x00000335, 0x00000347, 0x00000357, 0x0000036a,
+	0x00000376, 0x0000037f, 0x0000038f, 0x000003ce,
+	0x000003e4, 0x000003ee, 0x000003fc, 0x00000406,
+	0x00000419, 0x00000420, 0x00000428, 0x0000042f,
 	// Entry 40 - 5F
-	0x00000435, 0x00000449, 0x00000450, 0x00000468,
-	0x0000047f, 0x00000489, 0x00000493, 0x00000499,
-	0x000004a2, 0x000004ac, 0x000004ca, 0x000004d2,
-	0x000004e0, 0x000004f0, 0x000004f8, 0x00000503,
-	0x00000513, 0x0000051c, 0x00000535, 0x0000053d,
-	0x0000054d, 0x00000560, 0x00000569, 0x00000572,
-	0x00000577, 0x00000588, 0x0000058c, 0x00000597,
-	0x000005a7, 0x000005b4, 0x000005c6, 0x000005d0,
+	0x0000043b, 0x00000446, 0x0000045a, 0x00000461,
+	0x00000479, 0x00000490, 0x0000049a, 0x000004a4,
+	0x000004aa, 0x000004b3, 0x000004bd, 0x000004db,
+	0x000004e3, 0x000004f1, 0x00000501, 0x00000509,
+	0x00000514, 0x00000524, 0x0000052d, 0x00000546,
+	0x0000054e, 0x0000055e, 0x00000571, 0x0000057a,
+	0x00000583, 0x00000588, 0x00000599, 0x0000059d,
+	0x000005a8, 0x000005b8, 0x000005c5, 0x000005d7,
 	// Entry 60 - 7F
-	0x000005d7,
-} // Size: 412 bytes
+	0x000005e1, 0x000005e8,
+} // Size: 416 bytes
 
-const enData string = "" + // Size: 1495 bytes
+const enData string = "" + // Size: 1512 bytes
 	"\x02Home\x02Circulation\x02Orders\x02Metadata\x02Holdings\x02Configurati" +
 	"on\x02Maintenance\x02Show recent transactions\x02Latest job runs\x02Sche" +
-	"duled jobs\x02Show metadata for review\x02Search/browse catalogue\x02Imp" +
-	"ort\x02Identifiers\x02ISBN, ISSN or EAN\x021 per line\x02Preview\x02wait" +
-	"...\x02Properties\x02Identificators and links\x02Publications and contri" +
-	"butions\x02Role\x02Year\x02Publication\x02Other relations\x02Broader ter" +
-	"ms\x02Narrower terms\x02Has components\x02Reference terms\x02Dewey numbe" +
-	"rs where %[1]s is a component\x02Publications classified with\x02Already" +
-	" in catalogue\x02Resource not found.\x02Validation failed. Check input f" +
-	"ields.\x02OK, saved.\x02No changes.\x02Network error. Server unreachable" +
-	". Check your connection\x02Cover-image\x02Publication cover-image\x02Con" +
-	"tributions and relations\x02Role/relation\x02Agent\x02Search and connect" +
-	" to resource\x02%[1]d hits (%[2]v)\x02Basic information\x02Name\x02Requi" +
-	"red field\x02Short description\x02Name variations\x02One entry per line" +
-	"\x02Parent name\x02Lifespan\x02Foundation year\x02Year must be a 1-4 dig" +
-	"it number. Negative numbers signify BCE.\x02Disestablishment year\x02Unc" +
-	"ertain\x02Previous page\x02Next page\x02Started (duration)\x02Status\x02" +
-	"Actions\x02View output\x02Cancel\x02Personalia\x02Description (short)" +
-	"\x02Gender\x02Associated country/area\x02Associated nationality\x02Birth" +
-	"year\x02Deathyear\x02Title\x02Subtitle\x02Publisher\x02Year must be a 4-" +
-	"digit number\x02Content\x02Main language\x02Other languages\x02Fiction" +
-	"\x02Nonfiction\x02Genre and forms\x02Audience\x02Physical characteristic" +
-	"s\x02Binding\x02Number of pages\x02Must be an integer\x02Resource\x02Rel" +
-	"ation\x02Data\x02Add new schedule\x02Job\x02Choose job\x02Cron expressio" +
-	"n\x02Schedule job\x02Run now (one-off)\x02Schedules\x02Delete"
+	"duled jobs\x02Show metadata for review\x02Search/browse catalogue\x02inc" +
+	"lude archived\x02Import\x02Identifiers\x02ISBN, ISSN or EAN\x021 per lin" +
+	"e\x02Preview\x02wait...\x02Properties\x02Identificators and links\x02Pub" +
+	"lications and contributions\x02Role\x02Year\x02Publication\x02Other rela" +
+	"tions\x02Broader terms\x02Narrower terms\x02Has components\x02Reference " +
+	"terms\x02Dewey numbers where %[1]s is a component\x02Publications classi" +
+	"fied with\x02Already in catalogue\x02Resource not found.\x02Validation f" +
+	"ailed. Check input fields.\x02OK, saved.\x02No changes.\x02Network error" +
+	". Server unreachable. Check your connection\x02Cover-image\x02Publicatio" +
+	"n cover-image\x02Contributions and relations\x02Role/relation\x02Agent" +
+	"\x02Search and connect to resource\x02%[1]d hits (%[2]v)\x02Basic inform" +
+	"ation\x02Name\x02Required field\x02Short description\x02Name variations" +
+	"\x02One entry per line\x02Parent name\x02Lifespan\x02Foundation year\x02" +
+	"Year must be a 1-4 digit number. Negative numbers signify BCE.\x02Disest" +
+	"ablishment year\x02Uncertain\x02Previous page\x02Next page\x02Started (d" +
+	"uration)\x02Status\x02Actions\x02Cancel\x02View output\x02Personalia\x02" +
+	"Description (short)\x02Gender\x02Associated country/area\x02Associated n" +
+	"ationality\x02Birthyear\x02Deathyear\x02Title\x02Subtitle\x02Publisher" +
+	"\x02Year must be a 4-digit number\x02Content\x02Main language\x02Other l" +
+	"anguages\x02Fiction\x02Nonfiction\x02Genre and forms\x02Audience\x02Phys" +
+	"ical characteristics\x02Binding\x02Number of pages\x02Must be an integer" +
+	"\x02Resource\x02Relation\x02Data\x02Add new schedule\x02Job\x02Choose jo" +
+	"b\x02Cron expression\x02Schedule job\x02Run now (one-off)\x02Schedules" +
+	"\x02Delete"
 
-var noIndex = []uint32{ // 97 elements
+var noIndex = []uint32{ // 98 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000005, 0x00000011, 0x0000001e,
 	0x00000027, 0x0000002f, 0x0000003d, 0x00000049,
 	0x00000061, 0x00000072, 0x00000087, 0x000000a7,
-	0x000000bc, 0x000000c5, 0x000000d5, 0x000000ea,
-	0x000000f6, 0x00000103, 0x0000010b, 0x00000116,
-	0x00000130, 0x00000145, 0x0000014b, 0x0000014f,
-	0x00000159, 0x0000016a, 0x0000017d, 0x00000191,
-	0x000001a0, 0x000001b2, 0x000001d1, 0x000001ed,
+	0x000000bc, 0x000000cf, 0x000000d8, 0x000000e8,
+	0x000000fd, 0x00000109, 0x00000116, 0x0000011e,
+	0x00000129, 0x00000143, 0x00000158, 0x0000015e,
+	0x00000162, 0x0000016c, 0x0000017d, 0x00000190,
+	0x000001a4, 0x000001b3, 0x000001c5, 0x000001e4,
 	// Entry 20 - 3F
-	0x00000202, 0x00000216, 0x0000023d, 0x00000249,
-	0x00000259, 0x00000291, 0x0000029e, 0x000002b7,
-	0x000002cc, 0x000002db, 0x000002e2, 0x000002fc,
-	0x00000310, 0x0000032a, 0x0000032f, 0x0000033d,
-	0x0000034e, 0x0000035d, 0x00000375, 0x00000389,
-	0x00000391, 0x0000039a, 0x000003d8, 0x000003e1,
-	0x000003ea, 0x000003f7, 0x00000402, 0x00000415,
-	0x0000041c, 0x00000427, 0x00000432, 0x00000439,
+	0x00000200, 0x00000215, 0x00000229, 0x00000250,
+	0x0000025c, 0x0000026c, 0x000002a4, 0x000002b1,
+	0x000002ca, 0x000002df, 0x000002ee, 0x000002f5,
+	0x0000030f, 0x00000323, 0x0000033d, 0x00000342,
+	0x00000350, 0x00000361, 0x00000370, 0x00000388,
+	0x0000039c, 0x000003a4, 0x000003ad, 0x000003eb,
+	0x000003f4, 0x000003fd, 0x0000040a, 0x00000415,
+	0x00000428, 0x0000042f, 0x0000043a, 0x00000441,
 	// Entry 40 - 5F
-	0x00000444, 0x00000455, 0x0000045c, 0x00000473,
-	0x0000048a, 0x00000496, 0x0000049f, 0x000004a6,
-	0x000004b2, 0x000004ba, 0x000004dd, 0x000004e5,
-	0x000004f5, 0x00000502, 0x0000050a, 0x0000050e,
-	0x0000051e, 0x00000529, 0x0000053c, 0x00000548,
-	0x00000551, 0x00000566, 0x0000056e, 0x00000577,
-	0x0000057c, 0x00000591, 0x00000596, 0x000005a0,
-	0x000005ad, 0x000005b6, 0x000005ca, 0x000005df,
+	0x0000044c, 0x00000457, 0x00000468, 0x0000046f,
+	0x00000486, 0x0000049d, 0x000004a9, 0x000004b2,
+	0x000004b9, 0x000004c5, 0x000004cd, 0x000004f0,
+	0x000004f8, 0x00000508, 0x00000515, 0x0000051d,
+	0x00000521, 0x00000531, 0x0000053c, 0x0000054f,
+	0x0000055b, 0x00000564, 0x00000579, 0x00000581,
+	0x0000058a, 0x0000058f, 0x000005a4, 0x000005a9,
+	0x000005b3, 0x000005c0, 0x000005c9, 0x000005dd,
 	// Entry 60 - 7F
-	0x000005e5,
-} // Size: 412 bytes
+	0x000005f2, 0x000005f8,
+} // Size: 416 bytes
 
-const noData string = "" + // Size: 1509 bytes
+const noData string = "" + // Size: 1528 bytes
 	"\x02Hjem\x02Sirkulasjon\x02Bestillinger\x02Metadata\x02Bestand\x02Konfig" +
 	"urasjon\x02Vedlikehold\x02Vis siste transaksjoner\x02Siste kjøringer\x02" +
 	"Planlagte kjøringer\x02Vis opplysninger til gjennomsyn\x02Søk/bla i kata" +
-	"logen\x02Importer\x02Identifikatorer\x02ISBN, ISSN eller EAN\x021 per li" +
-	"nje\x02Forhåndsvis\x02vent...\x02Egenskaper\x02Identifikatorer og lenker" +
-	"\x02Utgivelser og bidrag\x02Rolle\x02År\x02Utgivelse\x02Andre relasjoner" +
-	"\x02Overordnede begrep\x02Underordnede begrep\x02Er oppbyggd av\x02Henvi" +
-	"sningstermer\x02Deweynummer hvor %[1]s inngår\x02Utgivelser klassifisert" +
-	" med\x02Allerede i katalogen\x02Ressurs ikke funnet\x02Validering feilet" +
-	". Sjekk inputfeltene.\x02OK, lagret.\x02Ingen endringer\x02Nettverksfeil" +
-	". Kan ikke nå tjener. Sjekk forbindelsen.\x02Forsidebilde\x02Utgivelsens" +
-	" forsidebilde\x02Bidrag og relasjoner\x02Rolle/relasjon\x02Aktør\x02Søk " +
-	"og koble til ressurs\x02%[1]d treff (%[2]v)\x02Grunnleggende informasjon" +
-	"\x02Navn\x02Påkrevd felt\x02Kort beskrivelse\x02Navnevarianter\x02En inn" +
-	"førsel per linje\x02Navn på overordnet\x02Levetid\x02Etablert\x02År må v" +
-	"ære et 1-4 sifret heltall. Negative tall betyr BCE.\x02Oppløst\x02Usikk" +
-	"ert\x02Forrige side\x02Neste side\x02Startet (varighet)\x02Status\x02Han" +
-	"dlinger\x02Vis utdata\x02Avbryt\x02Personalia\x02Kort beskrivelse\x02Kjø" +
-	"nn\x02Assosiert land/område\x02Assosiert nasjonalitet\x02Fødselsår\x02Dø" +
-	"dsår\x02Tittel\x02Undertittel\x02Utgiver\x02År må være et 4-siffret helt" +
-	"all\x02Innhold\x02Språk (hoved-)\x02Andre språk\x02Fiksjon\x02Fag\x02Sja" +
-	"nger og form\x02Målgruppe\x02Fysiske egenskaper\x02Innbdinding\x02Sideta" +
-	"ll\x02Må være et heltall\x02Ressurs\x02Relasjon\x02Data\x02Sett opp ny k" +
-	"jøring\x02Jobb\x02Velg jobb\x02Cron-uttrykk\x02Legg til\x02Kjør nå (en g" +
-	"ang)\x02Planlagte kjøringer\x02Slett"
+	"logen\x02inkluder arkiverte\x02Importer\x02Identifikatorer\x02ISBN, ISSN" +
+	" eller EAN\x021 per linje\x02Forhåndsvis\x02vent...\x02Egenskaper\x02Ide" +
+	"ntifikatorer og lenker\x02Utgivelser og bidrag\x02Rolle\x02År\x02Utgivel" +
+	"se\x02Andre relasjoner\x02Overordnede begrep\x02Underordnede begrep\x02E" +
+	"r oppbyggd av\x02Henvisningstermer\x02Deweynummer hvor %[1]s inngår\x02U" +
+	"tgivelser klassifisert med\x02Allerede i katalogen\x02Ressurs ikke funne" +
+	"t\x02Validering feilet. Sjekk inputfeltene.\x02OK, lagret.\x02Ingen endr" +
+	"inger\x02Nettverksfeil. Kan ikke nå tjener. Sjekk forbindelsen.\x02Forsi" +
+	"debilde\x02Utgivelsens forsidebilde\x02Bidrag og relasjoner\x02Rolle/rel" +
+	"asjon\x02Aktør\x02Søk og koble til ressurs\x02%[1]d treff (%[2]v)\x02Gru" +
+	"nnleggende informasjon\x02Navn\x02Påkrevd felt\x02Kort beskrivelse\x02Na" +
+	"vnevarianter\x02En innførsel per linje\x02Navn på overordnet\x02Levetid" +
+	"\x02Etablert\x02År må være et 1-4 sifret heltall. Negative tall betyr BC" +
+	"E.\x02Oppløst\x02Usikkert\x02Forrige side\x02Neste side\x02Startet (vari" +
+	"ghet)\x02Status\x02Handlinger\x02Avbryt\x02Vis utdata\x02Personalia\x02K" +
+	"ort beskrivelse\x02Kjønn\x02Assosiert land/område\x02Assosiert nasjonali" +
+	"tet\x02Fødselsår\x02Dødsår\x02Tittel\x02Undertittel\x02Utgiver\x02År må " +
+	"være et 4-siffret heltall\x02Innhold\x02Språk (hoved-)\x02Andre språk" +
+	"\x02Fiksjon\x02Fag\x02Sjanger og form\x02Målgruppe\x02Fysiske egenskaper" +
+	"\x02Innbdinding\x02Sidetall\x02Må være et heltall\x02Ressurs\x02Relasjon" +
+	"\x02Data\x02Sett opp ny kjøring\x02Jobb\x02Velg jobb\x02Cron-uttrykk\x02" +
+	"Legg til\x02Kjør nå (en gang)\x02Planlagte kjøringer\x02Slett"
 
-	// Total table size 3828 bytes (3KiB); checksum: C2F412CB
+	// Total table size 3872 bytes (3KiB); checksum: FC93A784

@@ -86,6 +86,13 @@
             "fuzzy": true
         },
         {
+            "id": "include archived",
+            "message": "include archived",
+            "translation": "include archived",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Import",
             "message": "Import",
             "translation": "Import",
@@ -457,16 +464,16 @@
             "fuzzy": true
         },
         {
-            "id": "View output",
-            "message": "View output",
-            "translation": "View output",
+            "id": "Cancel",
+            "message": "Cancel",
+            "translation": "Cancel",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Cancel",
-            "message": "Cancel",
-            "translation": "Cancel",
+            "id": "View output",
+            "message": "View output",
+            "translation": "View output",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

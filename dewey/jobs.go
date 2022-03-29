@@ -431,14 +431,7 @@ func (j *ImportJob) index(batch []sirkulator.Resource) {
 
 	docs := make([]search.Document, 0, len(batch))
 	for _, r := range batch {
-		docs = append(docs, search.Document{
-			ID:        r.ID,
-			Type:      r.Type.String(),
-			Label:     r.Label,
-			Gain:      1.0,
-			CreatedAt: r.CreatedAt,
-			UpdatedAt: r.UpdatedAt,
-		})
+		docs = append(docs, r.Document())
 	}
 	if err := j.Idx.Store(docs...); err != nil {
 		log.Printf("ImportJob.index: %v", err) // TODO remove, or write to w

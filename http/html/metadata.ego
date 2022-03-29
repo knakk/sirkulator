@@ -27,13 +27,23 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
             <h3><%= l.Translate("Search/browse catalogue") %></h3>
         </summary>
         <div>
+            <div class="search-options">
+                <input
+                    id="include_archived"
+                    name="include_archived"
+                    type="checkbox"
+                    hx-post="/metadata/search"
+                    hx-include="[name='q'], [name='type']"
+                    hx-target="#search-results">
+                <label for="include_archived"><%= l.Translate("include archived") %></label>
+            </div>
             <table class="metadata-search-results">
                 <thead>
                     <tr>
                         <th>
                             <select name="type"
                                 hx-post="/metadata/search"
-                                hx-include="[name='q']"
+                                hx-include="[name='q'], [name='include_archived']"
                                 hx-target="#search-results">
                                 <option value="">Alle typer</option>
                                 <% for _, t := range sirkulator.AllResourceTypes() { %>
@@ -44,19 +54,19 @@ func (tmpl *MetadataTemplate) Render(ctx context.Context, w io.Writer) {
                         <th>
                             <input name="q"
                                 hx-post="/metadata/search"
-                                hx-include="[name='type']"
+                                hx-include="[name='type'], [name='include_archived']"
                                 hx-trigger="keyup changed delay:200ms, search"
                                 hx-target="#search-results"
                                 type="search" placeholder="Søk">
                         </th>
                         <th class="clickable sortable" hx-post="/metadata/search"
-                            hx-include="[name='q'], [name='type'], [name='sort_asc']"
+                            hx-include="[name='q'], [name='type'], [name='sort_asc'], [name='include_archived']"
                             hx-vals='{"sort_by": "created"}'
                             hx-target="#search-results">
                             Opprettet
                         </th>
                         <th class="clickable sortable" hx-post="/metadata/search"
-                            hx-include="[name='q'], [name='type'], [name='sort_asc']"
+                            hx-include="[name='q'], [name='type'], [name='sort_asc'], [name='include_archived']"
                             hx-vals='{"sort_by": "updated"}'
                             hx-target="#search-results">
                             Endret

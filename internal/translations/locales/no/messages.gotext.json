@@ -62,6 +62,11 @@
             "translation": "Søk/bla i katalogen"
         },
         {
+            "id": "include archived",
+            "message": "include archived",
+            "translation": "inkluder arkiverte"
+        },
+        {
             "id": "Import",
             "message": "Import",
             "translation": "Importer"
@@ -335,14 +340,14 @@
             "translation": "Handlinger"
         },
         {
-            "id": "View output",
-            "message": "View output",
-            "translation": "Vis utdata"
-        },
-        {
             "id": "Cancel",
             "message": "Cancel",
             "translation": "Avbryt"
+        },
+        {
+            "id": "View output",
+            "message": "View output",
+            "translation": "Vis utdata"
         },
         {
             "id": "Personalia",

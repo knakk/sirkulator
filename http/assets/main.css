@@ -133,6 +133,7 @@ nav li::after { content: attr(data-title); height: 0; visibility: hidden; overfl
 /* Page specific */
 
 /* metadata page */
+.search-options { text-align: right; padding: 0.5rem 1rem }
 table.metadata-search-results td { min-width: 250px; }
 table.reviews td { max-width: 400px}
 tr.review { background: #eee }
@@ -147,4 +148,4 @@ th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
 
 
 /* dewey page */
-table.dewey td:first-of-type { width: 12em; text-align: right; padding-right: 1em }
+table.dewey td:first-of-type { width: 12em; text-align: right; padding-right: 1rem }
