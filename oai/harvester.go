@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -36,10 +37,18 @@ func (h *Harvester) Run(ctx context.Context, w io.Writer) error {
 	if err := h.storeSource(ctx); err != nil {
 		return fmt.Errorf("Harvester.Run: %w", err)
 	}
+	if h.Token != "" {
+		fmt.Fprintf(w, "Starting harvesting from %s using resumptiontoken=%s\n", h.Endpoint, h.Token)
+	} else {
+		fmt.Fprintf(w, "Starting harvesting from %s requesting records updated since %v\n", h.Endpoint, h.StartAt)
+	}
+
 	const batchSize int = 1000
 	recordUpserts := make([]ProcessedRecord, 0, batchSize)
 	recordArchived := make([]ProcessedRecord, 0)
 	identifiers := make([][4]string, 0, batchSize)
+	numNewUpdated := 0 // TODO get separate numbers for new and updated
+	numArchived := 0
 
 	for {
 		records, err := h.fetchRecords(ctx)
@@ -50,7 +59,7 @@ func (h *Harvester) Run(ctx context.Context, w io.Writer) error {
 		for _, rec := range records {
 			prec, err := h.Process(rec)
 			if err != nil {
-				w.Write([]byte(err.Error() + "\n"))
+				fmt.Fprintln(w, err.Error())
 				// TODO consider continue harvesting, and just write err to w
 				//return fmt.Errorf("Harvester.Run: %w", err)
 			}
@@ -68,6 +77,10 @@ func (h *Harvester) Run(ctx context.Context, w io.Writer) error {
 				if err := h.storeRecords(ctx, recordUpserts, recordArchived, identifiers); err != nil {
 					return fmt.Errorf("Harvester.Run: %w", err)
 				}
+				fmt.Fprint(w, ".")
+
+				numNewUpdated += len(recordUpserts)
+				numArchived += len(recordArchived)
 				recordUpserts = make([]ProcessedRecord, 0, batchSize)
 				recordArchived = make([]ProcessedRecord, 0)
 				identifiers = make([][4]string, 0, batchSize)
@@ -88,7 +101,13 @@ func (h *Harvester) Run(ctx context.Context, w io.Writer) error {
 		if err := h.storeRecords(ctx, recordUpserts, recordArchived, identifiers); err != nil {
 			return fmt.Errorf("Harvester.Run: %w", err)
 		}
+		fmt.Fprint(w, ".")
+		numNewUpdated += len(recordUpserts)
+		numArchived += len(recordArchived)
 	}
+
+	fmt.Fprintf(w, "\nDone: %d new/updated records, %d archived.\n", numNewUpdated, numArchived)
+
 	return nil
 }
 
@@ -214,10 +233,40 @@ func (h *Harvester) storeSource(ctx context.Context) error {
 		return context.Canceled
 	}
 	defer h.DB.Put(conn)
-	const q = "INSERT OR IGNORE INTO oai.source (id, url, dataset, prefix) VALUES (?, ?, ?, ?)"
-	if err := sqlitex.Exec(conn, q, nil, h.Source, h.Endpoint, h.Set, h.Prefix); err != nil {
-		return fmt.Errorf("storeSource: %w", err)
+
+	stmt := conn.Prep(`
+		INSERT INTO source (id, url, dataset, prefix)
+		            VALUES ($id, $url, $dataset, $prefix)
+		ON CONFLICT (id) DO UPDATE SET id=$id
+		RETURNING token, in_sync_at
+	`)
+
+	stmt.SetText("$id", h.Source)
+	stmt.SetText("$url", h.Endpoint)
+	stmt.SetText("$dataset", h.Set)
+	stmt.SetText("$prefix", h.Prefix)
+	if ok, err := stmt.Step(); err != nil {
+		return err // TODO annotate
+	} else if !ok {
+		return errors.New("storeSource: no token, in_sync_at returned")
 	}
+
+	token := stmt.GetText("token")
+	inSyncAt := stmt.GetInt64("in_sync_at")
+
+	if token != "" {
+		// If resumptiontoken found stored in DB, we use that when querying for records
+		h.Token = token
+	} else if inSyncAt != 0 {
+		// We harvested all before, and was in sync, use this as timestamp when querying for records
+		h.StartAt = time.Unix(inSyncAt, 0) // TODO round or set to date 1 day before?
+	} else {
+		// Presumably first time we harvest, so we want to statr from the beginning
+		h.StartAt = time.Date(1900, 0, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	stmt.Reset()
+
 	return nil
 }
 

@@ -20,6 +20,7 @@ import (
 	"github.com/knakk/sirkulator/etl"
 	"github.com/knakk/sirkulator/http/html"
 	"github.com/knakk/sirkulator/internal/localizer"
+	"github.com/knakk/sirkulator/oai"
 	"github.com/knakk/sirkulator/runner"
 	"github.com/knakk/sirkulator/search"
 	"github.com/knakk/sirkulator/sql"
@@ -57,6 +58,16 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100})
 	s.runner.Register(&dewey.ImportJob{DB: db, Idx: idx, BatchSize: 100, Update: true})
 	s.runner.Register(&search.Indexer{DB: db, Idx: idx, BatchSize: 100})
+	s.runner.Register(&oai.HarvestJob{
+		Harvester: oai.Harvester{
+			DB:       db,
+			Source:   "bs/pub",
+			Endpoint: "https://oai.aja.bs.no/mlnb",
+			Prefix:   "marc21",
+			Process:  oai.ProcessBibsys,
+		},
+		JobName: "oai_harvest_bs/pub",
+	})
 
 	if err := s.runner.Start(ctx); err != nil {
 		// TODO consider setting up separatly and pass to NewServer as an argument, like db and idx.
