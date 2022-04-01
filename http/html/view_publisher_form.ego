@@ -1,0 +1,77 @@
+<%
+package html
+
+import (
+    "strings"
+
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type PublisherForm struct {
+    Publisher *sirkulator.Publisher
+    Localizer localizer.Localizer
+    UpdatedAt int64
+}
+
+
+func (form *PublisherForm) Render(ctx context.Context, w io.Writer) {
+    publisher := form.Publisher
+    l := form.Localizer
+%>
+
+<form id="publisher-form">
+    <input id="updated_at" type="hidden" name="updated_at" value="<%= form.UpdatedAt %>" />
+
+    <fieldset>
+        <legend><%= l.Translate("About") %></legend>
+
+        <ego:InputString
+            ID="name"
+            Required=true
+            Value=publisher.Name
+            Label=l.Translate("Name")
+            ValidationMsg=l.Translate("Required field") />
+
+        <ego:InputString
+            ID="description"
+            Value=publisher.Description
+            Label=l.Translate("Description (short)") />
+
+        <ego:InputText
+            ID="name_variations"
+            Rows=len(publisher.NameVariations)
+            Label=l.Translate("Name variations")
+            Value=strings.Join(publisher.NameVariations, "\n")
+            InfoMsg=l.Translate("One entry per line") />
+
+    </fieldset>
+
+    <fieldset>
+        <legend><%= l.Translate("Year of activity") %></legend>
+
+        <ego:InputString
+            ID="year_range.from"
+            Value=string(publisher.YearRange.From)
+            Label=l.Translate("Founded")
+            Validation=`-?\d{1,4}`
+            Size="5"
+            ValidationMsg=l.Translate("Year must be a 1-4 digit number. Negative numbers signify BCE.") />
+
+        <ego:InputString
+            ID="year_range.to"
+            Value=string(publisher.YearRange.To)
+            Label=l.Translate("Ended")
+            Validation=`-?\d{1,4}`
+            Size="5"
+            ValidationMsg=l.Translate("Year must be a 1-4 digit number. Negative numbers signify BCE.") />
+
+        <ego:InputBool
+            ID="year_range.approx"
+            Value=publisher.YearRange.Approx
+            Label=l.Translate("Uncertain") />
+
+    </fieldset>
+
+</form>
+<% } %>

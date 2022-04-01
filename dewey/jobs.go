@@ -172,9 +172,12 @@ func (j *ImportJob) Run(ctx context.Context, w io.Writer) error {
 		return err
 	}
 
-	// Some duplicate relations might be insetred, delete them at this point:
+	// Some duplicate relations might be inserted, delete them at this point:
 	if err := sqlitex.ExecScript(conn,
-		"DELETE FROM relation WHERE rowid NOT IN (SELECT min(rowid) FROM relation GROUP BY from_id, to_id, type)"); err != nil {
+		`DELETE FROM relation WHERE to_id IS NOT NULL AND rowid NOT IN
+		 (SELECT min(rowid) FROM relation GROUP BY from_id, to_id, type);
+		 DELETE FROM relation WHERE to_id IS NULL AND rowid NOT IN
+		 (SELECT min(rowid) FROM relation GROUP BY from_id, data, type)`); err != nil {
 		fmt.Fprintf(w, "failed to delete duplicate relations: %v\n", err)
 	}
 
@@ -183,6 +186,7 @@ func (j *ImportJob) Run(ctx context.Context, w io.Writer) error {
 
 	if j.Update {
 		fmt.Fprintf(w, "done updating/importing %d dewey numbers\n", c)
+		// TODO list numbers if less than < 30?
 	} else {
 		fmt.Fprintf(w, "done importing %d dewey numbers\n", c)
 	}
@@ -391,7 +395,7 @@ func (j *ImportJob) persist(ctx context.Context, batch importBatch) (err error) 
 	}
 
 	for _, rel := range batch.Relations {
-		delQ := `DELETE FROM relation 	WHERE id=? AND (type='has_parent' OR type='has_part')`
+		delQ := `DELETE FROM relation WHERE id=? AND (type='has_parent' OR type='has_part')`
 		if err := sqlitex.Exec(conn, delQ, nil, rel.FromID); err != nil {
 			return err // TODO annotate
 		}

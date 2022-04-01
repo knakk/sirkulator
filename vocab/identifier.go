@@ -3,19 +3,22 @@ package vocab
 import "fmt"
 
 var identifiers = map[string][2]string{
-	"bibbi":    {"BIBBI", "https://id.bs.no/bibbi/%s"},
-	"bibsys":   {"BIBSYS", "https://authority.bibsys.no/authority/rest/authorities/v2/%s?format=xml"},
-	"gtin":     {"GTIN", ""},                         // Global Trade Item Number (formerly EAN: European Article Number)
-	"isbn":     {"ISBN", ""},                         // International Standard Book Number
-	"isni":     {"ISNI", "https://isni.org/isni/%s"}, // International Standard Name Identifier
-	"issn":     {"ISSN", ""},                         // International Standard Serial Number
-	"orcid":    {"ORCID", "http://orcid.org/%s"},     // Open Researcher and Contributor ID
-	"snl":      {"Store norske leksikon", "https://snl.no/%s"},
-	"viaf":     {"VIAF", "http://viaf.org/viaf/%s"}, // Virtual International Authority File
-	"wiki-en":  {"Wikipedia (English)", "https://en.wikipedia.org/wiki"},
-	"wiki-no":  {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki"},
-	"wikidata": {"Wikidata", "https://www.wikidata.org/wiki/%s"},
-	"worldcat": {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
+	"bibbi":           {"BIBBI", "https://id.bs.no/bibbi/%s"},
+	"bibsys":          {"BIBSYS", "https://authority.bibsys.no/authority/rest/authorities/v2/%s?format=xml"},
+	"gtin":            {"GTIN", ""},                         // Global Trade Item Number (formerly EAN: European Article Number)
+	"isbn":            {"ISBN", ""},                         // International Standard Book Number
+	"isni":            {"ISNI", "https://isni.org/isni/%s"}, // International Standard Name Identifier
+	"issn":            {"ISSN", ""},                         // International Standard Serial Number
+	"orcid":           {"ORCID", "http://orcid.org/%s"},     // Open Researcher and Contributor ID
+	"snl":             {"Store norske leksikon", "https://snl.no/%s"},
+	"viaf":            {"VIAF", "http://viaf.org/viaf/%s"}, // Virtual International Authority File
+	"wiki-en":         {"Wikipedia (English)", "https://en.wikipedia.org/wiki"},
+	"wiki-no":         {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki"},
+	"wikidata":        {"Wikidata", "https://www.wikidata.org/wiki/%s"},
+	"worldcat":        {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
+	"nb/isbnforlag":   {"Norske forlagsadresser", "https://nb.no/isbnforlag/record/%s"},
+	"www":             {"WWW", "%s"},
+	"isbn-registrant": {"ISBN registrant", ""},
 
 	// TODO candidates:
 	//discogs-artist  https://www.discogs.com/artist/32198

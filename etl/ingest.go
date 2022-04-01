@@ -21,6 +21,8 @@ import (
 	"github.com/knakk/sirkulator/marc"
 	"github.com/knakk/sirkulator/oai"
 	"github.com/knakk/sirkulator/search"
+	"github.com/knakk/sirkulator/sql"
+	"github.com/knakk/sirkulator/vocab"
 	"golang.org/x/image/draw"
 )
 
@@ -223,6 +225,71 @@ func (ig *Ingestor) localRecord(ctx context.Context, idtype, id string) (oai.Rec
 	return rec, nil
 }
 
+// localPublisher checks if we have an exiting Publisher matching the given
+// ISBN registrant number. If found, it is returned, along with a boolean true.
+// If found as an oai.Record, a Resource is constructed from it and returned,
+// along with a boolean false.
+func (ig *Ingestor) localPublisher(ctx context.Context, isbnRegistrant string) (sirkulator.Resource, bool, error) {
+	var res sirkulator.Resource
+	existing := false
+	conn := ig.db.Get(ctx)
+	if conn == nil {
+		return res, existing, context.Canceled
+	}
+	defer ig.db.Put(conn)
+
+	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn-registrant' AND id=$id")
+	stmt.SetText("$id", isbnRegistrant)
+	id, err := sqlitex.ResultText(stmt)
+	if err == nil {
+		res, err = sql.GetResource(conn, sirkulator.TypePublisher, id)
+		if err != nil {
+			return res, false, err
+		}
+		return res, true, nil
+	}
+
+	fn := func(stmt *sqlite.Stmt) error {
+		if stmt.ColumnInt64(0) != 1 {
+			return sqlitex.ErrMultipleResults
+		}
+		blob, err := conn.OpenBlob("oai", "record", "data", stmt.ColumnInt64(1), false)
+		if err != nil {
+			return err
+		}
+		defer blob.Close()
+		gz, err := gzip.NewReader(blob)
+		if err != nil {
+			return err
+		}
+		dec := json.NewDecoder(gz)
+		var pub oai.Publisher
+		if err := dec.Decode(&pub); err != nil {
+			return err
+		}
+		res = pub.Resource()
+		res.ID = ig.idFunc()
+		return nil
+	}
+	q := `
+		SELECT
+			count(r.id) AS n,
+			r.rowid
+		FROM oai.link t
+			JOIN oai.record r ON (t.source_id=r.source_id AND t.record_id=r.id)
+		WHERE t.type='isbn-registrant' AND t.id=?
+		GROUP BY t.id
+	`
+	if err := sqlitex.Exec(conn, q, fn, isbnRegistrant); err != nil {
+		return res, existing, err
+	}
+	if res.ID == "" {
+		return res, existing, sirkulator.ErrNotFound
+	}
+
+	return res, existing, nil
+}
+
 type sruResponse struct {
 	XMLName         xml.Name `xml:"searchRetrieveResponse"`
 	Text            string   `xml:",chardata"`
@@ -292,8 +359,7 @@ func (ig *Ingestor) remoteRecord(ctx context.Context, idtype, id string) (Ingest
 // the given data is assumed to be valid at this point, as not to
 // trigger any SQL constraint errors when inserting into DB.
 //
-// CreatedAt/UpdatdAt timestamps on resources will be set
-// TODO consider setting them earlier
+// CreatedAt/UpdatdAt timestamps on resources will be set here.
 func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	defer sqlitex.Save(conn)(&err)
 
@@ -356,6 +422,7 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 				IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
 			FROM v LEFT JOIN resource res ON (res.id = $to_id)
 		`)
+		// TODO fix query, queued_at is NULL when rel.to_id IS NULL
 
 		stmt.SetText("$from_id", rel.FromID)
 		stmt.SetText("$to_id", rel.ToID)
@@ -444,6 +511,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 	}
 	defer ig.db.Put(conn)
 
+	var extraResources []sirkulator.Resource
 	// Check if there are any resources matching any of our local
 	// resources in DB, remove from data.Resources and swap the matching IDs in
 	// data.Relations.
@@ -453,10 +521,42 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 
 		res := data.Resources[i]
 		if res.Type == sirkulator.TypePublication {
-			// This is already checked not in DB, before we started ingesting (TODO)
+			// Special handling of published_by relation and Publisher resource
+			var isbnStr string
+			for _, link := range res.Links {
+				if link[0] == "isbn" {
+					isbnStr = link[1]
+					// a publication can have several ISBN numbers,
+					// but the publisher will be the same, so one is enough
+					break
+				}
+			}
+			if isbnStr != "" {
+				isbnNr, err := isbn.Parse(isbnStr)
+				if err == nil {
+					publisher, existing, err := ig.localPublisher(ctx, isbnNr.Publisher)
+					if err == nil {
+						if !existing {
+							// New Publisher imported from oai record
+							extraResources = append(extraResources, publisher)
+						}
+						// Peplace 'published_by' relation.to_id with publisher.ID
+						for j, rel := range data.Relations {
+							if rel.FromID == res.ID && rel.Type == vocab.RelationPublishedBy.String() {
+								rel.ToID = publisher.ID
+								data.Relations[j] = rel
+							}
+						}
+					}
+				}
+			}
+
+			// Publication itself is already verified not in DB before we started ingesting,
+			// so no further processing of this resource is needed.
 			// TODO make this (whole Ingest method) transactional?
 			continue
 		}
+
 		newResource := true
 		stmt := conn.Prep("SELECT resource_id FROM link WHERE type=$type AND id=$id")
 		for _, link := range res.Links {
@@ -552,6 +652,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 			}
 		}
 	}
+	data.Resources = append(data.Resources, extraResources...)
 
 	results := make([]sirkulator.SimpleResource, 0, len(data.Resources))
 	for _, r := range data.Resources {

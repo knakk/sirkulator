@@ -43,6 +43,9 @@ func readData(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt *sq
 	case sirkulator.TypeDewey:
 		res.Data = &sirkulator.Dewey{}
 		return readResource(res, t)
+	case sirkulator.TypePublisher:
+		res.Data = &sirkulator.Publisher{}
+		return readResource(res, t)
 	default:
 		panic("sql.GetResource: readData: TODO")
 	}
@@ -288,6 +291,52 @@ func GetAgentContributions(conn *sqlite.Conn, id string, sortBy string, sortAsc 
 
 	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
 		return res, fmt.Errorf("sql.GetAgentContributions(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetPublisherPublications(conn *sqlite.Conn, id string, sortBy string, sortAsc bool) ([]sirkulator.PublisherPublication, error) {
+	var res []sirkulator.PublisherPublication
+
+	sortDir := "DESC"
+	if sortAsc {
+		sortDir = "ASC"
+	}
+	switch sortBy {
+	case "year":
+	// OK
+	case "label":
+		sortBy = "res_label"
+	default:
+		sortBy = "year"
+	}
+
+	q := fmt.Sprintf(`
+    SELECT
+        r.from_id,
+        resource.label as res_label,
+        json_extract(resource.data, '$.year') AS year
+    FROM
+        relation r
+        JOIN resource ON (from_id=resource.id)
+    WHERE
+        r.type='published_by'
+    AND to_id=?
+    ORDER BY %s %s`, sortBy, sortDir)
+
+	fn := func(stmt *sqlite.Stmt) error {
+		r := sirkulator.PublisherPublication{}
+		r.ID = stmt.ColumnText(0)
+		r.Type = sirkulator.TypePublication
+		r.Label = stmt.ColumnText(1)
+		r.Year = stmt.ColumnInt(2)
+		res = append(res, r)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetPublisherPublications(%q): %w", id, err)
 	}
 
 	return res, nil

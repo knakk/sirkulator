@@ -265,10 +265,10 @@ func IndexBibsysAuthority(res *ProcessedRecord, mrc marc.Record) {
 		case "isni":
 			res.Identifiers = append(res.Identifiers, [2]string{"isni", val})
 		case "bibbi":
-			res.Identifiers = append(res.Identifiers, [2]string{"bibbi", val})
+			res.Identifiers = append(res.Identifiers, [2]string{"bibbi", strings.TrimPrefix(val, "https://id.bs.no/bibbi/")})
 		case "orcid":
 			res.Identifiers = append(res.Identifiers, [2]string{"orcid", val})
-		case "no-trbib", "dma", "hdl":
+		case "no-trbib", "dma", "hdl", "no-osbas":
 			// ignore
 		default:
 			fmt.Printf("unhandled 024 identifier: %s\t%s\n", code, val)

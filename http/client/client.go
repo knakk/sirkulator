@@ -1,3 +1,4 @@
+// package client TODO rename httpclient?
 package client
 
 import (

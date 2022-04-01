@@ -257,7 +257,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 	// TODO handle multiple 260/264 fields
 	if ok {
 		if publisher := f.ValueAt("b"); publisher != "" {
-			p.Publisher = publisher
+			p.Publisher = publisher // TODO remove this? Relation 'published_by' should suffice
 			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
 				Type:   "published_by",

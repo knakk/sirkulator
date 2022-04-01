@@ -68,6 +68,19 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 		},
 		JobName: "oai_harvest_bs/pub",
 	})
+	s.runner.Register(&oai.HarvestJob{
+		Harvester: oai.Harvester{
+			DB:       db,
+			Endpoint: "https://authority.bibsys.no/authority/rest/oai",
+			Source:   "bibsys/aut",
+			Set:      "national_authorities",
+			Prefix:   "marcxchange",
+			Process:  oai.ProcessBibsys,
+		},
+		JobName: "oai_harves_bibsys/aut",
+	})
+	s.runner.Register(&sql.JanitorJob{DB: db, Idx: idx})
+	s.runner.Register(&oai.HarvestPublishersJob{DB: db})
 
 	if err := s.runner.Start(ctx); err != nil {
 		// TODO consider setting up separatly and pass to NewServer as an argument, like db and idx.
@@ -156,6 +169,8 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Get("/publication/{id}", s.pagePublication)
 			r.Get("/dewey/{id}", s.pageDewey)
 			r.Get("/dewey/{id}/partsof", s.viewDeweyPartsOf)
+			r.Get("/publisher/{id}", s.pagePublisher)
+			r.Post("/publisher/{id}/publications", s.viewPublisherPublications)
 		})
 
 		r.Route("/maintenance", func(r chi.Router) {

@@ -1,0 +1,34 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+)
+
+type ViewPublisherPublications struct {
+    Publications []sirkulator.PublisherPublication
+    SortBy string
+    SortAsc bool
+}
+
+func (tmpl *ViewPublisherPublications) Render(ctx context.Context, w io.Writer) {
+    //l, _ := ctx.Value("localizer").(localizer.Localizer)
+%>
+<tbody id="publisher_publications">
+    <% for _, p := range tmpl.Publications { %>
+        <tr>
+            <td><%= notZero(p.Year) %></td>
+            <td>
+                <a href="<%= resourceLink(p.SimpleResource) %>"><%= p.Label %></a>
+            </td>
+        </tr>
+    <% } %>
+    <tr>
+        <td colspan="2">
+            <input type="hidden" name="sort_by" value="<%= tmpl.SortBy %>">
+            <input type="hidden" name="sort_asc" value="<%= tmpl.SortAsc %>">
+        </td>
+    </tr>
+</tbody>
+
+<% } %>

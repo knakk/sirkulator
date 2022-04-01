@@ -103,6 +103,7 @@ type Resource struct {
 	// Description string   // Short description (max 50 characters)
 	// Aliases     []string // To function as "synonyms", giving hits when searching, but not for display?
 	// Tags        []string // anything that's interesting for discovery/categorization: subject, suptype, genre, etc
+	// Notes	   []string // anything, memos for internal use
 
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
@@ -321,6 +322,11 @@ type PublicationContribution struct {
 	Roles []marc.Relator
 }
 
+type PublisherPublication struct {
+	SimpleResource
+	Year int
+}
+
 // 2) Concrete types
 
 type Publication struct {
@@ -366,7 +372,15 @@ func (p Publication) Label() string {
 }
 
 type Publisher struct {
-	YearRange
+	YearRange      YearRange `json:"year_range"` // TODO pointer *YearRange?
+	Name           string    `json:"name"`
+	Description    string    `json:"description"`
+	NameVariations []string  `json:"name_variations"`
+	Notes          []string  `json:"notes"`
+}
+
+func (p Publisher) Label() string {
+	return p.Name
 }
 
 type Person struct {
@@ -377,6 +391,7 @@ type Person struct {
 	Gender         vocab.Gender `json:"gender"`
 	Countries      []string     `json:"countries"`
 	Nationalities  []string     `json:"nationalities"`
+	Notes          []string     `json:"notes"`
 }
 
 func (p Person) Label() string {
@@ -393,6 +408,8 @@ type Corporation struct {
 	Description    string    `json:"description"`
 	ParentName     string    `json:"parent_name,omitempty"`
 	NameVariations []string  `json:"name_variations"`
+	Notes          []string  `json:"notes"`
+
 	//Type           vocab.CorporationType `json:"type"` // University, Municipality, Music gorup, Record label etc
 }
 
