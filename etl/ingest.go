@@ -11,6 +11,7 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
+	"strings"
 	"time"
 
 	"crawshaw.io/sqlite"
@@ -225,16 +226,25 @@ func (ig *Ingestor) localRecord(ctx context.Context, idtype, id string) (oai.Rec
 	return rec, nil
 }
 
+// TODO consider something more refined, like Levenshtein distance.
+func looksSame(a, b string) bool {
+	a = strings.ToLower(a)
+	b = strings.ToLower(b)
+	if len(a) > len(b) {
+		return strings.Contains(a, b)
+	}
+	return strings.Contains(b, a)
+}
+
 // localPublisher checks if we have an exiting Publisher matching the given
-// ISBN registrant number. If found, it is returned, along with a boolean true.
+// ISBN registrant number and name. If found, it is returned, along with a boolean true.
 // If found as an oai.Record, a Resource is constructed from it and returned,
 // along with a boolean false.
-func (ig *Ingestor) localPublisher(ctx context.Context, isbnRegistrant string) (sirkulator.Resource, bool, error) {
+func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant string) (sirkulator.Resource, bool, error) {
 	var res sirkulator.Resource
-	existing := false
 	conn := ig.db.Get(ctx)
 	if conn == nil {
-		return res, existing, context.Canceled
+		return res, false, context.Canceled
 	}
 	defer ig.db.Put(conn)
 
@@ -246,14 +256,14 @@ func (ig *Ingestor) localPublisher(ctx context.Context, isbnRegistrant string) (
 		if err != nil {
 			return res, false, err
 		}
-		return res, true, nil
+		if looksSame(name, res.Label) {
+			return res, true, nil
+		}
 	}
 
+	var candidates []sirkulator.Resource
 	fn := func(stmt *sqlite.Stmt) error {
-		if stmt.ColumnInt64(0) != 1 {
-			return sqlitex.ErrMultipleResults
-		}
-		blob, err := conn.OpenBlob("oai", "record", "data", stmt.ColumnInt64(1), false)
+		blob, err := conn.OpenBlob("oai", "record", "data", stmt.ColumnInt64(0), false)
 		if err != nil {
 			return err
 		}
@@ -262,32 +272,33 @@ func (ig *Ingestor) localPublisher(ctx context.Context, isbnRegistrant string) (
 		if err != nil {
 			return err
 		}
-		dec := json.NewDecoder(gz)
 		var pub oai.Publisher
-		if err := dec.Decode(&pub); err != nil {
+		if err := json.NewDecoder(gz).Decode(&pub); err != nil {
 			return err
 		}
-		res = pub.Resource()
-		res.ID = ig.idFunc()
+		c := pub.Resource()
+		c.ID = ig.idFunc()
+		candidates = append(candidates, c)
 		return nil
 	}
 	q := `
 		SELECT
-			count(r.id) AS n,
 			r.rowid
-		FROM oai.link t
-			JOIN oai.record r ON (t.source_id=r.source_id AND t.record_id=r.id)
-		WHERE t.type='isbn-registrant' AND t.id=?
-		GROUP BY t.id
+		FROM oai.link l
+			JOIN oai.record r ON (l.source_id=r.source_id AND l.record_id=r.id)
+		WHERE l.type='isbn-registrant' AND l.id=? AND l.source_id='nb/isbnforlag'
 	`
 	if err := sqlitex.Exec(conn, q, fn, isbnRegistrant); err != nil {
-		return res, existing, err
-	}
-	if res.ID == "" {
-		return res, existing, sirkulator.ErrNotFound
+		return res, false, err
 	}
 
-	return res, existing, nil
+	for _, c := range candidates {
+		if looksSame(name, c.Label) {
+			return c, false, nil
+		}
+	}
+
+	return res, false, sirkulator.ErrNotFound
 }
 
 type sruResponse struct {
@@ -534,7 +545,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 			if isbnStr != "" {
 				isbnNr, err := isbn.Parse(isbnStr)
 				if err == nil {
-					publisher, existing, err := ig.localPublisher(ctx, isbnNr.Publisher)
+					publisher, existing, err := ig.localPublisher(ctx, res.Data.(sirkulator.Publication).Publisher, isbnNr.Publisher)
 					if err == nil {
 						if !existing {
 							// New Publisher imported from oai record

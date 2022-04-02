@@ -45,6 +45,12 @@ func (form *PublisherForm) Render(ctx context.Context, w io.Writer) {
             Value=strings.Join(publisher.NameVariations, "\n")
             InfoMsg=l.Translate("One entry per line") />
 
+        <ego:InputText
+            ID="notes"
+            Rows=len(publisher.Notes)
+            Label=l.Translate("Notes")
+            Value=strings.Join(publisher.Notes, "\n") />
+
     </fieldset>
 
     <fieldset>
