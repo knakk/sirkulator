@@ -77,10 +77,21 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 			Prefix:   "marcxchange",
 			Process:  oai.ProcessBibsys,
 		},
-		JobName: "oai_harves_bibsys/aut",
+		JobName: "oai_harvest_bibsys/aut",
+	})
+	s.runner.Register(&oai.HarvestJob{
+		Harvester: oai.Harvester{
+			DB:       db,
+			Endpoint: "https://bibsys.alma.exlibrisgroup.com/view/oai/47BIBSYS_NETWORK/request",
+			Source:   "bibsys/pub",
+			Set:      "nasjonalbibliografien", // number of records: ca 900K
+			Prefix:   "marc21",
+			Process:  oai.ProcessBibsys,
+		},
+		JobName: "oai_harvest_nasjonalbibliografien",
 	})
 	s.runner.Register(&sql.JanitorJob{DB: db, Idx: idx})
-	s.runner.Register(&oai.HarvestPublishersJob{DB: db})
+	s.runner.Register(&oai.HarvestPublishersJob{DB: db}) // number of records: ca 18k
 
 	if err := s.runner.Start(ctx); err != nil {
 		// TODO consider setting up separatly and pass to NewServer as an argument, like db and idx.

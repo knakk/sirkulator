@@ -226,8 +226,11 @@ func (ig *Ingestor) localRecord(ctx context.Context, idtype, id string) (oai.Rec
 	return rec, nil
 }
 
+var publisherReplacer = strings.NewReplacer("forl.", "", "forlag", "", " AS", "")
+
 // TODO consider something more refined, like Levenshtein distance.
 func looksSame(a, b string) bool {
+	a = publisherReplacer.Replace(a)
 	a = strings.ToLower(a)
 	b = strings.ToLower(b)
 	if len(a) > len(b) {
@@ -250,9 +253,16 @@ func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant str
 
 	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn-registrant' AND id=$id")
 	stmt.SetText("$id", isbnRegistrant)
-	id, err := sqlitex.ResultText(stmt)
-	if err == nil {
-		res, err = sql.GetResource(conn, sirkulator.TypePublisher, id)
+	defer stmt.Reset()
+	for {
+		hasRow, err := stmt.Step()
+		if !hasRow {
+			break
+		}
+		if err != nil {
+			return res, false, err
+		}
+		res, err = sql.GetResource(conn, sirkulator.TypePublisher, stmt.ColumnText(0))
 		if err != nil {
 			return res, false, err
 		}
