@@ -16,7 +16,6 @@ import (
 
 func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	l, _ := r.Context().Value("localizer").(localizer.Localizer)
 
 	conn := s.db.Get(r.Context())
 	if conn == nil {
@@ -33,6 +32,30 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		ServerError(w, err)
 		return
 	}
+
+	img, _ := sql.GetImage(conn, id) // img is nil if err != nil TODO log err if err != ErrNotFound?
+
+	tmpl := html.PublicationTemplate{
+		Page: html.Page{
+			Lang: s.Lang,
+			Path: r.URL.Path,
+		},
+		Resource: res,
+		Image:    img,
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) viewPublicationRelations(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	l, _ := r.Context().Value("localizer").(localizer.Localizer)
+
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
 
 	rel, err := sql.GetPublcationRelations(conn, id)
 	if err != nil {
@@ -76,16 +99,8 @@ func (s *Server) pagePublication(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	img, _ := sql.GetImage(conn, id) // img is nil if err != nil TODO log err if err != ErrNotFound?
-
-	tmpl := html.PublicationTemplate{
-		Page: html.Page{
-			Lang: s.Lang,
-			Path: r.URL.Path,
-		},
-		Resource:  res,
+	tmpl := html.ViewPublicationRelations{
 		Relations: rel,
-		Image:     img,
 	}
 	tmpl.Render(r.Context(), w)
 }

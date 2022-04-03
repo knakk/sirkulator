@@ -178,6 +178,8 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Get("/person/{id}", s.pagePerson)
 			r.Post("/person/{id}/contributions", s.viewContributions)
 			r.Get("/publication/{id}", s.pagePublication)
+			r.Get("/publication/{id}/relations", s.viewPublicationRelations)
+			r.Delete("/relation/{id}", s.deleteRelation)
 			r.Get("/dewey/{id}", s.pageDewey)
 			r.Get("/dewey/{id}/partsof", s.viewDeweyPartsOf)
 			r.Get("/publisher/{id}", s.pagePublisher)
@@ -461,4 +463,32 @@ func ServerError(w http.ResponseWriter, err error) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(http.StatusInternalServerError)
 	fmt.Fprintln(w, http.StatusText(http.StatusInternalServerError))
+}
+
+func (s *Server) deleteRelation(w http.ResponseWriter, r *http.Request) {
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	stmt := conn.Prep("DELETE FROM relation WHERE id=$id returning id")
+	stmt.SetInt64("$id", int64(id))
+	defer stmt.Reset()
+	if ok, err := stmt.Step(); err != nil {
+		ServerError(w, err)
+		return
+	} else if !ok {
+		http.NotFound(w, r)
+		return
+	}
+
+	w.Header().Add("HX-Trigger", "relationDeleted")
 }

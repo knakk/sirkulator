@@ -12,7 +12,6 @@ import (
 type PublicationTemplate struct {
     Page
     Resource sirkulator.Resource
-    Relations []sirkulator.RelationExp
     Image *sirkulator.Image
 }
 
@@ -87,37 +86,8 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
             <h3><%= l.Translate("Contributions and relations") %></h3>
         </summary>
         <div class="border pad">
-            <table>
-                <thead>
-                    <tr>
-                        <th><%= l.Translate("Role/relation") %></th>
-                        <th><%= l.Translate("Agent") %></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for _, r := range tmpl.Relations { %>
-                        <tr>
-                            <td>
-                                <%= r.Type %>
-                            </td>
-                            <% if r.To.ID != "" { %>
-                                <td colspan="2">
-                                    <a href="<%= resourceLink(r.To) %>"><%= r.To.Label %></a>
-                                </td>
-                            <% } else { %>
-                                <td>
-                                    <%= r.Data["label"] %>
-                                </td>
-                                <td>
-                                    <button><%= l.Translate("Search and connect to resource") %></button>
-                                </td>
-                            <% } %>
-                        </tr>
-                    <% } %>
-                </tbody>
+            <table id="publication-relations" hx-get="/metadata/publication/<%= tmpl.Resource.ID %>/relations" hx-trigger="load, relationDeleted from:body">
             </table>
-
         </div>
     </details>
 

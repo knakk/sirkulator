@@ -1,0 +1,51 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ViewPublicationRelations struct {
+    Relations []sirkulator.RelationExp
+}
+
+func (tmpl *ViewPublicationRelations) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%>
+    <thead>
+        <tr>
+            <th><%= l.Translate("Role/relation") %></th>
+            <th><%= l.Translate("Agent") %></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for _, r := range tmpl.Relations { %>
+            <tr>
+                <td>
+                    <%= r.Type %>
+                </td>
+                <% if r.To.ID != "" { %>
+                    <td>
+                        <a href="<%= resourceLink(r.To) %>"><%= r.To.Label %></a>
+                    </td>
+                    <td></td>
+                <% } else { %>
+                    <td>
+                        <%= r.Data["label"] %>
+                    </td>
+                    <td>
+                        <button><%= l.Translate("Search and connect to resource") %></button>
+                    </td>
+                <% } %>
+                    <td>
+                        <button hx-confirm="<%= l.Translate("Are you sure?") %>" hx-delete="/metadata/relation/<%= r.ID %>" hx-swap="none"><%= l.Translate("Delete") %></button>
+                    </td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<% } %>
