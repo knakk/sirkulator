@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 
 	"crawshaw.io/sqlite/sqlitex"
@@ -65,10 +64,7 @@ func (p Publisher) Resource() sirkulator.Resource {
 	}
 	res.Links = append(res.Links, [2]string{"nb/isbnforlag", p.ID})
 	for _, prefix := range p.ISBNPrefixes {
-		parts := strings.Split(prefix, "-")
-		if len(parts) == 3 {
-			res.Links = append(res.Links, [2]string{"isbn/publisher", parts[2]})
-		}
+		res.Links = append(res.Links, [2]string{"isbn/prefix", prefix})
 	}
 	res.Data = pub
 	res.Label = pub.Label()
@@ -149,17 +145,13 @@ func (h *HarvestPublishersJob) persist(ctx context.Context, batch []Publisher) (
 		stmt.Reset()
 
 		for _, prefix := range p.ISBNPrefixes {
-			parts := strings.Split(prefix, "-")
-			if len(parts) == 3 {
-				links = append(links, [2]string{p.ID, parts[2]})
-			}
-
+			links = append(links, [2]string{p.ID, prefix})
 		}
 	}
 
 	stmt = conn.Prep(`
 		INSERT OR IGNORE INTO oai.link (source_id, record_id, type, id)
-			VALUES ('nb/isbnforlag', $record_id, 'isbn/publisher', $id)
+			VALUES ('nb/isbnforlag', $record_id, 'isbn/prefix', $id)
 	`)
 
 	for _, link := range links {

@@ -3,26 +3,26 @@ package vocab
 import "fmt"
 
 var identifiers = map[string][2]string{
-	"bibbi":          {"BIBBI", "https://id.bs.no/bibbi/%s"},
-	"bibsys/aut":     {"BIBSYS", "https://authority.bibsys.no/authority/rest/authorities/v2/%s?format=xml"},
-	"bibsys/pub":     {"BIBSYS", "https://marcpresentation.bibs.aws.unit.no/?mms_id=%s"},
-	"gtin":           {"GTIN", ""},                         // Global Trade Item Number (formerly EAN: European Article Number)
-	"isbn":           {"ISBN", ""},                         // International Standard Book Number
-	"isni":           {"ISNI", "https://isni.org/isni/%s"}, // International Standard Name Identifier
-	"issn":           {"ISSN", ""},                         // International Standard Serial Number
-	"orcid":          {"ORCID", "http://orcid.org/%s"},     // Open Researcher and Contributor ID
-	"snl":            {"Store norske leksikon", "https://snl.no/%s"},
-	"viaf":           {"VIAF", "http://viaf.org/viaf/%s"}, // Virtual International Authority File
-	"wp-en":          {"Wikipedia (English)", "https://en.wikipedia.org/wiki/%s"},
-	"wp-no":          {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki/%s"},
-	"wikidata":       {"Wikidata", "https://www.wikidata.org/wiki/%s"},
-	"worldcat":       {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
-	"nb/isbnforlag":  {"Norske forlagsadresser", "https://nb.no/isbnforlag/record/%s"},
-	"www":            {"WWW", "%s"},
-	"isbn/publisher": {"ISBN forlagsnr.", ""},
-	"nb/free":        {"Nasjonalbiblioteket (i det fri)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
-	"nb/norway":      {"Nasjonalbiblioteket (kun fra Norge)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
-	"nb/restricted":  {"Nasjonalbiblioteket (begrenset)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
+	"bibbi":         {"BIBBI", "https://id.bs.no/bibbi/%s"},
+	"bibsys/aut":    {"BIBSYS", "https://authority.bibsys.no/authority/rest/authorities/v2/%s?format=xml"},
+	"bibsys/pub":    {"BIBSYS", "https://marcpresentation.bibs.aws.unit.no/?mms_id=%s"},
+	"gtin":          {"GTIN", ""},                         // Global Trade Item Number (formerly EAN: European Article Number)
+	"isbn":          {"ISBN", ""},                         // International Standard Book Number
+	"isni":          {"ISNI", "https://isni.org/isni/%s"}, // International Standard Name Identifier
+	"issn":          {"ISSN", ""},                         // International Standard Serial Number
+	"orcid":         {"ORCID", "http://orcid.org/%s"},     // Open Researcher and Contributor ID
+	"snl":           {"Store norske leksikon", "https://snl.no/%s"},
+	"viaf":          {"VIAF", "http://viaf.org/viaf/%s"}, // Virtual International Authority File
+	"wp-en":         {"Wikipedia (English)", "https://en.wikipedia.org/wiki/%s"},
+	"wp-no":         {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki/%s"},
+	"wikidata":      {"Wikidata", "https://www.wikidata.org/wiki/%s"},
+	"worldcat":      {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
+	"nb/isbnforlag": {"Norske forlagsadresser", "https://nb.no/isbnforlag/record/%s"},
+	"www":           {"WWW", "%s"},
+	"isbn/prefix":   {"ISBN prefix", ""},
+	"nb/free":       {"Nasjonalbiblioteket (i det fri)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
+	"nb/norway":     {"Nasjonalbiblioteket (kun fra Norge)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
+	"nb/restricted": {"Nasjonalbiblioteket (begrenset)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
 
 	// TODO candidates:
 	//discogs-artist  https://www.discogs.com/artist/32198

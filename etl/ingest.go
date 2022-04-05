@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"log"
@@ -243,7 +244,7 @@ func looksSame(a, b string) bool {
 // ISBN registrant number and name. If found, it is returned, along with a boolean true.
 // If found as an oai.Record, a Resource is constructed from it and returned,
 // along with a boolean false.
-func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant string) (sirkulator.Resource, bool, error) {
+func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnPrefix string) (sirkulator.Resource, bool, error) {
 	var res sirkulator.Resource
 	conn := ig.db.Get(ctx)
 	if conn == nil {
@@ -251,8 +252,9 @@ func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant str
 	}
 	defer ig.db.Put(conn)
 
-	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn/publisher' AND id=$id")
-	stmt.SetText("$id", isbnRegistrant)
+	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn/prefix' AND (id=$id OR id=$id2)")
+	stmt.SetText("$id", isbnPrefix)
+	stmt.SetText("$id2", "978-"+isbnPrefix) // TODO consider adding to isbnPrefix argument instead
 	defer stmt.Reset()
 	for {
 		hasRow, err := stmt.Step()
@@ -296,9 +298,9 @@ func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant str
 			r.rowid
 		FROM oai.link l
 			JOIN oai.record r ON (l.source_id=r.source_id AND l.record_id=r.id)
-		WHERE l.type='isbn/publisher' AND l.id=? AND l.source_id='nb/isbnforlag'
+		WHERE l.type='isbn/prefix' AND l.id=? AND l.source_id='nb/isbnforlag'
 	`
-	if err := sqlitex.Exec(conn, q, fn, isbnRegistrant); err != nil {
+	if err := sqlitex.Exec(conn, q, fn, isbnPrefix); err != nil {
 		return res, false, err
 	}
 
@@ -554,8 +556,12 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 			}
 			if isbnStr != "" {
 				isbnNr, err := isbn.Parse(isbnStr)
+				prefix := fmt.Sprintf("%s-%s-%s", isbnNr.Prefix, isbnNr.Group, isbnNr.Publisher)
+				if isbnNr.Prefix == "" {
+					prefix = prefix[1:] // strip leading "-"
+				}
 				if err == nil {
-					publisher, existing, err := ig.localPublisher(ctx, res.Data.(sirkulator.Publication).Publisher, isbnNr.Publisher)
+					publisher, existing, err := ig.localPublisher(ctx, res.Data.(sirkulator.Publication).Publisher, prefix)
 					if err == nil {
 						if !existing {
 							// New Publisher imported from oai record
