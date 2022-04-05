@@ -317,7 +317,10 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Type:  sirkulator.TypePublication,
 					Label: "Liv Køltzow - Liv Køltzow: dagbøker i utvalg 1964-2008 (2021)",
-					Links: [][2]string{{"isbn", "9788203365133"}},
+					Links: [][2]string{
+						{"isbn", "9788203365133"},
+						{"bibsys/pub", "999921380896302201"},
+					},
 					Data: sirkulator.Publication{
 						Title:      "Liv Køltzow",
 						Subtitle:   "dagbøker i utvalg 1964-2008",
@@ -334,7 +337,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t2",
 					Type:  sirkulator.TypePerson,
 					Label: "Liv Køltzow (1945–)",
-					Links: [][2]string{{"bibsys", "90086277"}},
+					Links: [][2]string{{"bibsys/aut", "90086277"}},
 					Data: sirkulator.Person{
 						Name: "Liv Køltzow",
 						YearRange: sirkulator.YearRange{
@@ -346,7 +349,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t3",
 					Type:  sirkulator.TypePerson,
 					Label: "Hans Petter Blad (1962–)",
-					Links: [][2]string{{"bibsys", "90916002"}},
+					Links: [][2]string{{"bibsys/aut", "90916002"}},
 					Data: sirkulator.Person{
 						Name: "Hans Petter Blad",
 						YearRange: sirkulator.YearRange{
@@ -358,7 +361,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t4",
 					Type:  sirkulator.TypePerson,
 					Label: "Kaja Schjerven Mollerin (1980–)",
-					Links: [][2]string{{"bibsys", "6088516"}},
+					Links: [][2]string{{"bibsys/aut", "6088516"}},
 					Data: sirkulator.Person{
 						Name: "Kaja Schjerven Mollerin",
 						YearRange: sirkulator.YearRange{
@@ -608,7 +611,11 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Type:  sirkulator.TypePublication,
 					Label: "Kerstin Ekman - Hendelser ved vann (1994)",
-					Links: [][2]string{{"isbn", "8203200168"}, {"isbn", "8273504166"}},
+					Links: [][2]string{
+						{"isbn", "8203200168"},
+						{"isbn", "8273504166"},
+						{"bibsys/pub", "999410140454702201"},
+					},
 					Data: sirkulator.Publication{
 						Title:            "Hendelser ved vann",
 						TitleOriginal:    "Händelser vid vatten",
@@ -625,7 +632,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t2",
 					Type:  sirkulator.TypePerson,
 					Label: "Kerstin Ekman (1933–)",
-					Links: [][2]string{{"bibsys", "90058909"}},
+					Links: [][2]string{{"bibsys/aut", "90058909"}},
 					Data: sirkulator.Person{
 						Name: "Kerstin Ekman",
 						YearRange: sirkulator.YearRange{
@@ -637,7 +644,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t3",
 					Type:  sirkulator.TypePerson,
 					Label: "Gunnel Malmström (1921–2007)",
-					Links: [][2]string{{"bibsys", "90589668"}},
+					Links: [][2]string{{"bibsys/aut", "90589668"}},
 					Data: sirkulator.Person{
 						Name: "Gunnel Malmström",
 						YearRange: sirkulator.YearRange{
@@ -880,7 +887,10 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Label: "Ove Fredrik Arbo Høeg - Planter og tradisjon: floraen i levende tale og tradisjon i Norge 1925-1973 (2021)",
 					Type:  sirkulator.TypePublication,
-					Links: [][2]string{{"isbn", "9788230021743"}},
+					Links: [][2]string{
+						{"isbn", "9788230021743"},
+						{"bibsys/pub", "999921296219502201"},
+					},
 					Data: sirkulator.Publication{
 						Title:     "Planter og tradisjon",
 						Subtitle:  "floraen i levende tale og tradisjon i Norge 1925-1973",
@@ -897,7 +907,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypePerson,
 					ID:    "t2",
 					Label: "Ove Fredrik Arbo Høeg (1898–1993)",
-					Links: [][2]string{{"bibsys", "1533887371289"}},
+					Links: [][2]string{{"bibsys/aut", "1533887371289"}},
 					Data: sirkulator.Person{
 						Name: "Ove Fredrik Arbo Høeg",
 						YearRange: sirkulator.YearRange{
@@ -910,7 +920,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypePerson,
 					ID:    "t3",
 					Label: "Ove Arbo Høeg (1898–1993)",
-					Links: [][2]string{{"bibsys", "90103766"}},
+					Links: [][2]string{{"bibsys/aut", "90103766"}},
 					Data: sirkulator.Person{
 						Name: "Ove Arbo Høeg",
 						YearRange: sirkulator.YearRange{
@@ -923,19 +933,19 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypeCorporation,
 					ID:    "t4",
 					Label: "Norges sopp- og nyttevekstforbund",
-					Links: [][2]string{{"bibsys", "5032677"}},
+					Links: [][2]string{{"bibsys/aut", "5032677"}},
 				},
 				{
 					Type:  sirkulator.TypeCorporation,
 					ID:    "t5",
 					Label: "Nordic People and Plants (prosjekt)",
-					Links: [][2]string{{"bibsys", "1614124828252"}},
+					Links: [][2]string{{"bibsys/aut", "1614124828252"}},
 				},
 				{
 					Type:  sirkulator.TypeCorporation,
 					ID:    "t6",
 					Label: "Universitetet i Oslo",
-					Links: [][2]string{{"bibsys", "11071432"}},
+					Links: [][2]string{{"bibsys/aut", "11071432"}},
 				},*/
 			},
 			Relations: []sirkulator.Relation{
@@ -1152,7 +1162,10 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Label: "Deichman Bjørvika: Lundhagem og Atelier Oslo arkitekter (2022)",
 					Type:  sirkulator.TypePublication,
-					Links: [][2]string{{"isbn", "9788253043203"}},
+					Links: [][2]string{
+						{"isbn", "9788253043203"},
+						{"bibsys/pub", "999921641921002201"},
+					},
 					Data: sirkulator.Publication{
 						Title:     "Deichman Bjørvika",
 						Subtitle:  "Lundhagem og Atelier Oslo arkitekter",
@@ -1168,7 +1181,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypeCorporation,
 					ID:    "t2",
 					Label: "Deichman Bjørvika",
-					Links: [][2]string{{"bibsys", "1642068353945"}},
+					Links: [][2]string{{"bibsys/aut", "1642068353945"}},
 					Data: sirkulator.Corporation{
 						Name: "Deichman Bjørvika",
 					},
@@ -1177,7 +1190,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypePerson,
 					ID:    "t3",
 					Label: "Lars Müller",
-					Links: [][2]string{{"bibsys", "90961231"}},
+					Links: [][2]string{{"bibsys/aut", "90961231"}},
 					Data: sirkulator.Person{
 						Name: "Lars Müller",
 					},
@@ -1186,7 +1199,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypePerson,
 					ID:    "t4",
 					Label: "Elif Shafak (1971–)",
-					Links: [][2]string{{"bibsys", "8035652"}},
+					Links: [][2]string{{"bibsys/aut", "8035652"}},
 					Data: sirkulator.Person{
 						Name: "Elif Shafak",
 						YearRange: sirkulator.YearRange{
@@ -1198,7 +1211,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypePerson,
 					ID:    "t5",
 					Label: "Niklas Maak (1972–)",
-					Links: [][2]string{{"bibsys", "12010078"}},
+					Links: [][2]string{{"bibsys/aut", "12010078"}},
 					Data: sirkulator.Person{
 						Name: "Niklas Maak",
 						YearRange: sirkulator.YearRange{
@@ -1210,7 +1223,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypePerson,
 					ID:    "t6",
 					Label: "Liv Sæteren",
-					Links: [][2]string{{"bibsys", "9009005"}},
+					Links: [][2]string{{"bibsys/aut", "9009005"}},
 					Data: sirkulator.Person{
 						Name: "Liv Sæteren",
 					},
@@ -1224,7 +1237,7 @@ func TestIngestOAIRecord(t *testing.T) {
 					Type:  sirkulator.TypeCorporation,
 					ID:    "t8",
 					Label: "Atelier Oslo",
-					Links: [][2]string{{"bibsys", "12073195"}},
+					Links: [][2]string{{"bibsys/aut", "12073195"}},
 				},*/
 			},
 			Relations: []sirkulator.Relation{
@@ -1480,7 +1493,10 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Label: "Bjørn Ingvaldsen - Når noen klikker i vinkel (2022)",
 					Type:  sirkulator.TypePublication,
-					Links: [][2]string{{"isbn", "9788205560130"}},
+					Links: [][2]string{
+						{"isbn", "9788205560130"},
+						{"bibsys/pub", "999921603445902201"},
+					},
 					Data: sirkulator.Publication{
 						Title:      "Når noen klikker i vinkel",
 						Publisher:  "Gyldendal",
@@ -1500,13 +1516,13 @@ func TestIngestOAIRecord(t *testing.T) {
 					Data: sirkulator.Person{
 						YearRange: sirkulator.YearRange{From: "1962"},
 						Name:      "Bjørn Ingvaldsen"},
-					Links: [][2]string{{"bibsys", "90829580"}},
+					Links: [][2]string{{"bibsys/aut", "90829580"}},
 				},
 				{
 					Type:  sirkulator.TypePerson,
 					ID:    "t3",
 					Label: "Anders Bergesen (1976–)",
-					Links: [][2]string{{"bibsys", "10007330"}},
+					Links: [][2]string{{"bibsys/aut", "10007330"}},
 					Data: sirkulator.Person{
 						Name:      "Anders Bergesen",
 						YearRange: sirkulator.YearRange{From: "1976"},
@@ -1713,7 +1729,10 @@ func TestIngestOAIRecord(t *testing.T) {
 					ID:    "t1",
 					Label: "Tor Åge Bringsværd - Den glemte byen (2017)",
 					Type:  sirkulator.TypePublication,
-					Links: [][2]string{{"isbn", "9788202527921"}},
+					Links: [][2]string{
+						{"isbn", "9788202527921"},
+						{"bibsys/pub", "999920253627802201"},
+					},
 					Data: sirkulator.Publication{
 						Title:      "Den glemte byen",
 						Publisher:  "Cappelen Damm",
@@ -1733,13 +1752,13 @@ func TestIngestOAIRecord(t *testing.T) {
 					Data: sirkulator.Person{
 						YearRange: sirkulator.YearRange{From: "1939"},
 						Name:      "Tor Åge Bringsværd"},
-					Links: [][2]string{{"bibsys", "90058926"}},
+					Links: [][2]string{{"bibsys/aut", "90058926"}},
 				},
 				{
 					Type:  sirkulator.TypePerson,
 					ID:    "t3",
 					Label: "Haakon Lie (1991–)",
-					Links: [][2]string{{"bibsys", "13037663"}},
+					Links: [][2]string{{"bibsys/aut", "13037663"}},
 					Data: sirkulator.Person{
 						Name:      "Haakon Lie",
 						YearRange: sirkulator.YearRange{From: "1991"},
@@ -1885,7 +1904,7 @@ func TestPersonFromAuthority(t *testing.T) {
 			Countries:     []string{"iso3166/FI", "iso3166/NO"},
 			Nationalities: []string{"bs/n", "bs/sam"},
 		},
-		Links: [][2]string{{"bibsys", "90067942"}, {"isni", "0000000109115902"}, {"viaf", "59247880"}, {"bibbi", "37524"}},
+		Links: [][2]string{{"bibsys/aut", "90067942"}, {"isni", "0000000109115902"}, {"viaf", "59247880"}, {"bibbi", "37524"}},
 	}
 
 	got, err := PersonFromAuthority(marc.MustParseString(autrec))
@@ -1948,7 +1967,7 @@ func TestCorporationFromAuthority(t *testing.T) {
 			ParentName:     "United Nations",
 			NameVariations: []string{"Arbeidsgruppen for urfolksspørsmål / Forente nasjoner", "Arbeidsgruppen for urfolksspørsmål"},
 		},
-		Links: [][2]string{{"bibsys", "11008994"}},
+		Links: [][2]string{{"bibsys/aut", "11008994"}},
 	}
 
 	got, err := CorporationFromAuthority(marc.MustParseString(autrec))

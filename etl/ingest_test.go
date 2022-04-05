@@ -204,7 +204,9 @@ func dummyImage() []byte {
 	img := image.NewRGBA(image.Rect(0, 0, 100, 50))
 	img.Set(2, 3, color.RGBA{255, 0, 0, 255})
 	var b bytes.Buffer
-	jpeg.Encode(&b, img, nil)
+	if err := jpeg.Encode(&b, img, nil); err != nil {
+		panic(err)
+	}
 	return b.Bytes()
 }
 
@@ -263,7 +265,7 @@ func TestIngestISBN(t *testing.T) {
 			INSERT INTO resource (id, type, label, data, created_at, updated_at)
 				VALUES ('p0','person', 'Per Arvid Åsen (1949-)', x'%x', 0, 0);
 			INSERT INTO link (resource_id, type, id)
-				VALUES ('p0', 'bibsys', '90294124');
+				VALUES ('p0', 'bibsys/aut', '90294124');
 		`, oairecord, b)
 
 	if err := sqlitex.ExecScript(conn, q); err != nil {
@@ -283,7 +285,7 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePerson,
 		Label: "Per Arvid Åsen (1949-)",
 		ID:    "p0",
-		Links: [][2]string{{"bibsys", "90294124"}},
+		Links: [][2]string{{"bibsys/aut", "90294124"}},
 		Data:  &personWant,
 	}
 	perGot, err := sql.GetResource(conn, sirkulator.TypePerson, "p0")
@@ -313,8 +315,11 @@ func TestIngestISBN(t *testing.T) {
 		Type:  sirkulator.TypePublication,
 		Label: "Per Arvid Åsen - Illustrert algeflora (1980)",
 		ID:    "t1",
-		Links: [][2]string{{"isbn", "82-02-01856-0"}},
-		Data:  &pubData,
+		Links: [][2]string{
+			{"bibsys/pub", "998110670684702201"},
+			{"isbn", "82-02-01856-0"},
+		},
+		Data: &pubData,
 	}
 	pubGot, err := sql.GetResource(conn, sirkulator.TypePublication, "t1")
 	if err != nil {
@@ -502,7 +507,7 @@ func TestIngestPersonFromLocalOAI(t *testing.T) {
 		ID:    "t2",
 		Links: [][2]string{
 			{"bibbi", "40502"},
-			{"bibsys", "90294124"},
+			{"bibsys/aut", "90294124"},
 			{"isni", "0000000383686038"},
 			{"viaf", "270825492"},
 		},

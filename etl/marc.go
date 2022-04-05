@@ -107,7 +107,7 @@ func createAgent(f marc.DataField, idFunc func() string) (res sirkulator.Resourc
 			// Ex: "(NO-TrBIB)90086277"
 			// TODO validate ID ^\d+$
 			res.Links = append(res.Links,
-				[2]string{"bibsys", strings.TrimPrefix(v, "(NO-TrBIB)")})
+				[2]string{"bibsys/aut", strings.TrimPrefix(v, "(NO-TrBIB)")})
 		}
 		if strings.HasPrefix(v, "(orcid)") {
 			// Ex: "(orcid)0000-0003-1274-907"
@@ -193,6 +193,7 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 			*/
 		}
 	}
+
 	if f, ok := rec.ControlFieldAt("008"); ok {
 		// Fiction/Nonfiction
 		if len(f.Value) > 33 {
@@ -457,7 +458,7 @@ classLoop:
 		Data:  p,
 	}
 
-	// Publication identifiers: ISBN, ISSN, GTIN (EAN)
+	// Publication identifiers: ISBN, ISSN, GTIN (EAN), BIBSYS/OAI
 	for _, id := range rec.ValuesAt("020", "a") {
 		res.Links = append(res.Links, [2]string{"isbn", isbn.Clean(id)})
 	}
@@ -468,6 +469,11 @@ classLoop:
 	for _, gtin := range rec.ValuesAt("024", "a") {
 		// TODO clean GTIN (EAN) number
 		res.Links = append(res.Links, [2]string{"gtin", gtin})
+	}
+	if f, ok := rec.ControlFieldAt("001"); ok {
+		if strings.HasPrefix(f.Value, "99") {
+			res.Links = append(res.Links, [2]string{"bibsys/pub", f.Value})
+		}
 	}
 
 	ing.Resources = append(ing.Resources, res)
@@ -671,7 +677,7 @@ func PersonFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 		case "orcid":
 			res.Links = append(res.Links, [2]string{"orcid", val})
 		case "no-trbib":
-			res.Links = append(res.Links, [2]string{"bibsys", strings.TrimPrefix(val, "x")})
+			res.Links = append(res.Links, [2]string{"bibsys/aut", strings.TrimPrefix(val, "x")})
 		}
 	}
 
@@ -733,7 +739,7 @@ func CorporationFromAuthority(rec marc.Record) (sirkulator.Resource, error) {
 		case "orcid":
 			res.Links = append(res.Links, [2]string{"orcid", val})
 		case "no-trbib":
-			res.Links = append(res.Links, [2]string{"bibsys", strings.TrimPrefix(val, "x")})
+			res.Links = append(res.Links, [2]string{"bibsys/aut", strings.TrimPrefix(val, "x")})
 		}
 	}
 

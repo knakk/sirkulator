@@ -251,7 +251,7 @@ func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant str
 	}
 	defer ig.db.Put(conn)
 
-	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn-registrant' AND id=$id")
+	stmt := conn.Prep("SELECT resource_id FROM link WHERE type='isbn/publisher' AND id=$id")
 	stmt.SetText("$id", isbnRegistrant)
 	defer stmt.Reset()
 	for {
@@ -296,7 +296,7 @@ func (ig *Ingestor) localPublisher(ctx context.Context, name, isbnRegistrant str
 			r.rowid
 		FROM oai.link l
 			JOIN oai.record r ON (l.source_id=r.source_id AND l.record_id=r.id)
-		WHERE l.type='isbn-registrant' AND l.id=? AND l.source_id='nb/isbnforlag'
+		WHERE l.type='isbn/publisher' AND l.id=? AND l.source_id='nb/isbnforlag'
 	`
 	if err := sqlitex.Exec(conn, q, fn, isbnRegistrant); err != nil {
 		return res, false, err
@@ -609,7 +609,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 		if newResource {
 			// check if an authority record is present in local oai db, and use that instead
 			for _, link := range res.Links {
-				if link[0] != "bibsys" {
+				if link[0] != "bibsys/aut" {
 					continue
 				}
 				var rec oai.Record

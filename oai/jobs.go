@@ -67,7 +67,7 @@ func (p Publisher) Resource() sirkulator.Resource {
 	for _, prefix := range p.ISBNPrefixes {
 		parts := strings.Split(prefix, "-")
 		if len(parts) == 3 {
-			res.Links = append(res.Links, [2]string{"isbn-registrant", parts[2]})
+			res.Links = append(res.Links, [2]string{"isbn/publisher", parts[2]})
 		}
 	}
 	res.Data = pub
@@ -159,7 +159,7 @@ func (h *HarvestPublishersJob) persist(ctx context.Context, batch []Publisher) (
 
 	stmt = conn.Prep(`
 		INSERT OR IGNORE INTO oai.link (source_id, record_id, type, id)
-			VALUES ('nb/isbnforlag', $record_id, 'isbn-registrant', $id)
+			VALUES ('nb/isbnforlag', $record_id, 'isbn/publisher', $id)
 	`)
 
 	for _, link := range links {

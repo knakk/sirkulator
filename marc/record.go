@@ -97,7 +97,7 @@ func (r Record) ValuesAt(tag, code string) (res []string) {
 	return res
 }
 
-// ControlFieldAt returns the control fiel of the given tag, along
+// ControlFieldAt returns the control field of the given tag, along
 // with a boolean denoting if it was found or not.
 func (r Record) ControlFieldAt(tag string) (ControlField, bool) {
 	for _, f := range r.ControlFields {
