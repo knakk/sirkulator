@@ -11,12 +11,13 @@ import (
 
 type DeweyTemplate struct {
     Page
-    Resource     sirkulator.Resource
-    Parents      [][2]string
-    Children     [][2]string
-    Parts        [][2]string
-    Publications [][2]string
-    PartsOfCount int
+    Resource          sirkulator.Resource
+    Parents           [][2]string
+    Children          [][2]string
+    Parts             [][2]string
+    PartsOfCount      int
+    PublicationsCount int
+    PublicationsSubCount int
 }
 
 func (tmpl *DeweyTemplate) Render(ctx context.Context, w io.Writer) {
@@ -92,15 +93,30 @@ func (tmpl *DeweyTemplate) Render(ctx context.Context, w io.Writer) {
     <br/>
 
     <details>
-        <summary>
-            <h3><%= l.Translate("Publications classified with") %> <%= dewey.Number %> (<%= len(tmpl.Publications) %>)</h3>
+        <summary hx-get="/metadata/dewey/<%= tmpl.Resource.ID %>/publications?count=<%= tmpl.PublicationsCount %>" hx-target="#dewey-publications" hx-trigger="click once">
+            <h3><%= l.Translate("Publications classified with") %> <%= dewey.Number %> (<%= tmpl.PublicationsCount %>/<%= tmpl.PublicationsSubCount %>)</h3>
         </summary>
         <div class="border pad">
-           <% if len(tmpl.Publications) > 0 { %>
-                <% for _, p := range tmpl.Publications { %>
-                    <p><a href="/metadata/publication/<%= p[0] %>"><%= p[1] %></a></p>
-                <% } %>
-            <% } %>
+            <div class="search-options">
+                <input
+                    id="include_subdewey"
+                    name="include_subdewey"
+                    type="checkbox"
+                    hx-get="/metadata/dewey/<%= dewey.Number %>/publications"
+                    hx-target="#dewey-publications">
+                <label for="include_subdewey"><%= l.Translate("include narrower numbers") %></label>
+            </div>
+           <table class="dewey-publications">
+                <thead>
+                    <tr>
+                        <th><%= l.Translate("Year") %></th>
+                        <th><%= l.Translate("Publication") %></th>
+                        <th><%= l.Translate("Dewey number") %></th>
+                    </tr>
+                </thead>
+                <tbody id="dewey-publications">
+                </tbody>
+           </table>
         </div>
     </details>
 

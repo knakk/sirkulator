@@ -149,3 +149,4 @@ th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
 
 /* dewey page */
 table.dewey td:first-of-type { width: 12em; text-align: right; padding-right: 1rem }
+table.dewey-publications td { padding-right: 1rem; }

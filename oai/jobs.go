@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"crawshaw.io/sqlite/sqlitex"
@@ -54,10 +55,10 @@ func (p Publisher) Resource() sirkulator.Resource {
 		Notes: p.Notes,
 	}
 	if p.AltName != "" {
-		pub.NameVariations = append(pub.NameVariations, p.AltName)
+		pub.NameVariations = append(pub.NameVariations, strings.Split(p.AltName, ", ")...)
 	}
 	if p.FullName != "" {
-		pub.NameVariations = append(pub.NameVariations, p.FullName)
+		pub.NameVariations = append(pub.NameVariations, strings.Split(p.FullName, ", ")...)
 	}
 	if p.WWW != "" {
 		res.Links = append(res.Links, [2]string{"www", p.WWW})

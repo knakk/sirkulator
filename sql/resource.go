@@ -172,16 +172,152 @@ func GetDeweyPartsOfCount(conn *sqlite.Conn, id string) (int, error) {
 	return n, nil
 }
 
-func GetDeweyPublications(conn *sqlite.Conn, id string) ([][2]string, error) {
-	const q = `
-    SELECT res.id, res.label
+func GetDeweyPublicationsCount(conn *sqlite.Conn, id string) (int, error) {
+	var stmt *sqlite.Stmt
+	if strings.HasPrefix(id, "T") {
+		stmt = conn.Prep(`
+		SELECT count(DISTINCT res.id)
+		  FROM resource res
+		  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+		  JOIN relation prel ON (rel.to_id=prel.from_id AND prel.type='has_part')
+		 WHERE prel.to_id=$id AND res.type='publication'`)
+	} else {
+		stmt = conn.Prep(`
+		SELECT count(DISTINCT res.id)
+		  FROM resource res
+		  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+		 WHERE rel.to_id=$id AND res.type='publication'`)
+	}
+
+	stmt.SetText("$id", id)
+	n, err := sqlitex.ResultInt(stmt)
+	if err != nil {
+		return 0, fmt.Errorf("sql.GetDeweyPublicationsCount(%q): %w", id, err)
+	}
+	return n, nil
+}
+
+func GetDeweySubPublicationsCount(conn *sqlite.Conn, id string) (int, error) {
+	var stmt *sqlite.Stmt
+	if strings.HasPrefix(id, "T") {
+		stmt = conn.Prep(`
+		WITH RECURSIVE dewey (id) AS (
+			SELECT $id AS id
+
+			UNION ALL
+
+			SELECT from_id FROM relation
+			JOIN dewey ON to_id=dewey.id
+			WHERE type='has_parent'
+		)
+	SELECT count(DISTINCT res.id)
+	  FROM resource res
+	  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+	  JOIN relation prel ON (rel.to_id=prel.from_id AND prel.type='has_part')
+	  JOIN dewey ON (prel.to_id=dewey.id)
+	 WHERE res.type='publication'`)
+	} else {
+		stmt = conn.Prep(`
+		WITH RECURSIVE dewey (id) AS (
+			SELECT $id AS id
+
+			UNION ALL
+
+			SELECT from_id FROM relation
+			JOIN dewey ON to_id=dewey.id
+			WHERE type='has_parent'
+		)
+		SELECT count(DISTINCT res.id)
+		 FROM resource res
+		 JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+		 JOIN dewey ON (rel.to_id=dewey.id)
+		WHERE res.type='publication'`)
+	}
+
+	stmt.SetText("$id", id)
+	n, err := sqlitex.ResultInt(stmt)
+	if err != nil {
+		return 0, fmt.Errorf("sql.GetDeweySubPublicationsCount(%q): %w", id, err)
+	}
+	return n, nil
+}
+
+func deweyPublicationsQuery(id string, inclSub bool) string {
+	if strings.HasPrefix(id, "T") {
+		if inclSub {
+			return `
+			WITH RECURSIVE dewey (id) AS (
+				SELECT ? AS id
+
+				UNION ALL
+
+				SELECT from_id FROM relation
+				JOIN dewey ON to_id=dewey.id
+				WHERE type='has_parent'
+			)
+			SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+		  FROM resource res
+		  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+		  JOIN relation prel ON (rel.to_id=prel.from_id AND prel.type='has_part')
+		  JOIN dewey ON (prel.to_id=dewey.id)
+		 WHERE res.type='publication'
+	  GROUP BY res.id
+	  ORDER BY year DESC`
+		}
+
+		return `
+		SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+		  FROM resource res
+		  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+		  JOIN relation prel ON (rel.to_id=prel.from_id AND prel.type='has_part')
+		 WHERE prel.to_id=? AND res.type='publication'
+	  GROUP BY res.id
+	  ORDER BY year DESC`
+	}
+
+	if inclSub {
+		return `WITH RECURSIVE dewey (id) AS (
+			SELECT ? AS id
+
+			UNION ALL
+
+			SELECT from_id FROM relation
+			JOIN dewey ON to_id=dewey.id
+			WHERE type='has_parent'
+		)
+		SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+		 FROM resource res
+		 JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
+		 JOIN dewey ON (rel.to_id=dewey.id)
+		WHERE res.type='publication'
+	 GROUP BY res.id
+	 ORDER BY year DESC`
+	}
+
+	return `
+    SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
       FROM resource res
       JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
-     WHERE rel.to_id=?` // TODO consider json_extract(data, '$.name') as label
+     WHERE rel.to_id=? AND res.type='publication'
+  GROUP BY res.id
+  ORDER BY year DESC`
 
-	var res [][2]string
+}
+
+// [4]string{id, label, year, dewey}
+// TODO order by param
+// TODO sortDir param
+// TODO group_concat ordering: https://stackoverflow.com/questions/1897352/sqlite-group-concat-ordering
+func GetDeweyPublications(conn *sqlite.Conn, id string, inclSub bool) ([][4]string, error) {
+	q := deweyPublicationsQuery(id, inclSub)
+
+	var res [][4]string
 	fn := func(stmt *sqlite.Stmt) error {
-		res = append(res, [2]string{stmt.ColumnText(0), stmt.ColumnText(1)})
+		res = append(res, [4]string{
+			stmt.ColumnText(0),
+			stmt.ColumnText(1),
+			stmt.ColumnText(2),
+			stmt.ColumnText(3)})
 		return nil
 	}
 	if err := sqlitex.Exec(conn, q, fn, id); err != nil {

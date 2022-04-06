@@ -52,7 +52,13 @@ func (s *Server) pageDewey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	publications, err := sql.GetDeweyPublications(conn, id)
+	pubCount, err := sql.GetDeweyPublicationsCount(conn, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	pubSubCount, err := sql.GetDeweySubPublicationsCount(conn, id)
 	if err != nil {
 		ServerError(w, err)
 		return
@@ -63,12 +69,13 @@ func (s *Server) pageDewey(w http.ResponseWriter, r *http.Request) {
 			Lang: s.Lang,
 			Path: r.URL.Path,
 		},
-		Resource:     res,
-		Parents:      parents,
-		Children:     children,
-		Parts:        parts,
-		PartsOfCount: numPartsOf,
-		Publications: publications,
+		Resource:             res,
+		Parents:              parents,
+		Children:             children,
+		Parts:                parts,
+		PartsOfCount:         numPartsOf,
+		PublicationsCount:    pubCount,
+		PublicationsSubCount: pubSubCount,
 	}
 	tmpl.Render(r.Context(), w)
 }
@@ -102,6 +109,34 @@ func (s *Server) viewDeweyPartsOf(w http.ResponseWriter, r *http.Request) {
 		To:      to,
 		HasMore: hasMore,
 		PartsOf: partsOf,
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) viewDeweyPublications(w http.ResponseWriter, r *http.Request) {
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+
+	/*limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 10 // default size
+	}*/
+
+	id := chi.URLParam(r, "id")
+	inclSub := r.URL.Query().Get("include_subdewey") != ""
+
+	publications, err := sql.GetDeweyPublications(conn, id, inclSub)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	tmpl := html.ViewDeweyPublications{
+		Publications: publications,
 	}
 	tmpl.Render(r.Context(), w)
 }

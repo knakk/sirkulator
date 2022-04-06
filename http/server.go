@@ -183,6 +183,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Delete("/relation/{id}", s.deleteRelation)
 			r.Get("/dewey/{id}", s.pageDewey)
 			r.Get("/dewey/{id}/partsof", s.viewDeweyPartsOf)
+			r.Get("/dewey/{id}/publications", s.viewDeweyPublications)
 			r.Get("/publisher/{id}", s.pagePublisher)
 			r.Post("/publisher/{id}/publications", s.viewPublisherPublications)
 		})

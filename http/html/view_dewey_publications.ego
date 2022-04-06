@@ -1,0 +1,43 @@
+<%
+package html
+
+
+import (
+    "strings"
+    "sort"
+)
+
+
+type ViewDeweyPublications struct {
+    ID       string
+    Publications  [][4]string
+}
+
+func splitAndSort(s string) string {
+    t := strings.Split(s, ", ")
+    sort.Strings(t)
+    return strings.Join(t, "<br/>")
+}
+
+
+func (tmpl *ViewDeweyPublications) Render(ctx context.Context, w io.Writer) {
+
+%>
+
+    <% for _, p := range tmpl.Publications { %>
+        <tr>
+            <td><%= p[2] %></td>
+            <td><a href="/metadata/publication/<%= p[0] %>"><%= p[1] %></a></td>
+            <td>
+                <%
+                    numbers :=  strings.Split(p[3], ", ")
+                    sort.Strings(numbers)
+                %>
+                <% for _, n := range numbers { %>
+                    <a href="/metadata/dewey/<%= n %>"><%= n %></a><br/>
+                <% } %>
+            </td>
+        </tr>
+    <% } %>
+
+<% } %>
