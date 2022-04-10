@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -242,10 +243,42 @@ func GetDeweySubPublicationsCount(conn *sqlite.Conn, id string) (int, error) {
 	return n, nil
 }
 
-func deweyPublicationsQuery(id string, inclSub bool) string {
+func ltOrGt(dir string) string {
+	if strings.ToLower(dir) == "desc" {
+		return ">"
+	}
+	return "<"
+}
+
+func reverseDir(dir string) string {
+	if strings.ToLower(dir) == "desc" {
+		return "asc"
+	}
+	return "desc"
+}
+
+func deweyPublicationsQuery(id string, params DeweyPublicationsParams) string {
+	if params.SortBy == "dewey" {
+		params.SortBy = "rel.to_id"
+	}
+
+	order := params.SortDir
+	dir := ltOrGt(order)
+	if order == "asc" && params.From == "" {
+		dir = ">"
+	}
+	if params.To != "" {
+		if order == "asc" {
+			dir = "<"
+		}
+		order = reverseDir(order)
+	}
+	if params.From != "" {
+		dir = ltOrGt(reverseDir(order))
+	}
 	if strings.HasPrefix(id, "T") {
-		if inclSub {
-			return `
+		if params.InclSub {
+			return fmt.Sprintf(`
 			WITH RECURSIVE dewey (id) AS (
 				SELECT ? AS id
 
@@ -255,28 +288,33 @@ func deweyPublicationsQuery(id string, inclSub bool) string {
 				JOIN dewey ON to_id=dewey.id
 				WHERE type='has_parent'
 			)
-			SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+			SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS deweynumbers
 		  FROM resource res
 		  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
 		  JOIN relation prel ON (rel.to_id=prel.from_id AND prel.type='has_part')
 		  JOIN dewey ON (prel.to_id=dewey.id)
-		 WHERE res.type='publication'
+		 WHERE res.type='publication' AND
+			   %s %s ? OR (%s = ? AND res.id %s ?)
 	  GROUP BY res.id
-	  ORDER BY year DESC`
+	  ORDER BY %s %s, res.id %s
+	  LIMIT ?`, params.SortBy, dir, params.SortBy, dir, params.SortBy, order, order)
 		}
 
-		return `
-		SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+		return fmt.Sprintf(`
+		SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS deweynumbers
 		  FROM resource res
 		  JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
 		  JOIN relation prel ON (rel.to_id=prel.from_id AND prel.type='has_part')
-		 WHERE prel.to_id=? AND res.type='publication'
+		 WHERE prel.to_id=? AND
+		       res.type='publication' AND
+			   %s %s ? OR (%s = ? AND res.id %s ?)
 	  GROUP BY res.id
-	  ORDER BY year DESC`
+	  ORDER BY %s %s, res.id %s
+	  LIMIT ?`, params.SortBy, dir, params.SortBy, dir, params.SortBy, order, order)
 	}
 
-	if inclSub {
-		return `WITH RECURSIVE dewey (id) AS (
+	if params.InclSub {
+		return fmt.Sprintf(`WITH RECURSIVE dewey (id) AS (
 			SELECT ? AS id
 
 			UNION ALL
@@ -285,33 +323,47 @@ func deweyPublicationsQuery(id string, inclSub bool) string {
 			JOIN dewey ON to_id=dewey.id
 			WHERE type='has_parent'
 		)
-		SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+		SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS deweynumbers
 		 FROM resource res
 		 JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
 		 JOIN dewey ON (rel.to_id=dewey.id)
-		WHERE res.type='publication'
+		WHERE res.type='publication' AND
+			  %s %s ? OR (%s = ? AND res.id %s ?)
 	 GROUP BY res.id
-	 ORDER BY year DESC`
+	 ORDER BY %s %s, res.id %s
+	 LIMIT ?`, params.SortBy, dir, params.SortBy, dir, params.SortBy, order, order)
 	}
 
-	return `
-    SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS dewey
+	return fmt.Sprintf(`
+    SELECT res.id, res.label, json_extract(res.data, '$.year') AS year, group_concat(rel.to_id, ', ') AS deweynumbers
       FROM resource res
       JOIN relation rel ON (rel.from_id=res.id AND rel.type='has_classification')
-     WHERE rel.to_id=? AND res.type='publication'
+     WHERE rel.to_id=? AND
+           res.type='publication' AND
+		   %s %s ? OR (%s = ? AND res.id %s ?)
   GROUP BY res.id
-  ORDER BY year DESC`
+  ORDER BY %s %s, res.id %s
+  LIMIT ?`, params.SortBy, dir, params.SortBy, dir, params.SortBy, order, order)
 
 }
 
+type DeweyPublicationsParams struct {
+	InclSub bool
+	From    string
+	FromID  string
+	To      string
+	ToID    string
+	SortBy  string
+	SortDir string
+	Limit   int
+}
+
 // [4]string{id, label, year, dewey}
-// TODO order by param
-// TODO sortDir param
-// TODO group_concat ordering: https://stackoverflow.com/questions/1897352/sqlite-group-concat-ordering
-func GetDeweyPublications(conn *sqlite.Conn, id string, inclSub bool) ([][4]string, error) {
-	q := deweyPublicationsQuery(id, inclSub)
+func GetDeweyPublications(conn *sqlite.Conn, id string, params DeweyPublicationsParams) ([][4]string, bool, error) {
+	q := deweyPublicationsQuery(id, params)
 
 	var res [][4]string
+	hasMore := false
 	fn := func(stmt *sqlite.Stmt) error {
 		res = append(res, [4]string{
 			stmt.ColumnText(0),
@@ -320,11 +372,37 @@ func GetDeweyPublications(conn *sqlite.Conn, id string, inclSub bool) ([][4]stri
 			stmt.ColumnText(3)})
 		return nil
 	}
-	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
-		return res, fmt.Errorf("sql.GetDeweyPublications(%q): %w", id, err)
+	var fromOrTo any
+	fromOrTo = params.To
+	fromOrToID := params.ToID
+	if params.From != "" || params.To == "" {
+		fromOrTo = params.From
+		fromOrToID = params.FromID
+	}
+	if params.SortBy == "year" {
+		n, _ := strconv.Atoi(fromOrTo.(string))
+		fromOrTo = n
 	}
 
-	return res, nil
+	if err := sqlitex.Exec(conn, q, fn, id, fromOrTo, fromOrTo, fromOrToID, params.Limit+1); err != nil {
+		return res, hasMore, fmt.Errorf("sql.GetDeweyPublications(%q): %w", id, err)
+	}
+
+	// We try to fetch one more that requested, so that we know if there
+	// are more results to be had.
+	if len(res) > params.Limit {
+		hasMore = true
+		res = res[:params.Limit]
+	}
+
+	if params.To != "" {
+		// reverse res
+		for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
+			res[i], res[j] = res[j], res[i]
+		}
+	}
+
+	return res, hasMore, nil
 }
 
 func GetDeweyParents(conn *sqlite.Conn, id string) ([][2]string, error) {

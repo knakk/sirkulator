@@ -44,7 +44,7 @@ func (tmpl *ViewDeweyPartsOf) Render(ctx context.Context, w io.Writer) {
     HasMore=tmpl.HasMore
     PrevLabel=l.Translate("Previous page")
     NextLabel=l.Translate("Next page")
-    Target=fmt.Sprintf("/metadata/dewey/%s/partsof", tmpl.ID) >
+    Target=fmt.Sprintf("/metadata/dewey/%s/partsof?", tmpl.ID) >
 
     <tbody>
         <% for _, p := range tmpl.PartsOf { %>

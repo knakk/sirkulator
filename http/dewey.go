@@ -121,22 +121,35 @@ func (s *Server) viewDeweyPublications(w http.ResponseWriter, r *http.Request) {
 	}
 	defer s.db.Put(conn)
 
-	/*limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 	if err != nil {
 		limit = 10 // default size
-	}*/
+	}
 
 	id := chi.URLParam(r, "id")
-	inclSub := r.URL.Query().Get("include_subdewey") != ""
 
-	publications, err := sql.GetDeweyPublications(conn, id, inclSub)
+	params := sql.DeweyPublicationsParams{
+		InclSub: r.URL.Query().Get("include_subdewey") != "",
+		From:    r.URL.Query().Get("from"),
+		FromID:  r.URL.Query().Get("from_id"),
+		To:      r.URL.Query().Get("to"),
+		ToID:    r.URL.Query().Get("to_id"),
+		SortBy:  r.URL.Query().Get("sort_by"),
+		SortDir: r.URL.Query().Get("sort_dir"),
+		Limit:   limit,
+	}
+
+	publications, hasMore, err := sql.GetDeweyPublications(conn, id, params)
 	if err != nil {
 		ServerError(w, err)
 		return
 	}
 
 	tmpl := html.ViewDeweyPublications{
+		ID:           id,
+		HasMore:      hasMore,
 		Publications: publications,
+		Params:       params,
 	}
 	tmpl.Render(r.Context(), w)
 }

@@ -5,39 +5,168 @@ package html
 import (
     "strings"
     "sort"
+
+    "github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/sql"
+
 )
 
 
 type ViewDeweyPublications struct {
-    ID       string
-    Publications  [][4]string
+    ID           string
+    Params       sql.DeweyPublicationsParams
+    HasMore      bool
+    Publications [][4]string
 }
 
-func splitAndSort(s string) string {
-    t := strings.Split(s, ", ")
-    sort.Strings(t)
-    return strings.Join(t, "<br/>")
+func getLastSortBy(rows [][4]string, sortBy string) string {
+    if len(rows) == 0 {
+        return ""
+    }
+
+    var n int
+    switch sortBy {
+        case "label":
+            n = 1
+        case "year":
+            n = 2
+        case "dewey":
+            n = 3
+        default:
+            // n = 0
+    }
+
+    if len(rows[len(rows)-1]) < n {
+        return ""
+    }
+
+    return rows[len(rows)-1][n]
 }
 
+// [4]string{id, label, year, dewey}
+func getFirstSortBy(rows [][4]string, sortBy string) string {
+    if len(rows) == 0 {
+        return ""
+    }
+
+    var n int
+    switch sortBy {
+        case "label":
+            n = 1
+        case "year":
+            n = 2
+        case "dewey":
+            n = 3
+        default:
+            // n = 0
+    }
+
+    if len(rows[0]) < n {
+        return ""
+    }
+
+    return rows[0][n]
+}
+
+func sortDirFor(v, currentSortBy, currentDir string) string {
+    if v == currentSortBy {
+        if currentDir == "desc" {
+            return "asc"
+        }
+        return "desc"
+    }
+    return currentDir
+}
 
 func (tmpl *ViewDeweyPublications) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+    params := tmpl.Params
+    extraParams := "?"
+    if params.InclSub {
+        extraParams = "?include_subdewey=on&"
+    }
+
 
 %>
 
-    <% for _, p := range tmpl.Publications { %>
+<ego:TablePaginated
+    ID="dewey-publications"
+    Class="dewey-publications"
+    Limit=10
+    SortBy=params.SortBy
+    SortDir=params.SortDir
+    Last=getLastSortBy(tmpl.Publications, params.SortBy)
+    LastID=getLastSortBy(tmpl.Publications, "id")
+    First=getFirstSortBy(tmpl.Publications, params.SortBy)
+    FirstID=getFirstSortBy(tmpl.Publications, "id")
+    From=params.From
+    FromID=params.FromID
+    To=params.To
+    ToID=params.ToID
+    HasMore=tmpl.HasMore
+    PrevLabel=l.Translate("Previous page")
+    NextLabel=l.Translate("Next page")
+    Target=fmt.Sprintf("/metadata/dewey/%s/publications%s", tmpl.ID, extraParams) >
+
+    <thead>
         <tr>
-            <td><%= p[2] %></td>
-            <td><a href="/metadata/publication/<%= p[0] %>"><%= p[1] %></a></td>
-            <td>
-                <%
-                    numbers :=  strings.Split(p[3], ", ")
-                    sort.Strings(numbers)
-                %>
-                <% for _, n := range numbers { %>
-                    <a href="/metadata/dewey/<%= n %>"><%= n %></a><br/>
-                <% } %>
-            </td>
+            <th
+                class="clickable sortable"
+                style="width: 20%"
+                hx-get="/metadata/dewey/<%= tmpl.ID %>/publications"
+                hx-target="#dewey-publications"
+                hx-vals='{"sort_by": "dewey", "sort_dir": "<%= sortDirFor("dewey", params.SortBy, params.SortDir) %>"}'
+                hx-include="[name='include_subdewey']" >
+                <%= l.Translate("Dewey number") %>
+            </th>
+            <th
+                class="clickable sortable"
+                style="width: 80%"
+                hx-get="/metadata/dewey/<%= tmpl.ID %>/publications"
+                hx-target="#dewey-publications"
+                hx-vals='{"sort_by": "label", "sort_dir": "<%= sortDirFor("label", params.SortBy, params.SortDir) %>"}'
+                hx-include="[name='include_subdewey']" >
+                <%= l.Translate("Publication") %>
+            </th>
+            <th
+                class="clickable sortable"
+                style="width: 20%"
+                hx-get="/metadata/dewey/<%= tmpl.ID %>/publications"
+                hx-target="#dewey-publications"
+                hx-vals='{"sort_by": "year", "sort_dir": "<%= sortDirFor("year", params.SortBy, params.SortDir) %>"}'
+                hx-include="[name='include_subdewey']" >
+                <%= l.Translate("Year") %>
+            </th>
         </tr>
-    <% } %>
+    </thead>
+    <tbody>
+        <% for _, p := range tmpl.Publications { %>
+            <tr>
+                <td>
+                    <%
+                        numbers :=  strings.Split(p[3], ", ")
+                        if params.SortDir == "asc" {
+                            sort.Strings(numbers)
+                        } else {
+                            sort.Reverse(sort.StringSlice(numbers))
+                        }
+                    %>
+                    <% for _, n := range numbers { %>
+                        <% if n == tmpl.ID { %>
+                            <%= n %><br/>
+                        <% } else { %>
+                            <a href="/metadata/dewey/<%= n %>"><%= n %></a><br/>
+                        <% } %>
+                    <% } %>
+                </td>
+                <td>
+                    <a href="/metadata/publication/<%= p[0] %>"><%= p[1] %></a>
+                </td>
+                <td><%= p[2] %></td>
+            </tr>
+        <% } %>
+    </tbody>
+
+</ego:TablePaginated>
 
 <% } %>
