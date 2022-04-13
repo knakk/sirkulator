@@ -3,6 +3,7 @@ package html
 
 import (
     "strings"
+    "time"
 
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/internal/localizer"
@@ -12,6 +13,7 @@ type PublisherForm struct {
     Publisher *sirkulator.Publisher
     Localizer localizer.Localizer
     UpdatedAt int64
+    SaveMessage string
 }
 
 
@@ -54,12 +56,12 @@ func (form *PublisherForm) Render(ctx context.Context, w io.Writer) {
     </fieldset>
 
     <fieldset>
-        <legend><%= l.Translate("Year of activity") %></legend>
+        <legend><%= l.Translate("Years of activity") %></legend>
 
         <ego:InputString
             ID="year_range.from"
             Value=string(publisher.YearRange.From)
-            Label=l.Translate("Founded")
+            Label=l.Translate("Established")
             Validation=`-?\d{1,4}`
             Size="5"
             ValidationMsg=l.Translate("Year must be a 1-4 digit number. Negative numbers signify BCE.") />
@@ -67,7 +69,7 @@ func (form *PublisherForm) Render(ctx context.Context, w io.Writer) {
         <ego:InputString
             ID="year_range.to"
             Value=string(publisher.YearRange.To)
-            Label=l.Translate("Ended")
+            Label=l.Translate("Discontinued")
             Validation=`-?\d{1,4}`
             Size="5"
             ValidationMsg=l.Translate("Year must be a 1-4 digit number. Negative numbers signify BCE.") />
@@ -80,4 +82,15 @@ func (form *PublisherForm) Render(ctx context.Context, w io.Writer) {
     </fieldset>
 
 </form>
+<% if form.SaveMessage != "" { %>
+    <span id="resource-updated" hx-swap-oob="true">
+        <%= time.Unix(form.UpdatedAt, 0).Local().Format("2006-01-02") %>
+    </span>
+    <div id="save-messages" hx-swap-oob="afterbegin">
+        <div>
+            <%= time.Now().Local().Format("15:04")+" " %>
+            <%== form.SaveMessage %>
+        </div>
+    </div>
+<% } %>
 <% } %>

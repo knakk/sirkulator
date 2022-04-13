@@ -27,8 +27,11 @@ func (tmpl *PublisherTemplate) Render(ctx context.Context, w io.Writer) {
             hx-include="#publisher-form">
             Lagre
         </button>
-        <p class="error" id="save-error-message"></p>
-        <p id="save-message"></p>
+        <div class="resource-timestamps">
+            <%= l.Translate("Created") %>: <%= tmpl.Resource.CreatedAt.Format("2006-01-02") %><br/>
+            <%= l.Translate("Updated") %>: <span id="resource-updated"><%= tmpl.Resource.UpdatedAt.Format("2006-01-02")  %></span>
+        </div>
+        <div id="save-messages" class="save-messages"></div>
     </div>
     <details open>
         <summary>

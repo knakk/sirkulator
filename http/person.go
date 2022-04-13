@@ -1,9 +1,11 @@
 package http
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -58,19 +60,7 @@ func (s *Server) savePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check that resource hasn't been updated by some other process
 	l, _ := r.Context().Value("localizer").(localizer.Localizer)
-	if updatedAt := r.PostForm.Get("updated_at"); updatedAt != strconv.Itoa(int(res.UpdatedAt.Unix())) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.WriteHeader(http.StatusConflict)
-		w.Write([]byte(l.Translate("Not saved. Resource has been updated by some else.")))
-		w.Write([]byte(`<a href="/metadata/person/` + id + `" target="_blank">`))
-		w.Write([]byte(l.Translate("Open this page in a new tab")))
-		w.Write([]byte("</a> "))
-		w.Write([]byte(l.Translate("to verify and redo your changes.")))
-		return
-	}
 
 	// Validate input
 	valid := true
@@ -102,11 +92,12 @@ func (s *Server) savePerson(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !valid {
-		w.WriteHeader(http.StatusBadRequest)
+		//w.WriteHeader(http.StatusBadRequest)
 		tmpl := html.PersonForm{
-			Person:    &newP,
-			UpdatedAt: res.UpdatedAt.Unix(),
-			Localizer: l,
+			Person:      &newP,
+			UpdatedAt:   res.UpdatedAt.Unix(),
+			Localizer:   l,
+			SaveMessage: l.Translate("Validation failed. Check input fields."),
 		}
 		tmpl.Render(r.Context(), w)
 		return
@@ -114,7 +105,37 @@ func (s *Server) savePerson(w http.ResponseWriter, r *http.Request) {
 
 	if !changed {
 		// No changes to resource, no point in saving to DB
-		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+		tmpl := html.PersonForm{
+			Person:      &newP,
+			UpdatedAt:   res.UpdatedAt.Unix(),
+			Localizer:   l,
+			SaveMessage: l.Translate("No changes."),
+		}
+		tmpl.Render(r.Context(), w)
+		return
+	}
+
+	// Check that resource hasn't been updated by some other process
+	updatedAtStr := r.PostForm.Get("updated_at")
+	updatedAt, err := strconv.ParseInt(updatedAtStr, 10, 0)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	if updatedAt != res.UpdatedAt.Unix() {
+		var b bytes.Buffer
+		io.WriteString(&b, l.Translate("Not saved. Resource has been updated by some else."))
+		io.WriteString(&b, `<a href="/metadata/person/`+id+`" target="_blank">`)
+		io.WriteString(&b, l.Translate("Open this page in a new tab"))
+		io.WriteString(&b, "</a> ")
+		io.WriteString(&b, l.Translate("to verify and redo your changes."))
+		tmpl := html.PersonForm{
+			Person:      &newP,
+			UpdatedAt:   updatedAt,
+			Localizer:   l,
+			SaveMessage: b.String(),
+		}
+		tmpl.Render(r.Context(), w)
 		return
 	}
 
@@ -138,9 +159,10 @@ func (s *Server) savePerson(w http.ResponseWriter, r *http.Request) {
 	go s.indexResources([]sirkulator.Resource{res})
 
 	tmpl := html.PersonForm{
-		Person:    res.Data.(*sirkulator.Person),
-		UpdatedAt: res.UpdatedAt.Unix(),
-		Localizer: l,
+		Person:      res.Data.(*sirkulator.Person),
+		UpdatedAt:   res.UpdatedAt.Unix(),
+		Localizer:   l,
+		SaveMessage: l.Translate("OK, saved."),
 	}
 	tmpl.Render(r.Context(), w)
 }

@@ -140,6 +140,11 @@ tr.review { background: #eee }
 
 th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
 
+/* resources */
+.resource-timestamps { font-size: smaller; padding: 1rem 0; border-bottom: 1px solid var(--textcolor)}
+.save-messages { font-size: smaller; }
+.save-messages div { margin-bottom: 0.2rem }
+
 /* person page */
 
 .sticky-top-left { position: sticky; top: 1rem; float: left; margin-left: -11rem; text-align: right; width: 10rem }
