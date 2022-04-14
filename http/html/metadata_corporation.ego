@@ -6,7 +6,6 @@ import (
 
     "github.com/knakk/sirkulator"
     "github.com/knakk/sirkulator/internal/localizer"
-    "github.com/knakk/sirkulator/vocab"
 )
 
 type CorporationTemplate struct {
@@ -44,25 +43,7 @@ func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
                     UpdatedAt=tmpl.Resource.UpdatedAt.Unix() />
             </div>
             <div class="column pad">
-                <h4><%= l.Translate("Identificators and links") %></h4>
-                <p><br/></p>
-                <table>
-                    <% for _, link := range tmpl.Resource.Links {
-                        id := vocab.ParseIdentifier(link[0], link[1])
-                        %>
-                        <tr>
-                            <td><%= id.Label %></td>
-                            <td>
-                                <% if id.URL != "" { %>
-                                    <a href="<%= id.URL %>"><%= id.Value %></a>
-                                <% } else { %>
-                                    <%= id.Value %>
-                                <% } %>
-                            </td>
-                        </tr>
-                    <% } %>
-                </table>
-
+                <% ViewIdentifiers(tmpl.Resource.Links).Render(ctx, w) %>
             </div>
         </div>
     </details>

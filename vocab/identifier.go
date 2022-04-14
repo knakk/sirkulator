@@ -19,7 +19,7 @@ var identifiers = map[string][2]string{
 	"worldcat":      {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
 	"nb/isbnforlag": {"Norske forlagsadresser", "https://nb.no/isbnforlag/record/%s"},
 	"www":           {"WWW", "%s"},
-	"isbn/prefix":   {"ISBN prefix", ""},
+	"isbn/prefix":   {"ISBN prefiks", ""},
 	"nb/free":       {"Nasjonalbiblioteket (i det fri)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
 	"nb/norway":     {"Nasjonalbiblioteket (kun fra Norge)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
 	"nb/restricted": {"Nasjonalbiblioteket (begrenset)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},

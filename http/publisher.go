@@ -88,6 +88,7 @@ func (s *Server) savePublisher(w http.ResponseWriter, r *http.Request) {
 	if newP.Name == "" {
 		valid = false
 	}
+	newP.Notes = splitAndClean(r.PostFormValue("notes"))
 	newP.Description = strings.TrimSpace(r.PostFormValue("description"))
 	newP.NameVariations = splitAndClean(r.PostFormValue("name_variations"))
 	newP.YearRange.From = json.Number(strings.TrimSpace(r.PostFormValue("year_range.from")))

@@ -76,7 +76,7 @@ func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirku
 		return res, sirkulator.ErrNotFound
 	}
 
-	const qLinks = "SELECT type, id FROM link WHERE resource_id=?"
+	const qLinks = "SELECT type, id FROM link WHERE resource_id=? ORDER BY type"
 	if err := sqlitex.Exec(conn, qLinks, readLinks(&res), id); err != nil {
 		return res, fmt.Errorf("sql.GetResource(%s, %s): %w", t.String(), id, err)
 	}

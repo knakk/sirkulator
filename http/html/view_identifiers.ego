@@ -1,0 +1,37 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/vocab"
+)
+
+type ViewIdentifiers [][2]string
+
+func (v ViewIdentifiers) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%>
+<h4><%= l.Translate("Identificators and links") %></h4>
+<p><br/></p>
+<table>
+	<%
+		for i, link := range v {
+		id := vocab.ParseIdentifier(link[0], link[1])
+		%>
+		<tr>
+			<td>
+				<% if i == 0 || vocab.ParseIdentifier(v[i-1][0], v[i-1][1]).Label != id.Label { %>
+					<%= id.Label %>
+				<% } %>
+			</td>
+			<td>
+				<% if id.URL != "" { %>
+					<a href="<%= id.URL %>"><%= id.Value %></a>
+				<% } else { %>
+					<%= id.Value %>
+				<% } %>
+			</td>
+		</tr>
+	<% } %>
+</table>
+<% } %>
