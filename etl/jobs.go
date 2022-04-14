@@ -134,14 +134,13 @@ func nbSearch(conn *sqlite.Conn, resourceID, bibsysID string, c, n *int) error {
 		return nil
 	}
 
-	urnID := strings.TrimPrefix(res.Embedded.Items[0].Metadata.Identifiers.Urn, "URN:NBN:no-nb_digibok_")
-	if urnID == "" {
+	if res.Embedded.Items[0].Metadata.Identifiers.Urn == "" {
 		return nil
 	}
 
 	const q = `INSERT OR IGNORE INTO link (resource_id, type, id) VALUES (?, ?, ?)`
 
-	if err := sqlitex.Exec(conn, q, nil, resourceID, linkType, urnID); err != nil {
+	if err := sqlitex.Exec(conn, q, nil, resourceID, linkType, res.Embedded.Items[0].Metadata.Identifiers.Urn); err != nil {
 		return err
 	}
 	*n++

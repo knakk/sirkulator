@@ -20,9 +20,9 @@ var identifiers = map[string][2]string{
 	"nb/isbnforlag": {"Norske forlagsadresser", "https://nb.no/isbnforlag/record/%s"},
 	"www":           {"WWW", "%s"},
 	"isbn/prefix":   {"ISBN prefiks", ""},
-	"nb/free":       {"Nasjonalbiblioteket (i det fri)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
-	"nb/norway":     {"Nasjonalbiblioteket (kun fra Norge)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
-	"nb/restricted": {"Nasjonalbiblioteket (begrenset)", "https://urn.nb.no/URN:NBN:no-nb_digibok_%s"},
+	"nb/free":       {"Nasjonalbiblioteket (i det fri)", "https://urn.nb.no/%s"},
+	"nb/norway":     {"Nasjonalbiblioteket (kun fra Norge)", "https://urn.nb.no/%s"},
+	"nb/restricted": {"Nasjonalbiblioteket (begrenset)", "https://urn.nb.no/%s"},
 
 	// TODO candidates:
 	//discogs-artist  https://www.discogs.com/artist/32198
