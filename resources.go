@@ -331,10 +331,9 @@ type PublisherPublication struct {
 
 type Publication struct {
 	// Title and publishing info
-	Title     string   `json:"title"`
-	Subtitle  string   `json:"subtitle,omitempty"`
-	Publisher string   `json:"publisher,omitempty"`
-	Series    []string `json:"series"`
+	Title    string   `json:"title"`
+	Subtitle string   `json:"subtitle,omitempty"`
+	Series   []string `json:"series"`
 	// Note, Year|YearFirst=0 means we cannot have a publication published in year 0,
 	// assumed this to be not a practical problem, not a lot of known classics published that year (TODO any?)
 	// https://en.wikipedia.org/wiki/Ancient_literature

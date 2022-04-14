@@ -329,8 +329,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Nonfiction: true,
 						Year:       "2021",
 						//YearFirst:  2021, TODO later
-						Publisher: "Aschehoug",
-						NumPages:  "491",
+						NumPages: "491",
 					},
 				},
 				{
@@ -622,10 +621,9 @@ func TestIngestOAIRecord(t *testing.T) {
 						Language:         "iso6393/nob",
 						LanguageOriginal: "iso6393/swe",
 						//GenreForms: []string{"Romaner"}, // TODO
-						Fiction:   true,
-						Year:      "1994",
-						Publisher: "Aschehoug",
-						NumPages:  "446",
+						Fiction:  true,
+						Year:     "1994",
+						NumPages: "446",
 					},
 				},
 				{
@@ -892,10 +890,9 @@ func TestIngestOAIRecord(t *testing.T) {
 						{"bibsys/pub", "999921296219502201"},
 					},
 					Data: sirkulator.Publication{
-						Title:     "Planter og tradisjon",
-						Subtitle:  "floraen i levende tale og tradisjon i Norge 1925-1973",
-						Publisher: "Norges sopp- og nyttevekstforbund",
-						Year:      "2021",
+						Title:    "Planter og tradisjon",
+						Subtitle: "floraen i levende tale og tradisjon i Norge 1925-1973",
+						Year:     "2021",
 						//YearFirst: 1974 // TODO from note field 500
 						Language:   "iso6393/nob",
 						GenreForms: []string{"Populærvitenskap"},
@@ -1167,10 +1164,9 @@ func TestIngestOAIRecord(t *testing.T) {
 						{"bibsys/pub", "999921641921002201"},
 					},
 					Data: sirkulator.Publication{
-						Title:     "Deichman Bjørvika",
-						Subtitle:  "Lundhagem og Atelier Oslo arkitekter",
-						Publisher: "Pax forlag",
-						Year:      "2022",
+						Title:    "Deichman Bjørvika",
+						Subtitle: "Lundhagem og Atelier Oslo arkitekter",
+						Year:     "2022",
 						//YearFirst: 2022
 						Language:   "iso6393/nob",
 						Nonfiction: true,
@@ -1499,7 +1495,6 @@ func TestIngestOAIRecord(t *testing.T) {
 					},
 					Data: sirkulator.Publication{
 						Title:      "Når noen klikker i vinkel",
-						Publisher:  "Gyldendal",
 						Series:     []string{"Søstrene Proxy blogger om verden"},
 						Year:       "2022",
 						Language:   "iso6393/nob",
@@ -1735,7 +1730,6 @@ func TestIngestOAIRecord(t *testing.T) {
 					},
 					Data: sirkulator.Publication{
 						Title:      "Den glemte byen",
-						Publisher:  "Cappelen Damm",
 						Series:     []string{"Ulvegutten Tal", "Min første leseløve"},
 						Year:       "2017",
 						Language:   "iso6393/nob",

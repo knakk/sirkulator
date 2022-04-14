@@ -523,13 +523,16 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 	}
 }
 
-func unmappedPublishedBy(id string, rs []sirkulator.Relation) bool {
+func unmappedPublishedBy(id string, rs []sirkulator.Relation) string {
 	for _, rel := range rs {
 		if rel.FromID == id && rel.Type == vocab.RelationPublishedBy.String() && rel.ToID == "" {
-			return true
+			label, ok := rel.Data["label"].(string)
+			if ok {
+				return label
+			}
 		}
 	}
-	return false
+	return ""
 }
 
 // Ingest will merge the ingestion with locally matching resources before storing the data to db
@@ -552,7 +555,8 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 		// if we find any matches.
 
 		res := data.Resources[i]
-		if res.Type == sirkulator.TypePublication && unmappedPublishedBy(res.ID, data.Relations) {
+
+		if publisher := unmappedPublishedBy(res.ID, data.Relations); publisher != "" {
 			// Special handling of published_by relation and Publisher resource
 			var isbnStr string
 			for _, link := range res.Links {
@@ -580,7 +584,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 					continue
 				}
 
-				publisher, existing, err := ig.localPublisher(ctx, res.Data.(sirkulator.Publication).Publisher, prefix)
+				publisher, existing, err := ig.localPublisher(ctx, publisher, prefix)
 				if err != nil {
 					continue
 				}

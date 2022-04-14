@@ -40,11 +40,6 @@ func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
             Label=l.Translate("Subtitle") />
 
         <ego:InputString
-            ID="publisher"
-            Value=pub.Publisher
-            Label=l.Translate("Publisher") />
-
-        <ego:InputString
             ID="year"
             Value=string(pub.Year)
             Label=l.Translate("Year")

@@ -256,13 +256,13 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		f, ok = rec.DataFieldAt("264")
 	}
 	// TODO handle multiple 260/264 fields
+	var publisher string
 	if ok {
-		if publisher := f.ValueAt("b"); publisher != "" {
-			p.Publisher = publisher // TODO remove this? Relation 'published_by' should suffice
+		if publisher = f.ValueAt("b"); publisher != "" {
 			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
 				Type:   "published_by",
-				Data:   map[string]any{"label": p.Publisher},
+				Data:   map[string]any{"label": publisher},
 			})
 		}
 		if year := parseYear(f.ValueAt("c")); year != "" {
@@ -281,8 +281,8 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 					data["number"] = n
 				}
 			}
-			if p.Publisher != "" {
-				data["publisher"] = p.Publisher
+			if publisher != "" {
+				data["publisher"] = publisher
 			}
 			relations = append(relations, sirkulator.Relation{
 				FromID: pID,
