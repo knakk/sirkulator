@@ -172,34 +172,24 @@
             "translation": "Utgivelser klassifisert med"
         },
         {
+            "id": "include narrower numbers",
+            "message": "include narrower numbers",
+            "translation": "inkluder underordnede numre"
+        },
+        {
             "id": "Already in catalogue",
             "message": "Already in catalogue",
             "translation": "Allerede i katalogen"
         },
         {
-            "id": "Resource not found.",
-            "message": "Resource not found.",
-            "translation": "Ressurs ikke funnet"
+            "id": "Created",
+            "message": "Created",
+            "translation": "Opprettet"
         },
         {
-            "id": "Validation failed. Check input fields.",
-            "message": "Validation failed. Check input fields.",
-            "translation": "Validering feilet. Sjekk inputfeltene."
-        },
-        {
-            "id": "OK, saved.",
-            "message": "OK, saved.",
-            "translation": "OK, lagret."
-        },
-        {
-            "id": "No changes.",
-            "message": "No changes.",
-            "translation": "Ingen endringer"
-        },
-        {
-            "id": "Network error. Server unreachable. Check your connection",
-            "message": "Network error. Server unreachable. Check your connection",
-            "translation": "Nettverksfeil. Kan ikke nå tjener. Sjekk forbindelsen."
+            "id": "Updated",
+            "message": "Updated",
+            "translation": "Endret"
         },
         {
             "id": "Cover-image",
@@ -217,19 +207,9 @@
             "translation": "Bidrag og relasjoner"
         },
         {
-            "id": "Role/relation",
-            "message": "Role/relation",
-            "translation": "Rolle/relasjon"
-        },
-        {
-            "id": "Agent",
-            "message": "Agent",
-            "translation": "Aktør"
-        },
-        {
-            "id": "Search and connect to resource",
-            "message": "Search and connect to resource",
-            "translation": "Søk og koble til ressurs"
+            "id": "Publications",
+            "message": "Publications",
+            "translation": "Utgivelser"
         },
         {
             "id": "{Total} hits ({Time})",
@@ -323,6 +303,11 @@
             "id": "Next page",
             "message": "Next page",
             "translation": "Neste side"
+        },
+        {
+            "id": "Dewey number",
+            "message": "Dewey number",
+            "translation": "Deweynummer"
         },
         {
             "id": "Started (duration)",
@@ -460,6 +445,56 @@
             "translation": "Må være et heltall"
         },
         {
+            "id": "Role/relation",
+            "message": "Role/relation",
+            "translation": "Rolle/relasjon"
+        },
+        {
+            "id": "Agent",
+            "message": "Agent",
+            "translation": "Aktør"
+        },
+        {
+            "id": "Search and connect to resource",
+            "message": "Search and connect to resource",
+            "translation": "Søk og koble til ressurs"
+        },
+        {
+            "id": "Are you sure?",
+            "message": "Are you sure?",
+            "translation": "Er du sikker?"
+        },
+        {
+            "id": "Delete",
+            "message": "Delete",
+            "translation": "Slett"
+        },
+        {
+            "id": "About",
+            "message": "About",
+            "translation": "Om"
+        },
+        {
+            "id": "Notes",
+            "message": "Notes",
+            "translation": "Noter"
+        },
+        {
+            "id": "Years of activity",
+            "message": "Years of activity",
+            "translation": "Aktiv fra-til (år)"
+        },
+        {
+            "id": "Established",
+            "message": "Established",
+            "translation": "Grunnlagt"
+        },
+        {
+            "id": "Discontinued",
+            "message": "Discontinued",
+            "translation": "Opphørt"
+        },
+        {
             "id": "Resource",
             "message": "Resource",
             "translation": "Ressurs"
@@ -508,11 +543,6 @@
             "id": "Schedules",
             "message": "Schedules",
             "translation": "Planlagte kjøringer"
-        },
-        {
-            "id": "Delete",
-            "message": "Delete",
-            "translation": "Slett"
         }
     ]
 }

@@ -236,6 +236,13 @@
             "fuzzy": true
         },
         {
+            "id": "include narrower numbers",
+            "message": "include narrower numbers",
+            "translation": "include narrower numbers",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Already in catalogue",
             "message": "Already in catalogue",
             "translation": "Already in catalogue",
@@ -243,37 +250,16 @@
             "fuzzy": true
         },
         {
-            "id": "Resource not found.",
-            "message": "Resource not found.",
-            "translation": "Resource not found.",
+            "id": "Created",
+            "message": "Created",
+            "translation": "Created",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Validation failed. Check input fields.",
-            "message": "Validation failed. Check input fields.",
-            "translation": "Validation failed. Check input fields.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "OK, saved.",
-            "message": "OK, saved.",
-            "translation": "OK, saved.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "No changes.",
-            "message": "No changes.",
-            "translation": "No changes.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Network error. Server unreachable. Check your connection",
-            "message": "Network error. Server unreachable. Check your connection",
-            "translation": "Network error. Server unreachable. Check your connection",
+            "id": "Updated",
+            "message": "Updated",
+            "translation": "Updated",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -299,23 +285,9 @@
             "fuzzy": true
         },
         {
-            "id": "Role/relation",
-            "message": "Role/relation",
-            "translation": "Role/relation",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Agent",
-            "message": "Agent",
-            "translation": "Agent",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Search and connect to resource",
-            "message": "Search and connect to resource",
-            "translation": "Search and connect to resource",
+            "id": "Publications",
+            "message": "Publications",
+            "translation": "Publications",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -439,6 +411,13 @@
             "id": "Next page",
             "message": "Next page",
             "translation": "Next page",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Dewey number",
+            "message": "Dewey number",
+            "translation": "Dewey number",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -632,6 +611,76 @@
             "fuzzy": true
         },
         {
+            "id": "Role/relation",
+            "message": "Role/relation",
+            "translation": "Role/relation",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Agent",
+            "message": "Agent",
+            "translation": "Agent",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Search and connect to resource",
+            "message": "Search and connect to resource",
+            "translation": "Search and connect to resource",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Are you sure?",
+            "message": "Are you sure?",
+            "translation": "Are you sure?",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Delete",
+            "message": "Delete",
+            "translation": "Delete",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "About",
+            "message": "About",
+            "translation": "About",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Notes",
+            "message": "Notes",
+            "translation": "Notes",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Years of activity",
+            "message": "Years of activity",
+            "translation": "Years of activity",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Established",
+            "message": "Established",
+            "translation": "Established",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Discontinued",
+            "message": "Discontinued",
+            "translation": "Discontinued",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Resource",
             "message": "Resource",
             "translation": "Resource",
@@ -698,13 +747,6 @@
             "id": "Schedules",
             "message": "Schedules",
             "translation": "Schedules",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Delete",
-            "message": "Delete",
-            "translation": "Delete",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }
