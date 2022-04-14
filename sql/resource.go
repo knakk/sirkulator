@@ -604,8 +604,8 @@ func GetPublcationRelations(conn *sqlite.Conn, id string) ([]sirkulator.Relation
         rel.type,
         rel.to_id,
         rel.data,
-        res.type as res_type,
-        res.label as res_label
+        res.type AS res_type,
+        IFNULL(json_extract(rel.data, '$.label'), res.label) AS res_label
     FROM
         relation rel
         LEFT JOIN resource res ON (rel.to_id=res.id)
