@@ -476,6 +476,20 @@ classLoop:
 		}
 	}
 
+	// Check if any unmapped relations have a match in agents
+	for i, rel := range relations {
+		if rel.ToID != "" {
+			continue
+		}
+		if label, ok := rel.Data["label"].(string); ok {
+			for _, agent := range agents {
+				if strings.Contains(agent.Label, label) {
+					relations[i].ToID = agent.ID
+				}
+			}
+		}
+	}
+
 	ing.Resources = append(ing.Resources, res)
 	ing.Resources = append(ing.Resources, agents...)
 	ing.Relations = relations

@@ -523,6 +523,15 @@ func (ig *Ingestor) downloadImages(ctx context.Context, files []FileFetch) {
 	}
 }
 
+func unmappedPublishedBy(id string, rs []sirkulator.Relation) bool {
+	for _, rel := range rs {
+		if rel.FromID == id && rel.Type == vocab.RelationPublishedBy.String() && rel.ToID == "" {
+			return true
+		}
+	}
+	return false
+}
+
 // Ingest will merge the ingestion with locally matching resources before storing the data to db
 // and trigger indexing of documents.
 // if persist=false, nothing is persisted, and the returnet results represents a preview of which resources
@@ -543,7 +552,7 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 		// if we find any matches.
 
 		res := data.Resources[i]
-		if res.Type == sirkulator.TypePublication {
+		if res.Type == sirkulator.TypePublication && unmappedPublishedBy(res.ID, data.Relations) {
 			// Special handling of published_by relation and Publisher resource
 			var isbnStr string
 			for _, link := range res.Links {
@@ -554,26 +563,38 @@ func (ig *Ingestor) Ingest(ctx context.Context, data Ingestion, persist bool) ([
 					break
 				}
 			}
+
 			if isbnStr != "" {
 				isbnNr, err := isbn.Parse(isbnStr)
+				if err != nil {
+					continue
+				}
 				prefix := fmt.Sprintf("%s-%s-%s", isbnNr.Prefix, isbnNr.Group, isbnNr.Publisher)
 				if isbnNr.Prefix == "" {
 					prefix = prefix[1:] // strip leading "-"
 				}
-				if err == nil {
-					publisher, existing, err := ig.localPublisher(ctx, res.Data.(sirkulator.Publication).Publisher, prefix)
-					if err == nil {
-						if !existing {
-							// New Publisher imported from oai record
-							extraResources = append(extraResources, publisher)
-						}
-						// Peplace 'published_by' relation.to_id with publisher.ID
-						for j, rel := range data.Relations {
-							if rel.FromID == res.ID && rel.Type == vocab.RelationPublishedBy.String() {
-								rel.ToID = publisher.ID
-								data.Relations[j] = rel
-							}
-						}
+
+				if prefix == "978-82-303" || prefix == "82-303" {
+					// "Shared" publisher with over 15 0000 different persons/organization,
+					// typically with just one or very few publications each.
+					continue
+				}
+
+				publisher, existing, err := ig.localPublisher(ctx, res.Data.(sirkulator.Publication).Publisher, prefix)
+				if err != nil {
+					continue
+				}
+
+				if !existing {
+					// New Publisher imported from oai record
+					extraResources = append(extraResources, publisher)
+				}
+
+				// Peplace 'published_by' relation.to_id with publisher.ID
+				for j, rel := range data.Relations {
+					if rel.FromID == res.ID && rel.Type == vocab.RelationPublishedBy.String() {
+						rel.ToID = publisher.ID
+						data.Relations[j] = rel
 					}
 				}
 			}
