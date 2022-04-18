@@ -94,6 +94,8 @@ func NewServer(ctx context.Context, assetsDir string, db *sqlitex.Pool, idx *sea
 	s.runner.Register(&oai.HarvestPublishersJob{DB: db}) // number of records: ca 18k
 	s.runner.Register(&etl.HarvestNBLinksJob{DB: db})
 	s.runner.Register(&etl.HarvestSNLLinksJob{DB: db})
+	s.runner.Register(&etl.HarvestSNLDescriptions{DB: db})
+	s.runner.Register(&etl.UpdateSNLDescriptions{DB: db})
 
 	if err := s.runner.Start(ctx); err != nil {
 		// TODO consider setting up separatly and pass to NewServer as an argument, like db and idx.

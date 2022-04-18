@@ -53,6 +53,19 @@ CREATE TABLE link (
 
 CREATE INDEX idx_link_id ON link (id);
 
+
+CREATE TABLE resource_text (
+    id          INTEGER PRIMARY KEY,
+    resource_id TEXT REFERENCES resource (id),
+    text        TEXT NOT NULL,
+  --lang        TEXT NOT NULL,               -- en|no
+    format      TEXT NOT NULL DEFAULT 'txt', -- txt|html|md
+    source      TEXT NOT NULL,               -- wp/no|wp/en|snl|local
+    source_url  TEXT,                        -- time.Now().Unix()
+    updated_at  INTEGER NOT NULL,
+    locked      BOOL NOT NULL DEFAULT 0      -- if 1, don't allow automatic update
+);
+
 CREATE TABLE job_run (
     id       INTEGER PRIMARY KEY,
     name     TEXT NOT NULL,

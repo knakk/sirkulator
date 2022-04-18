@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
+	"time"
 
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
@@ -214,6 +216,7 @@ func (h *HarvestSNLLinksJob) Run(ctx context.Context, w io.Writer) error {
 	}
 
 	fmt.Fprintf(w, "Done. Of %d candidates without link to snl.no added %d links.\n", c, n)
+
 	return nil
 }
 
@@ -236,15 +239,183 @@ func snlSearch(conn *sqlite.Conn, repo *sparql.Repo, resourceID, bibsysID string
 	if err != nil {
 		return err
 	}
+
 	if len(res.Bindings()["snl_id"]) != 1 {
 		return nil
 	}
+
 	snlID := res.Bindings()["snl_id"][0].String()
+
 	const q = `INSERT OR IGNORE INTO link (resource_id, type, id) VALUES (?, ?, ?)`
 
 	if err := sqlitex.Exec(conn, q, nil, resourceID, "snl", snlID); err != nil {
 		return err
 	}
+
 	*n++
+
+	return nil
+}
+
+type HarvestSNLDescriptions struct {
+	DB *sqlitex.Pool
+}
+
+func (h *HarvestSNLDescriptions) Name() string {
+	return "harvest_snl_descriptions"
+}
+
+func (h *HarvestSNLDescriptions) Run(ctx context.Context, w io.Writer) error {
+	conn := h.DB.Get(ctx)
+	if conn == nil {
+		return context.Canceled
+	}
+	defer h.DB.Put(conn)
+
+	const q = `
+		SELECT l.resource_id, l.id FROM link l
+			LEFT JOIN resource_text rt ON (rt.resource_id = l.resource_id AND rt.source = 'snl')
+		WHERE l.type='snl' AND rt.id IS NULL
+	`
+
+	c := 0
+	n := 0
+	fn := func(stmt *sqlite.Stmt) error {
+		return snlDescription(conn, stmt.ColumnText(0), stmt.ColumnText(1), &c, &n)
+	}
+
+	if err := sqlitex.Exec(conn, q, fn); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, "Done. Of %d candidates without descriptions from snl.no added %d\n", c, n)
+
+	return nil
+}
+
+type snlSearchResult struct {
+	ID          string `json:"permalink"`
+	Description string `json:"first_two_sentences"`
+}
+
+const snlAPIURL = "https://snl.no/api/v1/search?query="
+
+func snlDescription(conn *sqlite.Conn, resourceID, snlID string, c, n *int) error {
+	*c++
+	snlIDEscaped := url.QueryEscape(snlID)
+	req, err := http.NewRequest(http.MethodGet, snlAPIURL+snlIDEscaped, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err // TODO: annotate
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("querying snl.no/api/v1/search: http status %d", resp.StatusCode)
+	}
+
+	var snlRes []snlSearchResult
+	if err := json.NewDecoder(resp.Body).Decode(&snlRes); err != nil {
+		return err // TODO: annotate
+	}
+	for _, r := range snlRes {
+		if r.ID == snlID || r.ID == snlIDEscaped {
+
+			const q = `
+				INSERT INTO resource_text (resource_id, text, source, source_url, updated_at)
+				VALUES (?, ?, 'snl', ?, ?)
+			`
+
+			if err := sqlitex.Exec(conn, q, nil, resourceID, r.Description, "https://snl.no/"+snlID, time.Now().Unix()); err != nil {
+				return err
+			}
+			*n++
+		}
+	}
+
+	return nil
+}
+
+type UpdateSNLDescriptions struct {
+	DB *sqlitex.Pool
+}
+
+func (u *UpdateSNLDescriptions) Name() string {
+	return "update_snl_descriptions"
+}
+
+func (u *UpdateSNLDescriptions) Run(ctx context.Context, w io.Writer) error {
+	conn := u.DB.Get(ctx)
+	if conn == nil {
+		return context.Canceled
+	}
+	defer u.DB.Put(conn)
+
+	const q = `
+		SELECT l.id, rt.id, rt.text FROM link l
+			LEFT JOIN resource_text rt ON (rt.resource_id = l.resource_id AND rt.source = 'snl')
+		WHERE l.type='snl'
+	`
+
+	c := 0
+	n := 0
+	fn := func(stmt *sqlite.Stmt) error {
+		return snlUpdateDescription(conn, stmt.ColumnText(0), stmt.ColumnInt64(0), stmt.ColumnText(1), &c, &n)
+	}
+
+	if err := sqlitex.Exec(conn, q, fn); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, "Done. Of %d snl descriptions updated %d\n", c, n)
+
+	return nil
+}
+
+func snlUpdateDescription(conn *sqlite.Conn, snlID string, textID int64, text string, c, n *int) error {
+	*c++
+	snlIDEscaped := url.QueryEscape(snlID)
+	req, err := http.NewRequest(http.MethodGet, snlAPIURL+snlIDEscaped, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err // TODO: annotate
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("querying snl.no/api/v1/search: http status %d", resp.StatusCode)
+	}
+
+	var snlRes []snlSearchResult
+	if err := json.NewDecoder(resp.Body).Decode(&snlRes); err != nil {
+		return err // TODO: annotate
+	}
+	for _, r := range snlRes {
+		if r.ID == snlID || r.ID == snlIDEscaped {
+
+			stmt := conn.Prep(`
+				UPDATE resource_text
+					SET text=$text, updated_at=$updated
+				WHERE id=$id AND text != $text
+				RETURNING id
+			`)
+			stmt.SetText("$text", r.Description)
+			stmt.SetInt64("$updated", time.Now().Unix())
+			stmt.SetInt64("$id", textID)
+			if ok, err := stmt.Step(); err != nil {
+				return err // TODO annotate
+			} else if ok {
+				*n++
+			}
+			stmt.Reset()
+		}
+	}
+
 	return nil
 }
