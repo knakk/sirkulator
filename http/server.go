@@ -179,6 +179,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Post("/import", s.importResources) // s.tmplImportResponse ?
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
+			r.Get("/text/{id}", s.viewResourceTexts)
 			r.Get("/corporation/{id}", s.pageCorporation)
 			r.Post("/person/{id}", s.savePerson)
 			r.Get("/person/{id}", s.pagePerson)
@@ -314,6 +315,27 @@ func (s *Server) pageMetadata(w http.ResponseWriter, r *http.Request) {
 			Lang: s.Lang,
 			Path: r.URL.Path,
 		},
+	}
+	tmpl.Render(r.Context(), w)
+}
+
+func (s *Server) viewResourceTexts(w http.ResponseWriter, r *http.Request) {
+	conn := s.db.Get(r.Context())
+	if conn == nil {
+		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		return
+	}
+	defer s.db.Put(conn)
+
+	id := chi.URLParam(r, "id")
+	res, err := sql.GetResourceTexts(conn, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
+	tmpl := html.ViewResourceTexts{
+		Texts: res,
 	}
 	tmpl.Render(r.Context(), w)
 }

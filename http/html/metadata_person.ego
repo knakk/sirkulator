@@ -81,6 +81,17 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
 
     <br/>
 
+    <details>
+        <summary hx-get="/metadata/text/<%= tmpl.Resource.ID %>" hx-swap="outerHTML" hx-target="#resource-texts" hx-trigger="click once">
+            <h3><%= l.Translate("Local and external descriptions") %></h3>
+        </summary>
+        <div class="border pad">
+            <div id="resource-texts"></div>
+        </div>
+    </details>
+
+    <br/>
+
     <details open>
         <summary>
             <h3><%= l.Translate("Publications and contributions") %></h3>

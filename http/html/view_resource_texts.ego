@@ -1,0 +1,26 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/vocab"
+)
+
+type ViewResourceTexts struct {
+    Texts []sirkulator.ResourceText
+}
+
+func (tmpl *ViewResourceTexts) Render(ctx context.Context, w io.Writer) {
+%>
+
+<div id="resource-texts">
+   <% for _, t := range tmpl.Texts { %>
+        <div class="resource-text">
+            <strong><%= vocab.ParseIdentifier(t.Source, "").Label %></strong>
+            <p><%= t.Text %></p>
+            <a href="<%= t.SourceURL %>"><%= t.SourceURL %></a> (<small><%= t.UpdatedAt.Format("2006-01-02") %></small>)
+        </div>
+    <% } %>
+</div>
+
+<% } %>

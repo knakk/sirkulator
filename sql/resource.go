@@ -774,4 +774,36 @@ func UpdateResource(conn *sqlite.Conn, res sirkulator.Resource, label string) (e
 	return nil
 }
 
-//func GetOAIRecord(conn *sqlite.Conn, source,id string) (oai.Record, error) {}
+func GetResourceTexts(conn *sqlite.Conn, id string) ([]sirkulator.ResourceText, error) {
+	var res []sirkulator.ResourceText
+
+	const q = `
+		SELECT
+			id,
+			text,
+			format,
+			source,
+			source_url,
+			updated_at
+		FROM resource_text
+		WHERE resource_id=?
+	`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		res = append(res, sirkulator.ResourceText{
+			ID:        stmt.ColumnInt64(0),
+			Text:      stmt.ColumnText(1),
+			Format:    stmt.ColumnText(2),
+			Source:    stmt.ColumnText(3),
+			SourceURL: stmt.ColumnText(4),
+			UpdatedAt: time.Unix(stmt.ColumnInt64(5), 0),
+		})
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetResourceTexts(%s): %w", id, err)
+	}
+
+	return res, nil
+}

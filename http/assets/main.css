@@ -145,6 +145,8 @@ th.sortable:before { content: '↕'; float: right; margin-right: 1rem; }
 .save-messages { font-size: smaller; }
 .save-messages div { margin-bottom: 0.2rem }
 
+.resource-text { margin-bottom: 1rem; }
+
 /* person page */
 
 .sticky-top-left { position: sticky; top: 1rem; float: left; margin-left: -11rem; text-align: right; width: 10rem }

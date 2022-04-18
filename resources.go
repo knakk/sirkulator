@@ -455,6 +455,15 @@ type RelationExp struct {
 	To   SimpleResource
 }
 
+type ResourceText struct {
+	ID        int64
+	Text      string
+	Format    string
+	Source    string
+	SourceURL string
+	UpdatedAt time.Time
+}
+
 type Image struct {
 	ID     string
 	Type   string // MIME type, but stored without "image/" prefix
