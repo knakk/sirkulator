@@ -508,3 +508,102 @@ func wikipediaSearch(conn *sqlite.Conn, repo *sparql.Repo, resourceID, bibsysID 
 
 	return nil
 }
+
+type HarvestWikipediaSummaries struct {
+	DB *sqlitex.Pool
+}
+
+func (h *HarvestWikipediaSummaries) Name() string {
+	return "harvest_wikipedia_summaries"
+}
+
+func (h *HarvestWikipediaSummaries) Run(ctx context.Context, w io.Writer) error {
+	conn := h.DB.Get(ctx)
+	if conn == nil {
+		return context.Canceled
+	}
+	defer h.DB.Put(conn)
+
+	const q = `
+		SELECT l.resource_id, l.type, l.id FROM link l
+			LEFT JOIN resource_text rt ON (rt.resource_id = l.resource_id AND rt.source IN('wikipedia/no','wikipedia/no'))
+		WHERE l.type IN ('wikipedia/no', 'wikipedia/en') AND rt.id IS NULL
+	`
+
+	c := 0
+	n := 0
+	fn := func(stmt *sqlite.Stmt) error {
+		return wikipediaSummary(
+			conn,
+			stmt.ColumnText(0),
+			strings.TrimPrefix(stmt.ColumnText(1), "wikipedia/"),
+			stmt.ColumnText(2),
+			&c,
+			&n,
+		)
+	}
+
+	if err := sqlitex.Exec(conn, q, fn); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, "Done. Of %d candidates without wikipeia summaries added %d\n", c, n)
+
+	return nil
+}
+
+type wpSummaryResults struct {
+	WikibaseItem      string `json:"wikibase_item"`
+	Description       string `json:"description"`
+	DescriptionSource string `json:"description_source"`
+	Extract           string `json:"extract"`
+	ExtractHTML       string `json:"extract_html"`
+}
+
+func wikipediaSummary(conn *sqlite.Conn, resourceID, wpLang, wpID string, c, n *int) error {
+	*c++
+	url := fmt.Sprintf("https://%s.wikipedia.org/api/rest_v1/page/summary/%s?redirect=true", wpLang, wpID)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", "hei@knakk.no")
+	req.Header.Set("Accept", "application/json; charset=utf-9")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err // TODO: annotate
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("querying %s.wikipedia.org/api/rest_v1/page/summary/%s: http status %d", wpLang, wpID, resp.StatusCode)
+	}
+
+	var res wpSummaryResults
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return err // TODO: annotate
+	}
+	if res.Extract == "" {
+		return nil
+	}
+
+	const q = `
+		INSERT INTO resource_text (resource_id, text, source, source_url, updated_at)
+		VALUES (?, ?, ?, ?, ?)
+	`
+
+	if err := sqlitex.Exec(
+		conn,
+		q,
+		nil,
+		resourceID,
+		res.Extract,
+		"wikipedia/"+wpLang,
+		fmt.Sprintf("https://%s.wikipedia.org/wiki/%s", wpLang, wpID),
+		time.Now().Unix(),
+	); err != nil {
+		return err
+	}
+	*n++
+
+	return nil
+}

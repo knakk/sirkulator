@@ -13,8 +13,8 @@ var identifiers = map[string][2]string{
 	"orcid":         {"ORCID", "http://orcid.org/%s"},     // Open Researcher and Contributor ID
 	"snl":           {"Store norske leksikon", "https://snl.no/%s"},
 	"viaf":          {"VIAF", "http://viaf.org/viaf/%s"}, // Virtual International Authority File
-	"wp-en":         {"Wikipedia (English)", "https://en.wikipedia.org/wiki/%s"},
-	"wp-no":         {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki/%s"},
+	"wikipedia/en":  {"Wikipedia (English)", "https://en.wikipedia.org/wiki/%s"},
+	"wikipedia/no":  {"Wikipedia (norsk)", "https://no.wikipedia.org/wiki/%s"},
 	"wikidata":      {"Wikidata", "https://www.wikidata.org/wiki/%s"},
 	"worldcat":      {"WorldCat", "https://www.worldcat.org/identities/lccn-%s"},
 	"nb/isbnforlag": {"Norske forlagsadresser", "https://nb.no/isbnforlag/record/%s"},
