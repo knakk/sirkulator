@@ -12,6 +12,7 @@ import (
 	"crawshaw.io/sqlite"
 	"crawshaw.io/sqlite/sqlitex"
 	"github.com/knakk/sirkulator/marc"
+	"github.com/knakk/sparql"
 )
 
 type HarvestNBLinksJob struct {
@@ -173,5 +174,77 @@ func (h *HarvestNBLinksJob) Run(ctx context.Context, w io.Writer) error {
 
 	fmt.Fprintf(w, "Done. Of %d candidates without link to nb.no added %d links.\n", c, n)
 
+	return nil
+}
+
+type HarvestSNLLinksJob struct {
+	DB *sqlitex.Pool
+}
+
+func (h *HarvestSNLLinksJob) Name() string {
+	return "harvest_snl_links"
+}
+
+func (h *HarvestSNLLinksJob) Run(ctx context.Context, w io.Writer) error {
+	conn := h.DB.Get(ctx)
+	if conn == nil {
+		return context.Canceled
+	}
+	defer h.DB.Put(conn)
+
+	const q = `
+		SELECT l.resource_id, l.id FROM link l
+			LEFT JOIN link l2 ON (l2.resource_id = l.resource_id AND l2.type = 'snl')
+		WHERE l.type='bibsys/aut' AND l2.id IS NULL
+	`
+
+	wikidata, err := sparql.NewRepo("https://query.wikidata.org/sparql")
+	if err != nil {
+		return err
+	}
+
+	c := 0
+	n := 0
+	fn := func(stmt *sqlite.Stmt) error {
+		return snlSearch(conn, wikidata, stmt.ColumnText(0), stmt.ColumnText(1), &c, &n)
+	}
+
+	if err := sqlitex.Exec(conn, q, fn); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, "Done. Of %d candidates without link to snl.no added %d links.\n", c, n)
+	return nil
+}
+
+func snlSearch(conn *sqlite.Conn, repo *sparql.Repo, resourceID, bibsysID string, c, n *int) error {
+	*c++
+
+	const sparqlQ = `
+		PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+		PREFIX wdtn: <http://www.wikidata.org/prop/direct-normalized/>
+
+		# wdtn:P1015	NORAF-ID (tidligere bibsys-id)
+		# wdt:P4342		Store norske leksikon-ID
+
+		SELECT ?snl_id WHERE {
+			?r 	wdtn:P1015 <https://livedata.bibsys.no/authority/%s> ;
+				wdt:P4342 ?snl_id
+		}
+	`
+	res, err := repo.Query(fmt.Sprintf(sparqlQ, bibsysID))
+	if err != nil {
+		return err
+	}
+	if len(res.Bindings()["snl_id"]) != 1 {
+		return nil
+	}
+	snlID := res.Bindings()["snl_id"][0].String()
+	const q = `INSERT OR IGNORE INTO link (resource_id, type, id) VALUES (?, ?, ?)`
+
+	if err := sqlitex.Exec(conn, q, nil, resourceID, "snl", snlID); err != nil {
+		return err
+	}
+	*n++
 	return nil
 }
