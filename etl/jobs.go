@@ -419,3 +419,92 @@ func snlUpdateDescription(conn *sqlite.Conn, snlID string, textID int64, text st
 
 	return nil
 }
+
+type HarvestWikipediaLinks struct {
+	DB *sqlitex.Pool
+}
+
+func (h *HarvestWikipediaLinks) Name() string {
+	return "harvest_wikipedia_links"
+}
+
+func (h *HarvestWikipediaLinks) Run(ctx context.Context, w io.Writer) error {
+	conn := h.DB.Get(ctx)
+	if conn == nil {
+		return context.Canceled
+	}
+	defer h.DB.Put(conn)
+
+	const q = `
+		SELECT l.resource_id, l.id FROM link l
+			LEFT JOIN link l2 ON (l2.resource_id = l.resource_id AND l2.type = 'wikidata')
+		WHERE l.type='bibsys/aut' AND l2.id IS NULL
+	`
+
+	wikidata, err := sparql.NewRepo("https://query.wikidata.org/sparql")
+	if err != nil {
+		return err
+	}
+
+	c := 0
+	n := 0
+	fn := func(stmt *sqlite.Stmt) error {
+		return wikipediaSearch(conn, wikidata, stmt.ColumnText(0), stmt.ColumnText(1), &c, &n)
+	}
+
+	if err := sqlitex.Exec(conn, q, fn); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, "Done. Of %d candidates without link to wikidata/wikipedia added %d links.\n", c, n)
+
+	return nil
+}
+
+func wikipediaSearch(conn *sqlite.Conn, repo *sparql.Repo, resourceID, bibsysID string, c, n *int) error {
+	*c++
+
+	const sparqlQ = `
+		PREFIX schema: <http://schema.org/>
+		PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
+		SELECT ?wikidata ?en ?no WHERE {
+			?id wdtn:P1015 <https://livedata.bibsys.no/authority/%s>  .
+			BIND(STRAFTER(STR(?id), "http://www.wikidata.org/entity/") AS ?wikidata)
+
+			OPTIONAL {
+				?wp_no schema:about ?id ; schema:isPartOf <https://no.wikipedia.org/> .
+				BIND(STRAFTER(STR(?wp_no), "https://no.wikipedia.org/wiki/") AS ?no)
+			}
+			OPTIONAL {
+				?wp_en schema:about ?id ; schema:isPartOf <https://en.wikipedia.org/> .
+				BIND(STRAFTER(STR(?wp_en), "https://en.wikipedia.org/wiki/") AS ?en)
+			}
+		}
+	`
+	res, err := repo.Query(fmt.Sprintf(sparqlQ, bibsysID))
+	if err != nil {
+		return err
+	}
+
+	if len(res.Solutions()) != 1 {
+		return nil
+	}
+
+	*n++
+
+	const q = `INSERT OR IGNORE INTO link (resource_id, type, id) VALUES (?, ?, ?)`
+
+	for k, v := range res.Solutions()[0] {
+		linkType := k
+		if linkType != "wikidata" {
+			linkType = "wikipedia/" + k
+		}
+
+		if err := sqlitex.Exec(conn, q, nil, resourceID, linkType, v.String()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
