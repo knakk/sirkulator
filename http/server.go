@@ -179,20 +179,42 @@ func (s *Server) router(assetsDir string) chi.Router {
 			r.Post("/import", s.importResources) // s.tmplImportResponse ?
 			r.Post("/preview", s.importPreview)
 			r.Post("/search", s.searchResources)
+
+			// Shared between all resources
 			r.Get("/text/{id}", s.viewResourceTexts)
-			r.Get("/corporation/{id}", s.pageCorporation)
-			r.Post("/person/{id}", s.savePerson)
-			r.Get("/person/{id}", s.pagePerson)
-			r.Post("/person/{id}/contributions", s.viewContributions)
-			r.Get("/publication/{id}", s.pagePublication)
-			r.Get("/publication/{id}/relations", s.viewPublicationRelations)
 			r.Delete("/relation/{id}", s.deleteRelation)
-			r.Get("/dewey/{id}", s.pageDewey)
-			r.Get("/dewey/{id}/partsof", s.viewDeweyPartsOf)
-			r.Get("/dewey/{id}/publications", s.viewDeweyPublications)
-			r.Get("/publisher/{id}", s.pagePublisher)
-			r.Post("/publisher/{id}", s.savePublisher)
-			r.Post("/publisher/{id}/publications", s.viewPublisherPublications)
+
+			// Person
+			r.Route("/person", func(r chi.Router) {
+				r.Post("/{id}", s.savePerson)
+				r.Get("/{id}", s.pagePerson)
+				r.Post("/{id}/contributions", s.viewContributions)
+			})
+
+			// Corporation
+			r.Route("/corporation", func(r chi.Router) {
+				r.Get("/{id}", s.pageCorporation)
+			})
+
+			// Publication
+			r.Route("/publication", func(r chi.Router) {
+				r.Get("/{id}", s.pagePublication)
+				r.Get("/{id}/relations", s.viewPublicationRelations)
+			})
+
+			// Dewey
+			r.Route("/dewey", func(r chi.Router) {
+				r.Get("/{id}", s.pageDewey)
+				r.Get("/{id}/partsof", s.viewDeweyPartsOf)
+				r.Get("/{id}/publications", s.viewDeweyPublications)
+			})
+
+			// Publisher
+			r.Route("/publisher", func(r chi.Router) {
+				r.Get("/{id}", s.pagePublisher)
+				r.Post("/{id}", s.savePublisher)
+				r.Post("/{id}/publications", s.viewPublisherPublications)
+			})
 		})
 
 		r.Route("/maintenance", func(r chi.Router) {
