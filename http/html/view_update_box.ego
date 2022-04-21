@@ -1,0 +1,35 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type UpdateBox struct {
+    Resource    sirkulator.Resource
+    Localizer   localizer.Localizer
+}
+
+
+func (box *UpdateBox) Render(ctx context.Context, w io.Writer) {
+    l := box.Localizer
+%>
+
+<div class="sticky-top-left">
+    <button
+        class="save-resource"
+        hx-post="/metadata/<%= box.Resource.Type.String() %>/<%= box.Resource.ID %>"
+        hx-target="#<%= box.Resource.Type.String() %>-form"
+        hx-include="#<%= box.Resource.Type.String() %>-form">
+        Lagre
+    </button>
+    <div class="resource-timestamps">
+        <%= l.Translate("Created") %>: <%= box.Resource.CreatedAt.Format("2006-01-02") %><br/>
+        <%= l.Translate("Updated") %>: <span id="resource-updated"><%= box.Resource.UpdatedAt.Format("2006-01-02")  %></span>
+    </div>
+    <div id="save-messages" class="save-messages"></div>
+</div>
+
+<% } %>
+

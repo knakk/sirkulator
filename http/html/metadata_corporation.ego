@@ -18,17 +18,7 @@ func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
     corp := tmpl.Resource.Data.(*sirkulator.Corporation)
 %><ego:App Page=tmpl.Page>
-    <div class="sticky-top-left">
-        <button
-            class="save-resource"
-            hx-post="/metadata/corporation/<%= tmpl.Resource.ID %>"
-            hx-target="#corporation-form"
-            hx-include="#corporation-form">
-            Lagre
-        </button>
-        <p class="error" id="save-error-message"></p>
-        <p id="save-message"></p>
-    </div>
+    <ego:UpdateBox Resource=tmpl.Resource Localizer=l />
     <details open>
         <summary>
             <h3><%= tmpl.Resource.Label %></h3>

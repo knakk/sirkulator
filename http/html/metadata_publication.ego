@@ -21,17 +21,7 @@ func (tmpl *PublicationTemplate) Render(ctx context.Context, w io.Writer) {
     img := tmpl.Image
 
 %><ego:App Page=tmpl.Page>
-    <div class="sticky-top-left">
-        <button
-            class="save-resource"
-            hx-post="/metadata/publication/<%= tmpl.Resource.ID %>"
-            hx-target="#person-form"
-            hx-include="#person-form">
-            Lagre
-        </button>
-        <p class="error" id="save-error-message"></p>
-        <p id="save-message"></p>
-    </div>
+    <ego:UpdateBox Resource=tmpl.Resource Localizer=l />
     <details open>
         <summary>
             <h3><%= tmpl.Resource.Label %></h3>

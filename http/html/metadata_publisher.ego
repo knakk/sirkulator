@@ -18,20 +18,7 @@ func (tmpl *PublisherTemplate) Render(ctx context.Context, w io.Writer) {
     l, _ := ctx.Value("localizer").(localizer.Localizer)
     publisher := tmpl.Resource.Data.(*sirkulator.Publisher)
 %><ego:App Page=tmpl.Page>
-    <div class="sticky-top-left">
-        <button
-            class="save-resource"
-            hx-post="/metadata/publisher/<%= tmpl.Resource.ID %>"
-            hx-target="#publisher-form"
-            hx-include="#publisher-form">
-            Lagre
-        </button>
-        <div class="resource-timestamps">
-            <%= l.Translate("Created") %>: <%= tmpl.Resource.CreatedAt.Format("2006-01-02") %><br/>
-            <%= l.Translate("Updated") %>: <span id="resource-updated"><%= tmpl.Resource.UpdatedAt.Format("2006-01-02")  %></span>
-        </div>
-        <div id="save-messages" class="save-messages"></div>
-    </div>
+    <ego:UpdateBox Resource=tmpl.Resource Localizer=l />
     <details open>
         <summary>
             <h3><%= tmpl.Resource.Label %></h3>
