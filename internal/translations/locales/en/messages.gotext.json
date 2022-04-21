@@ -142,9 +142,9 @@
             "fuzzy": true
         },
         {
-            "id": "Identificators and links",
-            "message": "Identificators and links",
-            "translation": "Identificators and links",
+            "id": "Local and external descriptions",
+            "message": "Local and external descriptions",
+            "translation": "Local and external descriptions",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -246,20 +246,6 @@
             "id": "Already in catalogue",
             "message": "Already in catalogue",
             "translation": "Already in catalogue",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Created",
-            "message": "Created",
-            "translation": "Created",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Updated",
-            "message": "Updated",
-            "translation": "Updated",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -422,6 +408,13 @@
             "fuzzy": true
         },
         {
+            "id": "Identificators and links",
+            "message": "Identificators and links",
+            "translation": "Identificators and links",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Started (duration)",
             "message": "Started (duration)",
             "translation": "Started (duration)",
@@ -516,13 +509,6 @@
             "id": "Subtitle",
             "message": "Subtitle",
             "translation": "Subtitle",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Publisher",
-            "message": "Publisher",
-            "translation": "Publisher",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -747,6 +733,48 @@
             "id": "Schedules",
             "message": "Schedules",
             "translation": "Schedules",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "save",
+            "message": "save",
+            "translation": "save",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "This resource is archived",
+            "message": "This resource is archived",
+            "translation": "This resource is archived",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "restore",
+            "message": "restore",
+            "translation": "restore",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Created",
+            "message": "Created",
+            "translation": "Created",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Updated",
+            "message": "Updated",
+            "translation": "Updated",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Archived",
+            "message": "Archived",
+            "translation": "Archived",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

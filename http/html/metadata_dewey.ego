@@ -26,6 +26,7 @@ func (tmpl *DeweyTemplate) Render(ctx context.Context, w io.Writer) {
 
 
 %><ego:App Page=tmpl.Page>
+    <ego:UpdateBox Resource=tmpl.Resource Localizer=l />
     <details open>
         <summary>
             <h3><%= tmpl.Resource.Label %></h3>

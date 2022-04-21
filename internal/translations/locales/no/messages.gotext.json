@@ -102,9 +102,9 @@
             "translation": "Egenskaper"
         },
         {
-            "id": "Identificators and links",
-            "message": "Identificators and links",
-            "translation": "Identifikatorer og lenker"
+            "id": "Local and external descriptions",
+            "message": "Local and external descriptions",
+            "translation": "Interne og eksterne beskrivelser"
         },
         {
             "id": "Publications and contributions",
@@ -180,16 +180,6 @@
             "id": "Already in catalogue",
             "message": "Already in catalogue",
             "translation": "Allerede i katalogen"
-        },
-        {
-            "id": "Created",
-            "message": "Created",
-            "translation": "Opprettet"
-        },
-        {
-            "id": "Updated",
-            "message": "Updated",
-            "translation": "Endret"
         },
         {
             "id": "Cover-image",
@@ -310,6 +300,11 @@
             "translation": "Deweynummer"
         },
         {
+            "id": "Identificators and links",
+            "message": "Identificators and links",
+            "translation": "Identifikatorer og lenker"
+        },
+        {
             "id": "Started (duration)",
             "message": "Started (duration)",
             "translation": "Startet (varighet)"
@@ -378,11 +373,6 @@
             "id": "Subtitle",
             "message": "Subtitle",
             "translation": "Undertittel"
-        },
-        {
-            "id": "Publisher",
-            "message": "Publisher",
-            "translation": "Utgiver"
         },
         {
             "id": "Year must be a 4-digit number",
@@ -543,6 +533,36 @@
             "id": "Schedules",
             "message": "Schedules",
             "translation": "Planlagte kjøringer"
+        },
+        {
+            "id": "save",
+            "message": "save",
+            "translation": "lagre"
+        },
+        {
+            "id": "This resource is archived",
+            "message": "This resource is archived",
+            "translation": "Denne ressursen er akrivert"
+        },
+        {
+            "id": "restore",
+            "message": "restore",
+            "translation": "gjenopprett"
+        },
+        {
+            "id": "Created",
+            "message": "Created",
+            "translation": "Opprettet"
+        },
+        {
+            "id": "Updated",
+            "message": "Updated",
+            "translation": "Endret"
+        },
+        {
+            "id": "Archived",
+            "message": "Archived",
+            "translation": "Arkivert"
         }
     ]
 }

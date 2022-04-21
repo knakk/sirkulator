@@ -25,6 +25,9 @@ func readResource(res *sirkulator.Resource, t sirkulator.ResourceType) func(stmt
 		}
 		res.CreatedAt = time.Unix(stmt.ColumnInt64(3), 0)
 		res.UpdatedAt = time.Unix(stmt.ColumnInt64(4), 0)
+		if n := stmt.ColumnInt64(5); n != 0 {
+			res.ArchivedAt = time.Unix(n, 0)
+		}
 		return nil
 	}
 }
@@ -68,7 +71,7 @@ func readLinks(res *sirkulator.Resource) func(stmt *sqlite.Stmt) error {
 func GetResource(conn *sqlite.Conn, t sirkulator.ResourceType, id string) (sirkulator.Resource, error) {
 	var res sirkulator.Resource
 
-	const qResouce = "SELECT id, label, data, created_at, updated_at FROM resource WHERE type=? AND id=?"
+	const qResouce = "SELECT id, label, data, created_at, updated_at, archived_at FROM resource WHERE type=? AND id=?"
 	if err := sqlitex.Exec(conn, qResouce, readData(&res, t), t.String(), id); err != nil {
 		return res, fmt.Errorf("sql.GetResource(%s, %s): %w", t.String(), id, err)
 	}

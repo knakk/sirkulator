@@ -17,16 +17,26 @@ func (box *UpdateBox) Render(ctx context.Context, w io.Writer) {
 %>
 
 <div class="sticky-top-left">
-    <button
-        class="save-resource"
-        hx-post="/metadata/<%= box.Resource.Type.String() %>/<%= box.Resource.ID %>"
-        hx-target="#<%= box.Resource.Type.String() %>-form"
-        hx-include="#<%= box.Resource.Type.String() %>-form">
-        Lagre
-    </button>
+    <% if box.Resource.ArchivedAt.IsZero() { %>
+        <button
+            class="save-resource"
+            hx-post="/metadata/<%= box.Resource.Type.String() %>/<%= box.Resource.ID %>"
+            hx-target="#<%= box.Resource.Type.String() %>-form"
+            hx-include="#<%= box.Resource.Type.String() %>-form">
+            <%= l.Translate("save") %>
+        </button>
+    <% } else { %>
+        <h3><%= l.Translate("This resource is archived") %></h3>
+         <button class="restore-resource">
+            <%= l.Translate("restore") %>
+        </button>
+    <% } %>
     <div class="resource-timestamps">
         <%= l.Translate("Created") %>: <%= box.Resource.CreatedAt.Format("2006-01-02") %><br/>
         <%= l.Translate("Updated") %>: <span id="resource-updated"><%= box.Resource.UpdatedAt.Format("2006-01-02")  %></span>
+        <% if !box.Resource.ArchivedAt.IsZero() { %>
+            <%= l.Translate("Archived") %>: <span id="resource-archived"><%= box.Resource.ArchivedAt.Format("2006-01-02")  %></span>
+        <% } %>
     </div>
     <div id="save-messages" class="save-messages"></div>
 </div>
