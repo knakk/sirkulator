@@ -443,7 +443,7 @@ func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 				JSON_PATCH(v.data, IIF(res.id IS NULL,
 					IIF($to_id != '', JSON_OBJECT('label', $to_id), '{}'), '{}')) AS data,
 				IIF(res.id IS NULL, $queued_at, NULL) AS queued_at
-			FROM v LEFT JOIN resource res ON (res.id = $to_id)
+			FROM v LEFT JOIN resource res ON (res.id = $to_id AND res.archived_at IS NULL)
 		`)
 		// TODO fix query, queued_at is NULL when rel.to_id IS NULL
 
