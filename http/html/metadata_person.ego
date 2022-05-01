@@ -13,8 +13,9 @@ import (
 
 type PersonTemplate struct {
     Page
-    Resource sirkulator.Resource
+    Resource      sirkulator.Resource
     Contributions []sirkulator.AgentContribution
+    Relations     []sirkulator.RelationExp
 }
 
 // TODO move util functions out to html.go ?
@@ -132,13 +133,6 @@ func (tmpl *PersonTemplate) Render(ctx context.Context, w io.Writer) {
 
     <br/>
 
-    <details open>
-        <summary>
-            <h3><%= l.Translate("Other relations") %></h3>
-        </summary>
-        <div class="border pad">
-
-        </div>
-    </details>
+    <ego:ViewOtherRelations Relations=tmpl.Relations></ego:ViewOtherRelations>
 </ego:App>
 <% } %>

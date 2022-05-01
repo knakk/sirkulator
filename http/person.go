@@ -190,6 +190,12 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	relations, err := sql.GetRelationsAsObject(conn, id)
+	if err != nil {
+		ServerError(w, err)
+		return
+	}
+
 	tmpl := html.PersonTemplate{
 		Page: html.Page{
 			Lang: s.Lang,
@@ -197,6 +203,7 @@ func (s *Server) pagePerson(w http.ResponseWriter, r *http.Request) {
 		},
 		Resource:      res,
 		Contributions: contrib,
+		Relations:     relations,
 	}
 	tmpl.Render(r.Context(), w)
 }

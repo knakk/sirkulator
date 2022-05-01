@@ -10,8 +10,9 @@ import (
 
 type CorporationTemplate struct {
     Page
-    Resource sirkulator.Resource
+    Resource      sirkulator.Resource
     Contributions []sirkulator.AgentContribution
+    Relations     []sirkulator.RelationExp
 }
 
 func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
@@ -84,13 +85,7 @@ func (tmpl *CorporationTemplate) Render(ctx context.Context, w io.Writer) {
 
     <br/>
 
-    <details open>
-        <summary>
-            <h3><%= l.Translate("Other relations") %></h3>
-        </summary>
-        <div class="border pad">
+    <ego:ViewOtherRelations Relations=tmpl.Relations></ego:ViewOtherRelations>
 
-        </div>
-    </details>
 </ego:App>
 <% } %>

@@ -57,7 +57,7 @@ func (s *Server) viewPublicationRelations(w http.ResponseWriter, r *http.Request
 	}
 	defer s.db.Put(conn)
 
-	rel, err := sql.GetPublcationRelations(conn, id)
+	rel, err := sql.GetPublicationRelations(conn, id)
 	if err != nil {
 		ServerError(w, err)
 		return

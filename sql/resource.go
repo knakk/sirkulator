@@ -598,7 +598,7 @@ func GetPublcationContributors(conn *sqlite.Conn, id string) ([]sirkulator.Publi
 	return res, nil
 }
 
-func GetPublcationRelations(conn *sqlite.Conn, id string) ([]sirkulator.RelationExp, error) {
+func GetPublicationRelations(conn *sqlite.Conn, id string) ([]sirkulator.RelationExp, error) {
 	var res []sirkulator.RelationExp
 
 	const q = `
@@ -640,6 +640,54 @@ func GetPublcationRelations(conn *sqlite.Conn, id string) ([]sirkulator.Relation
 
 	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
 		return res, fmt.Errorf("sql.GetPublicationRelations(%q): %w", id, err)
+	}
+
+	return res, nil
+}
+
+func GetRelationsAsObject(conn *sqlite.Conn, id string) ([]sirkulator.RelationExp, error) {
+	var res []sirkulator.RelationExp
+	const q = `
+    SELECT
+        rel.id,
+        rel.type,
+        rel.from_id,
+        rel.data,
+        res.type AS res_type,
+        IFNULL(json_extract(rel.data, '$.label'), res.label) AS res_label
+    FROM
+        relation rel
+        LEFT JOIN resource res ON (rel.from_id=res.id)
+    WHERE
+        rel.to_id=? AND
+        rel.type != 'has_contributor'`
+
+	fn := func(stmt *sqlite.Stmt) error {
+		r := sirkulator.RelationExp{
+			Relation: sirkulator.Relation{
+				ID:     stmt.ColumnInt64(0),
+				Type:   stmt.ColumnText(1),
+				FromID: stmt.ColumnText(2),
+				ToID:   id,
+			},
+			From: sirkulator.SimpleResource{
+				ID:    stmt.ColumnText(2),
+				Type:  sirkulator.ParseResourceType(stmt.ColumnText(4)),
+				Label: stmt.ColumnText(5),
+			},
+		}
+		var data map[string]any
+		if err := json.Unmarshal([]byte(stmt.ColumnText(3)), &data); err != nil {
+			return err // TODO annotate
+		}
+		r.Relation.Data = data
+
+		res = append(res, r)
+		return nil
+	}
+
+	if err := sqlitex.Exec(conn, q, fn, id); err != nil {
+		return res, fmt.Errorf("sql.GetRelationsAsObject(%q): %w", id, err)
 	}
 
 	return res, nil

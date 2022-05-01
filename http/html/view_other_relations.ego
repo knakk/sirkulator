@@ -1,0 +1,49 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+    "github.com/knakk/sirkulator/vocab"
+)
+
+type ViewOtherRelations struct {
+    Relations []sirkulator.RelationExp
+}
+
+func (tmpl *ViewOtherRelations) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%>
+<% if len(tmpl.Relations) > 0 { %>
+    <details open>
+<% } else { %>
+    <details>
+<% } %>
+    <summary>
+        <h3><%= l.Translate("Other relations") %> (<%= len(tmpl.Relations) %>)</h3>
+    </summary>
+    <div class="border pad">
+        <table>
+            <thead>
+                <tr>
+                    <th><%= l.Translate("Relation") %></th>
+                    <th><%= l.Translate("Resource") %></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for _, r := range tmpl.Relations { %>
+                    <tr>
+                        <td>
+                            <%= vocab.ParseRelation(r.Type).InverseLabel(l.Lang) %>
+                        </td>
+                        <td>
+                            <a href="<%= resourceLink(r.From) %>"><%= r.From.Label %></a>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</details>
+
+<% } %>
