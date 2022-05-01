@@ -194,6 +194,7 @@ func (s *Server) router(assetsDir string) chi.Router {
 			// Corporation
 			r.Route("/corporation", func(r chi.Router) {
 				r.Get("/{id}", s.pageCorporation)
+				r.Post("/{id}/contributions", s.viewContributions)
 			})
 
 			// Publication

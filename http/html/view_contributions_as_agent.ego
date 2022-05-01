@@ -1,0 +1,73 @@
+<%
+package html
+
+import (
+    "github.com/knakk/sirkulator"
+    "github.com/knakk/sirkulator/internal/localizer"
+)
+
+type ViewContributionsAsAgent struct {
+    Type          string
+    ID            string
+    Contributions []sirkulator.AgentContribution
+}
+
+func (tmpl *ViewContributionsAsAgent) Render(ctx context.Context, w io.Writer) {
+    l, _ := ctx.Value("localizer").(localizer.Localizer)
+%>
+<% if len(tmpl.Contributions) > 0 { %>
+    <details open>
+<% } else { %>
+    <details>
+<% } %>
+    <summary>
+        <h3><%= l.Translate("Publications and contributions") %></h3>
+    </summary>
+    <div class="border pad">
+        <table>
+            <thead>
+                <tr>
+                    <th><%= l.Translate("Role") %></th>
+                    <th class="clickable sortable"
+                        hx-post="/metadata/<%= tmpl.Type %>/<%= tmpl.ID %>/contributions"
+                        hx-include="[name='sort_asc']"
+                        hx-vals='{"sort_by": "year"}'
+                        hx-target="#agent_contributions"
+                        hx-swap="outerHTML">
+                        <%= l.Translate("Year") %>
+                    </th>
+                    <th class="clickable sortable"
+                        hx-post="/metadata/<%= tmpl.Type %>/<%= tmpl.ID %>/contributions"
+                        hx-include="[name='sort_asc']"
+                        hx-vals='{"sort_by": "label"}'
+                        hx-target="#agent_contributions"
+                        hx-swap="outerHTML">
+                        <%= l.Translate("Publication") %>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="agent_contributions">
+                <% for _, c := range tmpl.Contributions { %>
+                    <tr>
+                        <td>
+                            <%= printRoles(c.Roles, l) %>
+                        </td>
+                        <td><%= notZero(c.Year) %></td>
+                        <td>
+                            <a href="<%= resourceLink(c.SimpleResource) %>"><%= c.Label %></a>
+                        </td>
+                    </tr>
+                <% } %>
+                <tr>
+                    <td colspan="3">
+                        <input type="hidden" name="sort_by" value="year">
+                        <input type="hidden" name="sort_asc" value="false">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</details>
+
+<% } %>
