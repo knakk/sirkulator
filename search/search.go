@@ -139,6 +139,18 @@ type QueryOptions struct {
 	InclArchived bool
 }
 
+func isNumber(s string) bool {
+	for _, r := range s {
+		switch r {
+		case ',', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			continue
+		default:
+			return false
+		}
+	}
+	return true
+}
+
 func (idx *Index) Search(ctx context.Context, q string, opt QueryOptions) (Results, error) {
 	res := Results{}
 	terms := strings.Split(q, " ")
@@ -147,7 +159,11 @@ func (idx *Index) Search(ctx context.Context, q string, opt QueryOptions) (Resul
 		queries = []bluge.Query{bluge.NewMatchAllQuery()}
 	} else {
 		for _, term := range terms {
-			queries = append(queries, bluge.NewFuzzyQuery(term).SetField("label"))
+			if isNumber(term) {
+				queries = append(queries, bluge.NewMatchQuery(term).SetField("label"))
+			} else {
+				queries = append(queries, bluge.NewFuzzyQuery(term).SetField("label"))
+			}
 		}
 	}
 
