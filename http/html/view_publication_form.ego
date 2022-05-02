@@ -97,9 +97,12 @@ func (form *PublicationForm) Render(ctx context.Context, w io.Writer) {
     <fieldset>
         <legend><%= l.Translate("Physical characteristics") %></legend>
 
-        <ego:InputString
+        <ego:SearchSelect
             ID="binding"
-            Value="TODO"
+            Value=string(pub.Binding)
+            Multiple=false
+            URIPrefix=""
+            Options=vocab.BindingOptions(l.Lang)
             Label=l.Translate("Binding") />
 
         <ego:InputString

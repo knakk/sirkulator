@@ -21,7 +21,7 @@ type PersonForm struct {
 
 // TODO get from vocab package
 var genderOptions = [][2]string{
-	{"u", "Ukjent"},
+	{"?", "Ukjent"},
 	{"m", "Han"},
 	{"f", "Hun"},
 	{"o", "Annet"},

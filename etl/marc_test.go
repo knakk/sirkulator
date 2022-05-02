@@ -330,6 +330,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Year:       "2021",
 						//YearFirst:  2021, TODO later
 						NumPages: "491",
+						Binding:  "hardback",
 					},
 				},
 				{
@@ -624,6 +625,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Fiction:  true,
 						Year:     "1994",
 						NumPages: "446",
+						Binding:  "?",
 					},
 				},
 				{
@@ -898,6 +900,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						GenreForms: []string{"Populærvitenskap"},
 						Nonfiction: true,
 						NumPages:   "751",
+						Binding:    "hardback",
 					},
 				},
 				{
@@ -1171,6 +1174,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Language:   "iso6393/nob",
 						Nonfiction: true,
 						NumPages:   "271",
+						Binding:    "hardback",
 					},
 				},
 				{
@@ -1502,6 +1506,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Audiences:  []string{vocab.TG1003.Code(), vocab.TG1004.Code(), vocab.TG1009.Code()},
 						Fiction:    true,
 						NumPages:   "122",
+						Binding:    "hardback",
 					},
 				},
 				{
@@ -1737,6 +1742,7 @@ func TestIngestOAIRecord(t *testing.T) {
 						Audiences:  []string{vocab.TG1002.Code(), vocab.TG1006.Code()},
 						Fiction:    true,
 						NumPages:   "53",
+						Binding:    "hardback",
 					},
 				},
 				{

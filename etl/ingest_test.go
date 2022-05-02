@@ -308,6 +308,7 @@ func TestIngestISBN(t *testing.T) {
 		Nonfiction: true,
 		Year:       "1980",
 		NumPages:   "63",
+		Binding:    "paperback",
 		GenreForms: []string{"Floraer", "Bestemmelseslitteratur"},
 	}
 	pubWant := sirkulator.Resource{

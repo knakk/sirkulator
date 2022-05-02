@@ -187,8 +187,11 @@ func (i *SearchSelect) Render(ctx context.Context, w io.Writer) {
 		i.InfoMsg = "&nbsp;"
 	}
 	io.WriteString(w, `<div class="field"><input class="search-select`)
-	if !i.Multiple && i.Value != "" {
-		io.WriteString(w, ` single-value" disabled`)
+	if !i.Multiple {
+		io.WriteString(w, ` single-value"`)
+		if i.Value != "" {
+			io.WriteString(w, " disabled")
+		}
 		i.Values = []string{i.Value}
 	} else {
 		io.WriteString(w, `"`)

@@ -21,7 +21,7 @@ func (tmpl *ViewContributionsAsAgent) Render(ctx context.Context, w io.Writer) {
     <details>
 <% } %>
     <summary>
-        <h3><%= l.Translate("Publications and contributions") %></h3>
+        <h3><%= l.Translate("Publications and contributions") %> (<%= len(tmpl.Contributions) %>)</h3>
     </summary>
     <div class="border pad">
         <table>

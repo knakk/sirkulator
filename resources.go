@@ -356,8 +356,8 @@ type Publication struct {
 	Subjects       []string
 
 	// Physical info
-	Format   string      `json:"format"` // hardcover, paperback, innbundet, heftet etc... Binding?
-	NumPages json.Number `json:"numpages,omitempty"`
+	Binding  vocab.Binding `json:"binding"` // hardcover, paperback, innbundet, heftet etc...
+	NumPages json.Number   `json:"numpages,omitempty"`
 	// Weight   int    `json:"weight,omitempty"` // in grams
 	// Height   int    `json:"height,omitempty"` // in mm
 	// Width    int    `json:"width,omitempty"`  // in mm

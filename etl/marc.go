@@ -216,6 +216,13 @@ func ingestMarcRecord(source string, rec marc.Record, idFunc func() string) (Ing
 		// TODO audience pos 22: a=adult, j=juvenile
 	}
 
+	// Binding
+	for _, q := range rec.ValuesAt("020", "q") {
+		// There can be multiple 020 ISBN fields, but we don't really
+		// know which one is correct for this book, so we take one randomly
+		p.Binding = vocab.ParseBinding(q)
+	}
+
 	if f, ok := rec.DataFieldAt("041"); ok {
 		if f.Ind1 == "1" {
 			// The publication is a translation

@@ -5,7 +5,7 @@ import "golang.org/x/text/language"
 type Gender string
 
 const (
-	GenderUnknown Gender = ""
+	GenderUnknown Gender = "?"
 	GenderMale    Gender = "m"
 	GenderFemale  Gender = "f"
 	GenderOther   Gender = "o"
