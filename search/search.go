@@ -141,15 +141,18 @@ type QueryOptions struct {
 
 func (idx *Index) Search(ctx context.Context, q string, opt QueryOptions) (Results, error) {
 	res := Results{}
-	var query bluge.Query
+	terms := strings.Split(q, " ")
+	var queries []bluge.Query
 	if q == "" {
-		query = bluge.NewMatchAllQuery()
+		queries = []bluge.Query{bluge.NewMatchAllQuery()}
 	} else {
-		query = bluge.NewFuzzyQuery(q).SetField("label")
+		for _, term := range terms {
+			queries = append(queries, bluge.NewFuzzyQuery(term).SetField("label"))
+		}
 	}
 
 	boolq := bluge.NewBooleanQuery().
-		AddMust(query)
+		AddMust(queries...)
 	if !opt.InclArchived {
 		boolq.AddMustNot(bluge.NewMatchQuery("archived").SetField("flags"))
 	}
