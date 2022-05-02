@@ -28,22 +28,27 @@ func (tmpl *ViewContributionsAsAgent) Render(ctx context.Context, w io.Writer) {
             <thead>
                 <tr>
                     <th><%= l.Translate("Role") %></th>
-                    <th class="clickable sortable"
-                        hx-post="/metadata/<%= tmpl.Type %>/<%= tmpl.ID %>/contributions"
-                        hx-include="[name='sort_asc']"
-                        hx-vals='{"sort_by": "year"}'
-                        hx-target="#agent_contributions"
-                        hx-swap="outerHTML">
-                        <%= l.Translate("Year") %>
-                    </th>
-                    <th class="clickable sortable"
-                        hx-post="/metadata/<%= tmpl.Type %>/<%= tmpl.ID %>/contributions"
-                        hx-include="[name='sort_asc']"
-                        hx-vals='{"sort_by": "label"}'
-                        hx-target="#agent_contributions"
-                        hx-swap="outerHTML">
-                        <%= l.Translate("Publication") %>
-                    </th>
+                    <% if len(tmpl.Contributions) > 1 { %>
+                        <th class="clickable sortable"
+                            hx-post="/metadata/<%= tmpl.Type %>/<%= tmpl.ID %>/contributions"
+                            hx-include="[name='sort_asc']"
+                            hx-vals='{"sort_by": "year"}'
+                            hx-target="#agent_contributions"
+                            hx-swap="outerHTML">
+                            <%= l.Translate("Year") %>
+                        </th>
+                        <th class="clickable sortable"
+                            hx-post="/metadata/<%= tmpl.Type %>/<%= tmpl.ID %>/contributions"
+                            hx-include="[name='sort_asc']"
+                            hx-vals='{"sort_by": "label"}'
+                            hx-target="#agent_contributions"
+                            hx-swap="outerHTML">
+                            <%= l.Translate("Publication") %>
+                        </th>
+                    <% } else { %>
+                        <th><%= l.Translate("Year") %></th>
+                        <th><%= l.Translate("Publication") %></th>
+                    <% } %>
                 </tr>
             </thead>
             <tbody id="agent_contributions">
