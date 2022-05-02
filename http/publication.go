@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/knakk/sirkulator"
@@ -98,6 +99,10 @@ func (s *Server) viewPublicationRelations(w http.ResponseWriter, r *http.Request
 			rel[i].Relation.Type = vocab.ParseRelation(r.Type).Label(l.Lang)
 		}
 	}
+
+	sort.Slice(rel, func(i, j int) bool {
+		return rel[i].Type < rel[j].Type
+	})
 
 	tmpl := html.ViewPublicationRelations{
 		Relations: rel,
