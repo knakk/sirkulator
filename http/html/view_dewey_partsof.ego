@@ -9,24 +9,9 @@ import (
 
 type ViewDeweyPartsOf struct {
     ID       string
-    From     string
-    To       string
+    Offset   int
     HasMore  bool
     PartsOf  [][2]string
-}
-
-func getLast(p [][2]string) string {
-    if len(p) == 0 {
-        return ""
-    }
-    return p[len(p)-1][0]
-}
-
-func getFirst(p [][2]string) string {
-    if len(p) == 0 {
-        return ""
-    }
-    return p[0][0]
 }
 
 func (tmpl *ViewDeweyPartsOf) Render(ctx context.Context, w io.Writer) {
@@ -37,10 +22,7 @@ func (tmpl *ViewDeweyPartsOf) Render(ctx context.Context, w io.Writer) {
     ID="parts-of"
     Class="dewey"
     Limit=10
-    Last=getLast(tmpl.PartsOf)
-    First=getFirst(tmpl.PartsOf)
-    From=tmpl.From
-    To=tmpl.To
+    Offset=tmpl.Offset
     HasMore=tmpl.HasMore
     PrevLabel=l.Translate("Previous page")
     NextLabel=l.Translate("Next page")

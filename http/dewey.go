@@ -93,11 +93,14 @@ func (s *Server) viewDeweyPartsOf(w http.ResponseWriter, r *http.Request) {
 		limit = 10 // default size
 	}
 
-	id := chi.URLParam(r, "id")
-	from := r.URL.Query().Get("from")
-	to := r.URL.Query().Get("to")
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil || offset < 0 {
+		offset = 0
+	}
 
-	partsOf, hasMore, err := sql.GetDeweyPartsOf(conn, id, from, to, limit)
+	id := chi.URLParam(r, "id")
+
+	partsOf, hasMore, err := sql.GetDeweyPartsOf(conn, id, limit, offset)
 	if err != nil {
 		ServerError(w, err)
 		return
@@ -105,8 +108,7 @@ func (s *Server) viewDeweyPartsOf(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := html.ViewDeweyPartsOf{
 		ID:      id,
-		From:    from,
-		To:      to,
+		Offset:  offset,
 		HasMore: hasMore,
 		PartsOf: partsOf,
 	}
@@ -126,17 +128,19 @@ func (s *Server) viewDeweyPublications(w http.ResponseWriter, r *http.Request) {
 		limit = 10 // default size
 	}
 
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil || offset < 0 {
+		offset = 0
+	}
+
 	id := chi.URLParam(r, "id")
 
 	params := sql.DeweyPublicationsParams{
 		InclSub: r.URL.Query().Get("include_subdewey") != "",
-		From:    r.URL.Query().Get("from"),
-		FromID:  r.URL.Query().Get("from_id"),
-		To:      r.URL.Query().Get("to"),
-		ToID:    r.URL.Query().Get("to_id"),
 		SortBy:  r.URL.Query().Get("sort_by"),
 		SortDir: r.URL.Query().Get("sort_dir"),
 		Limit:   limit,
+		Offset:  offset,
 	}
 
 	publications, hasMore, err := sql.GetDeweyPublications(conn, id, params)

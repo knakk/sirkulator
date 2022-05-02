@@ -19,55 +19,6 @@ type ViewDeweyPublications struct {
     Publications [][4]string
 }
 
-func getLastSortBy(rows [][4]string, sortBy string) string {
-    if len(rows) == 0 {
-        return ""
-    }
-
-    var n int
-    switch sortBy {
-        case "label":
-            n = 1
-        case "year":
-            n = 2
-        case "dewey":
-            n = 3
-        default:
-            // n = 0
-    }
-
-    if len(rows[len(rows)-1]) < n {
-        return ""
-    }
-
-    return rows[len(rows)-1][n]
-}
-
-// [4]string{id, label, year, dewey}
-func getFirstSortBy(rows [][4]string, sortBy string) string {
-    if len(rows) == 0 {
-        return ""
-    }
-
-    var n int
-    switch sortBy {
-        case "label":
-            n = 1
-        case "year":
-            n = 2
-        case "dewey":
-            n = 3
-        default:
-            // n = 0
-    }
-
-    if len(rows[0]) < n {
-        return ""
-    }
-
-    return rows[0][n]
-}
-
 func sortDirFor(v, currentSortBy, currentDir string) string {
     if v == currentSortBy {
         if currentDir == "desc" {
@@ -93,16 +44,9 @@ func (tmpl *ViewDeweyPublications) Render(ctx context.Context, w io.Writer) {
     ID="dewey-publications"
     Class="dewey-publications"
     Limit=10
+    Offset=params.Offset
     SortBy=params.SortBy
     SortDir=params.SortDir
-    Last=getLastSortBy(tmpl.Publications, params.SortBy)
-    LastID=getLastSortBy(tmpl.Publications, "id")
-    First=getFirstSortBy(tmpl.Publications, params.SortBy)
-    FirstID=getFirstSortBy(tmpl.Publications, "id")
-    From=params.From
-    FromID=params.FromID
-    To=params.To
-    ToID=params.ToID
     HasMore=tmpl.HasMore
     PrevLabel=l.Translate("Previous page")
     NextLabel=l.Translate("Next page")

@@ -11,18 +11,11 @@ type TablePaginated struct {
 	Class     string
 	SortBy    string
 	SortDir   string
-	First     string
-	FirstID   string
-	Last      string
-	LastID    string
-	From      string
-	FromID    string
-	To        string
-	ToID      string
 	Target    string
 	PrevLabel string
 	NextLabel string
 	HasMore   bool
+	Offset    int
 	Limit     int
 	Yield     func()
 }
@@ -48,13 +41,13 @@ func (t *TablePaginated) Render(ctx context.Context, w io.Writer) {
 
 	io.WriteString(w, `<tfoot class="pagination"><tr><td`)
 
-	if t.From != "" || t.To != "" && t.HasMore {
+	if t.Offset > 0 {
 		// We're not on first page
 		writeAttr(w, "class", "clickable")
 		io.WriteString(w, `><a hx-swap="outerHTML" hx-target="#`)
 		io.WriteString(w, t.ID)
 		io.WriteString(w, `"`)
-		writeAttr(w, "hx-get", fmt.Sprintf("%slimit=%d&to=%s&to_id=%s&sort_by=%s&sort_dir=%s", t.Target, t.Limit, t.First, t.FirstID, t.SortBy, t.SortDir))
+		writeAttr(w, "hx-get", fmt.Sprintf("%slimit=%d&offset=%d&sort_by=%s&sort_dir=%s", t.Target, t.Limit, t.Offset-t.Limit, t.SortBy, t.SortDir))
 		io.WriteString(w, ">ᐊ ")
 		io.WriteString(w, t.PrevLabel)
 		io.WriteString(w, "</a>")
@@ -63,12 +56,12 @@ func (t *TablePaginated) Render(ctx context.Context, w io.Writer) {
 	}
 	io.WriteString(w, "</td><td")
 
-	if t.HasMore || t.To != "" {
+	if t.HasMore {
 		writeAttr(w, "class", "clickable")
 		io.WriteString(w, `><a hx-swap="outerHTML" hx-target="#`)
 		io.WriteString(w, t.ID)
 		io.WriteString(w, `"`)
-		writeAttr(w, "hx-get", fmt.Sprintf("%slimit=%d&from=%s&from_id=%s&sort_by=%s&sort_dir=%s", t.Target, t.Limit, t.Last, t.LastID, t.SortBy, t.SortDir))
+		writeAttr(w, "hx-get", fmt.Sprintf("%slimit=%d&offset=%d&sort_by=%s&sort_dir=%s", t.Target, t.Limit, t.Offset+t.Limit, t.SortBy, t.SortDir))
 		io.WriteString(w, ">")
 		io.WriteString(w, t.NextLabel)
 		io.WriteString(w, " ᐅ</a>")
