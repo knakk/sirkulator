@@ -18,6 +18,9 @@ const (
 	BindingBoard     Binding = "board"
 )
 
+// TODO check RDA bindings:
+// https://www.rdaregistry.info/termList/RDATypeOfBinding/
+
 var allBindings = []Binding{
 	BindingUnknown,
 	BindingHardback,
@@ -38,11 +41,11 @@ func ParseBinding(s string) Binding {
 	switch strings.TrimSuffix(s, ".") {
 	case "ib", "innbundet", "hardback":
 		return BindingHardback
-	case "h", "paperback":
+	case "h", "heftet", "paperback":
 		return BindingPaperback
 	case "spiralrygg", "spiral":
 		return BindingSpiral
-	case "board":
+	case "board", "kartonert":
 		return BindingBoard
 	default:
 		return BindingUnknown

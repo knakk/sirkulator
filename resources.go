@@ -18,7 +18,7 @@ import (
 )
 
 type Persistable interface {
-	Validate(url.Values) (any, bool)
+	Validate(url.Values) (Persistable, bool)
 	Label() string
 }
 
@@ -420,17 +420,17 @@ func (c Corporation) Label() string {
 }
 
 // Character is a fictional or mythical person/character.
-// Examples: Ulysses, Donald Duck, Harry Hole
+// Examples: Ulysses, Apollon, Zevs, Donald Duck, Harry Hole
 type Character struct {
 	Name           string   `json:"name"`
 	NameVariations []string `json:"name_variations"`
 }
 
 type Dewey struct {
-	Number string   `json:"number"`  // same as resource.ID
-	Name   string   `json:"name"`    // Only norwegian label for now
-	Terms  []string `json:"terms"`   // Henvisningstermer
-	IsHelp bool     `json:"is_help"` // Nummer fra hjelpetabell (Add table) TODO correct term?
+	Number string   `json:"number"` // same as resource.ID
+	Name   string   `json:"name"`   // Only norwegian label for now
+	Terms  []string `json:"terms"`  // Henvisningstermer
+	//IsHelp bool     `json:"is_help"` // Nummer fra hjelpetabell (Add table) TODO correct term?
 }
 
 func (d Dewey) Label() string {

@@ -382,7 +382,7 @@ func (ig *Ingestor) remoteRecord(ctx context.Context, idtype, id string) (Ingest
 // the given data is assumed to be valid at this point, as not to
 // trigger any SQL constraint errors when inserting into DB.
 //
-// CreatedAt/UpdatdAt timestamps on resources will be set here.
+// CreatedAt/UpdatedAt timestamps on resources will be set here.
 func persistIngestion(conn *sqlite.Conn, data Ingestion) (err error) {
 	defer sqlitex.Save(conn)(&err)
 

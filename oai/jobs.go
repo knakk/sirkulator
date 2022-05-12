@@ -80,7 +80,7 @@ func (h *HarvestPublishersJob) Name() string {
 	return "oai_harvest_isbnforlag"
 }
 
-func gzipPublsher(p Publisher) ([]byte, error) {
+func gzipPublisher(p Publisher) ([]byte, error) {
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
 
@@ -89,7 +89,7 @@ func gzipPublsher(p Publisher) ([]byte, error) {
 	}
 
 	if err := gz.Close(); err != nil {
-		return nil, fmt.Errorf("gzipPublsher: %w", err)
+		return nil, fmt.Errorf("gzipPublisher: %w", err)
 	}
 
 	return b.Bytes(), nil
@@ -124,7 +124,7 @@ func (h *HarvestPublishersJob) persist(ctx context.Context, batch []Publisher) (
 	const datelayout = "2006-01-02"
 	var links [][2]string // [2]{record_id, id}
 	for _, p := range batch {
-		data, err := gzipPublsher(p)
+		data, err := gzipPublisher(p)
 		if err != nil {
 			return err
 		}
