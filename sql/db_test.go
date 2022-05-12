@@ -18,14 +18,11 @@ func TestOpenAllMem(t *testing.T) {
 	}()
 
 	t.Run("foreign keys enforced", func(t *testing.T) {
-		t.Skip("Cannot get PRAGMA foreign_keys to work")
 		conn := db.Get(nil)
 		defer db.Put(conn)
 		stmt, err := conn.Prepare(`
 			INSERT INTO relation (from_id, to_id, type)
-				VALUES('abc', 'xyz', 'test')
-			RETURNING *
-		`)
+				VALUES('abc', 'xyz', 'test');`)
 		if err != nil {
 			t.Error(err)
 		} else if _, err := stmt.Step(); err == nil {

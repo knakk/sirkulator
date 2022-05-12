@@ -24,9 +24,11 @@ const (
 		sqlite.SQLITE_OPEN_NOMUTEX |
 		sqlite.SQLITE_OPEN_SHAREDCACHE
 
-	// TODO this init script does not seem to be working
+	// TODO the plan was to set PRAGMA foreing_keys=ON in initScript,
+	// but this is currently not possible, see:
 	// https://github.com/crawshaw/sqlite/issues/131
-	initScript = `PRAGMA foreign_keys = ON;`
+	// Instead for now enforcing this as a build constraint in crawshaw.io/sqlite fork
+	initScript = ``
 )
 
 //go:embed assets
@@ -82,11 +84,6 @@ func attachTo(pool *sqlitex.Pool, dir string, poolSize int, dbs ...database) err
 			if dir == "" { // memory-db
 				file = fmt.Sprintf(memPoolURI, db)
 			}
-
-			// TODO "PRAGMA foregin_keys=ON;" does not work, neither here or using OpenInit
-			//if err := sqlitex.ExecTransient(conn, "PRAGMA foregin_keys=ON;", nil); err != nil {
-			//	return fmt.Errorf("attachTo %v: %w", db, err)
-			//}
 
 			stmt, _, err := conn.PrepareTransient("ATTACH DATABASE $file AS $db;")
 			if err != nil {

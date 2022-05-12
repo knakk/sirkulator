@@ -257,13 +257,14 @@ func TestIngestISBN(t *testing.T) {
 
 	q := fmt.Sprintf(`
 			INSERT INTO oai.source (id, url, dataset, prefix)
-				VALUES ('bibsys/pub','dummy','dummy','dummy');
+				VALUES ('bibsys/aut','dummy','dummy','dummy'),
+				       ('bibsys/pub','dummy','dummy','dummy');
 			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
 				VALUES ('bibsys/pub', '999608854204702201', x'%x', 0, 0);
-			INSERT INTO oai.link (source_id, record_id, type, id)
-				VALUES ('bibsys/pub', '999608854204702201', 'isbn', '8202018560');
 			INSERT INTO resource (id, type, label, data, created_at, updated_at)
 				VALUES ('p0','person', 'Per Arvid Åsen (1949-)', x'%x', 0, 0);
+			INSERT INTO oai.link (source_id, record_id, type, id)
+				VALUES ('bibsys/pub', '999608854204702201', 'isbn', '8202018560');
 			INSERT INTO link (resource_id, type, id)
 				VALUES ('p0', 'bibsys/aut', '90294124');
 		`, oairecord, b)
@@ -480,7 +481,8 @@ func TestIngestPersonFromLocalOAI(t *testing.T) {
 
 	q := fmt.Sprintf(`
 			INSERT INTO oai.source (id, url, dataset, prefix)
-				VALUES ('bibsys/aut','dummy','dummy','dummy');
+				VALUES ('bibsys/aut','dummy','dummy','dummy'),
+				       ('bibsys/pub','dummy','dummy','dummy');
 			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
 				VALUES ('bibsys/aut', '90294124', x'%x', 0, 0);
 			INSERT INTO oai.record (source_id, id, data, created_at, updated_at)
