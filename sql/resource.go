@@ -536,7 +536,8 @@ func GetPublicationRelations(conn *sqlite.Conn, id string) ([]sirkulator.Relatio
         rel.to_id,
         rel.data,
         res.type AS res_type,
-        IFNULL(json_extract(rel.data, '$.label'), res.label) AS res_label
+        res.label AS res_label,
+		json_extract(rel.data, '$.label') AS rel_label
     FROM
         relation rel
         LEFT JOIN resource res ON (rel.to_id=res.id)
@@ -545,6 +546,7 @@ func GetPublicationRelations(conn *sqlite.Conn, id string) ([]sirkulator.Relatio
 
 	fn := func(stmt *sqlite.Stmt) error {
 		r := sirkulator.RelationExp{
+			Label: stmt.ColumnText(6),
 			Relation: sirkulator.Relation{
 				ID:   stmt.ColumnInt64(0),
 				Type: stmt.ColumnText(1),
@@ -582,7 +584,8 @@ func GetRelationsAsObject(conn *sqlite.Conn, id string) ([]sirkulator.RelationEx
         rel.from_id,
         rel.data,
         res.type AS res_type,
-        IFNULL(json_extract(rel.data, '$.label'), res.label) AS res_label
+        res.label AS res_label,
+		json_extract(rel.data, '$.label') AS rel_label
     FROM
         relation rel
         LEFT JOIN resource res ON (rel.from_id=res.id)
@@ -592,6 +595,7 @@ func GetRelationsAsObject(conn *sqlite.Conn, id string) ([]sirkulator.RelationEx
 
 	fn := func(stmt *sqlite.Stmt) error {
 		r := sirkulator.RelationExp{
+			Label: stmt.ColumnText(6),
 			Relation: sirkulator.Relation{
 				ID:     stmt.ColumnInt64(0),
 				Type:   stmt.ColumnText(1),

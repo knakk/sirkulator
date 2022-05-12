@@ -29,7 +29,11 @@ func (tmpl *ViewPublicationRelations) Render(ctx context.Context, w io.Writer) {
                 </td>
                 <% if r.To.ID != "" { %>
                     <td>
-                        <a href="<%= resourceLink(r.To) %>"><%= r.To.Label %></a>
+                        <% if r.Label != "" && r.Label != r.To.Label { %>
+                            <%= r.Label %> (<a href="<%= resourceLink(r.To) %>"><%= r.To.Label %></a>)
+                        <% } else { %>
+                            <a href="<%= resourceLink(r.To) %>"><%= r.To.Label %></a>
+                        <% } %>
                     </td>
                     <td></td>
                 <% } else { %>

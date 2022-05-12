@@ -451,8 +451,9 @@ type Relation struct {
 
 type RelationExp struct {
 	Relation
-	From SimpleResource
-	To   SimpleResource
+	Label string
+	From  SimpleResource
+	To    SimpleResource
 }
 
 type ResourceText struct {
